@@ -1,0 +1,29 @@
+{
+  "name": "ep_full_hyperlinks",
+  "version": "1.0.0",
+  "description": "etherpad plugin ep_full_hyperlink hyperlink",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samirsayyad/ep_full_hyperlinks.git"
+  },
+  "keywords": [
+    "etherpad",
+    "plugin",
+    "ep_full_hyperlink",
+    "hyperlink"
+  ],
+  "author": "Samir Sayyad",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/samirsayyad/ep_full_hyperlinks/issues"
+  },
+  "dependencies": {
+    "formidable": "*",
+    "socket.io-client": "*"
+  },
+  "homepage": "https://github.com/samirsayyad/ep_full_hyperlinks#readme"
+}

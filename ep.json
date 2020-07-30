@@ -1,0 +1,34 @@
+{
+    "parts": [
+      {
+        "name":"links_page",
+        "pre": ["ep_etherpad-lite/webaccess", "ep_page_view/page_view"],
+        "post": ["ep_etherpad-lite/static"],
+        "client_hooks": {
+          "postAceInit": "ep_full_hyperlinks/static/js/index",
+          "collectContentPre": "ep_full_hyperlinks/static/js/shared",
+          "aceAttribsToClasses": "ep_full_hyperlinks/static/js/index",
+          "aceEditorCSS": "ep_full_hyperlinks/static/js/index",
+          "aceEditEvent": "ep_full_hyperlinks/static/js/index",
+          "aceInitialized": "ep_full_hyperlinks/static/js/index"
+        },
+        "hooks": {
+          "padRemove": "ep_full_hyperlinks/index",
+          "padCopy": "ep_full_hyperlinks/index",
+          "socketio": "ep_full_hyperlinks/index",
+          "expressCreateServer": "ep_full_hyperlinks/index",
+          "collectContentPre": "ep_full_hyperlinks/static/js/shared",
+          "eejsBlock_editbarMenuLeft": "ep_full_hyperlinks/index",
+          "eejsBlock_dd_insert": "ep_full_hyperlinks/index",
+          "eejsBlock_scripts": "ep_full_hyperlinks/index",
+          "eejsBlock_mySettings": "ep_full_hyperlinks/index",
+          "eejsBlock_styles": "ep_full_hyperlinks/index",
+          "clientVars": "ep_full_hyperlinks/index",
+          "exportHtmlAdditionalTagsWithData": "ep_full_hyperlinks/exportHTML",
+          "getLineHTMLForExport": "ep_full_hyperlinks/exportHTML",
+          "handleMessageSecurity": "ep_full_hyperlinks/index"
+        }
+      }
+    ]
+  }
+  

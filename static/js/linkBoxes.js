@@ -1,0 +1,130 @@
+// Easier access to outter pad
+var padOuter;
+var getPadOuter = function() {
+  padOuter = padOuter || $('iframe[name="ace_outer"]').contents();
+  return padOuter;
+}
+
+var getLinksContainer = function() {
+  return getPadOuter().find("#links");
+}
+
+/* ***** Public methods: ***** */
+
+var showLink = function(linkId, e) {
+  var linkElm = getLinksContainer().find('#'+ linkId);
+  linkElm.show();
+
+  highlightLink(linkId, e);
+};
+
+var hideLink = function(linkId, hideLinkTitle) {
+  var linkElm = getLinksContainer().find('#'+ linkId);
+  linkElm.removeClass('full-display');
+
+  // hide even the link title
+  if (hideLinkTitle) linkElm.hide();
+
+  var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
+  inner.contents().find("head .link-style").remove();
+
+  getPadOuter().find('.link-modal').removeClass('popup-show');
+};
+
+var hideAllLinks = function() {
+  getLinksContainer().find('.sidebar-link').removeClass('full-display');
+  getPadOuter().find('.link-modal').removeClass('popup-show');
+}
+
+var highlightLink = function(linkId, e, editorLink){
+  var container       = getLinksContainer();
+  var linkElm      = container.find('#'+ linkId);
+  var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
+
+  if (container.is(":visible")) {
+    // hide all other links
+    container.find('.sidebar-link').each(function() {
+      inner.contents().find("head .link-style").remove();
+      $(this).removeClass('full-display')
+    });
+
+    // Then highlight new link
+    linkElm.addClass('full-display');
+    // now if we apply a class such as mouseover to the editor it will go shitty
+    // so what we need to do is add CSS for the specific ID to the document...
+    // It's fucked up but that's how we do it..
+    var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
+    inner.contents().find("head").append("<style class='link-style'>."+linkId+"{ color: #a7680c !important }</style>");
+  } else {
+    // make a full copy of the html, including listeners
+    var linkElmCloned = linkElm.clone(true, true);
+
+    // before of appending clear the css (like top positionning)
+    linkElmCloned.attr('style', '');
+    // fix checkbox, because as we are duplicating the sidebar-link, we lose unique input names
+    linkElmCloned.find('.label-suggestion-checkbox').click(function() {
+      $(this).siblings('input[type="checkbox"]').click();
+    })
+
+    // hovering link view
+    getPadOuter().find('.link-modal-link').html('').append(linkElmCloned);
+    var padInner = getPadOuter().find('iframe[name="ace_inner"]')
+    // get modal position
+    var containerWidth = getPadOuter().find('#outerdocbody').outerWidth(true);
+    var modalWitdh = getPadOuter().find('.link-modal').outerWidth(true);
+    var targetLeft = e.clientX;
+    var targetTop = $(e.target).offset().top;
+    if (editorLink) {
+      targetLeft += padInner.offset().left;
+      targetTop += parseInt(padInner.css('padding-top').split('px')[0])
+      targetTop += parseInt(padOuter.find('#outerdocbody').css('padding-top').split('px')[0])
+    } else {
+      // mean we are clicking from a link Icon
+      var targetLeft = $(e.target).offset().left - 20;
+    }
+
+    // if positioning modal on target left will make part of the modal to be
+    // out of screen, we place it closer to the middle of the screen
+    if (targetLeft + modalWitdh > containerWidth) {
+      targetLeft = containerWidth - modalWitdh - 25;
+    }
+    var editorLinkHeight = editorLink ? editorLink.outerHeight(true) : 30;
+    getPadOuter().find('.link-modal').addClass('popup-show').css({
+      left: targetLeft + "px",
+      top: targetTop + editorLinkHeight +"px"
+    });
+  }
+}
+
+// Adjust position of the link detail on the container, to be on the same
+// height of the pad text associated to the link, and return the affected element
+var adjustTopOf = function(linkId, baseTop) {
+  var linkElement = getPadOuter().find('#'+linkId);
+  linkElement.css("top", baseTop+"px");
+
+  return linkElement;
+}
+
+// Indicates if link is on the expected position (baseTop-5)
+var isOnTop = function(linkId, baseTop) {
+  var linkElement = getPadOuter().find('#'+linkId);
+  var expectedTop = baseTop + "px";
+  return linkElement.css("top") === expectedTop;
+}
+
+// Indicates if event was on one of the elements that does not close link
+var shouldNotCloseLink = function(e) {
+  // a link box
+  if ($(e.target).closest('.sidebar-link').length || $(e.target).closest('.link-modal').length) { // the link modal
+    return true;
+  }
+  return false;
+}
+
+exports.showLink = showLink;
+exports.hideLink = hideLink;
+exports.hideAllLinks = hideAllLinks;
+exports.highlightLink = highlightLink;
+exports.adjustTopOf = adjustTopOf;
+exports.isOnTop = isOnTop;
+exports.shouldNotCloseLink = shouldNotCloseLink;
