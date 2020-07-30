@@ -1201,7 +1201,7 @@ var hooks = {
     if (!$('#editorcontainerbox').hasClass('flex-layout')) {
       $.gritter.add({
         title: "Error",
-        text: "Ep_links_page: Please upgrade to etherpad 1.8.3 for this plugin to work correctly",
+        text: "ep_full_hyperlinks: Please upgrade to etherpad 1.8.3 for this plugin to work correctly",
         sticky: true,
         class_name: "error"
       })

@@ -173,34 +173,34 @@ exports.socketio = function (hook_name, args, cb){
 };
 
 exports.eejsBlock_dd_insert = function (hook_name, args, cb) {
-  args.content = args.content + eejs.require("ep_links_page/templates/menuButtons.ejs");
+  args.content = args.content + eejs.require("ep_full_hyperlinks/templates/menuButtons.ejs");
   return cb();
 };
 
 exports.eejsBlock_mySettings = function (hook_name, args, cb) {
-  args.content = args.content + eejs.require("ep_links_page/templates/settings.ejs");
+  args.content = args.content + eejs.require("ep_full_hyperlinks/templates/settings.ejs");
   return cb();
 };
 
 exports.eejsBlock_editbarMenuLeft = function (hook_name, args, cb) {
-  args.content = args.content + eejs.require("ep_links_page/templates/linkBarButtons.ejs");
+  args.content = args.content + eejs.require("ep_full_hyperlinks/templates/linkBarButtons.ejs");
   return cb();
 };
 
 exports.eejsBlock_scripts = function (hook_name, args, cb) {
-  args.content = args.content + eejs.require("ep_links_page/templates/links.html", {}, module);
-  args.content = args.content + eejs.require("ep_links_page/templates/linkIcons.html", {}, module);
+  args.content = args.content + eejs.require("ep_full_hyperlinks/templates/links.html", {}, module);
+  args.content = args.content + eejs.require("ep_full_hyperlinks/templates/linkIcons.html", {}, module);
   return cb();
 };
 
 exports.eejsBlock_styles = function (hook_name, args, cb) {
-  args.content = args.content + eejs.require("ep_links_page/templates/styles.html", {}, module);
+  args.content = args.content + eejs.require("ep_full_hyperlinks/templates/styles.html", {}, module);
   return cb();
 };
 
 exports.clientVars = function (hook, context, cb) {
-  var displayLinkAsIcon = settings.ep_links_page ? settings.ep_links_page.displayLinkAsIcon : false;
-  var highlightSelectedText = settings.ep_links_page ? settings.ep_links_page.highlightSelectedText : false;
+  var displayLinkAsIcon = settings.ep_full_hyperlinks ? settings.ep_full_hyperlinks.displayLinkAsIcon : false;
+  var highlightSelectedText = settings.ep_full_hyperlinks ? settings.ep_full_hyperlinks.highlightSelectedText : false;
   return cb({
     "displayLinkAsIcon": displayLinkAsIcon,
     "highlightSelectedText": highlightSelectedText,
