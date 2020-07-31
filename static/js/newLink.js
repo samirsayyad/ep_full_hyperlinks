@@ -3,12 +3,15 @@ var linkL10n = require('ep_full_hyperlinks/static/js/linkL10n');
 
 // Create a link object with data filled on the given form
 var buildLinkFrom = function(form) {
-  var text       = form.find('.link-content').val();
+  var text       = form.find('#hyperlink-text').val();
+  var hyperlink       = form.find('#hyperlink-url').val();
   var changeFrom = form.find('.from-value').text();
   var changeTo   = form.find('.to-value').val() || null;
   var link    = {};
 
   link.text = text;
+  link.hyperlink = hyperlink;
+
   if(changeTo){
     link.changeFrom = changeFrom;
     link.changeTo = changeTo;
@@ -27,6 +30,8 @@ var submitNewLink = function(callback) {
   var index = 0;
   var form = $('#newLink');
   var link = buildLinkFrom(form);
+  //@todo samir add url validation
+  console.log(link,"chios")
   if (link.text.length > 0 || link.changeTo && link.changeTo.length > 0) {
     form.find('.link-content, .to-value').removeClass('error');
     hideNewLinkPopup();

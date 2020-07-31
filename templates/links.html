@@ -18,23 +18,13 @@
         {{if reply}}
             <input type="text" class='link-content' data-l10n-id="ep_full_hyperlinks.links_template.reply.placeholder">
         {{else}}
-            <textarea class="link-content" autofocus></textarea>
+        <input type="text" class="link-content" id="hyperlink-text" placeholder=""/>
+        <input type="text" class="link-content"  id="hyperlink-url"  placeholder="http://..."/>
         {{/if}}
 
         <div class="form-more">
-            <p class="link-suggest">
-                <input type="checkbox" id="suggestion-checkbox-${linkId}" name="suggestion-checkbox-${linkId}" class="suggestion-checkbox">
-                <label for="suggestion-checkbox-${linkId}" class="label-suggestion-checkbox" data-l10n-id="ep_full_hyperlinks.links_template.include_suggestion">Include suggested change</label>
-            </p>
-            <div class="suggestion suggestion-create">
-                <span class="from-label" data-l10n-id="ep_full_hyperlinks.links_template.suggest_change_from">Suggest Change From</span>
-                <span class="from-value">${changeFrom}</span>
-                <span class="to-label" data-l10n-id="ep_full_hyperlinks.links_template.to">To</span>
-                <textarea class="to-value"></textarea>
-            </div>
-
             <div class="link-buttons">
-                <input type="submit" id="link-create-btn" class="btn btn-primary" value="Link" data-l10n-id="ep_full_hyperlinks.links_template.{{if reply}}reply{{else}}link{{/if}}.value" />
+                <input type="submit" id="link-create-btn" class="btn btn-primary" value="Link" data-l10n-id="ep_full_hyperlinks.links_template.{{if link}}link{{else}}link{{/if}}.value" />
                 <input type="reset" id="link-reset" class="btn btn-default btn-cancel-reply" value="Cancel" data-l10n-id="ep_full_hyperlinks.links_template.cancel.value" />
             </div>
         </div>
@@ -48,14 +38,14 @@
 
         <div class="compact-display-content">
             <span class="link-author-name">${name}</span>
-            {{tmpl "#link-text"}}
+            {{tmpl "#link-text"}} 
         </div>
 
         <div class="full-display-content">
             <div class="link-title-wrapper">
                 <span class="link-author-name">${name}</span>
                 <span class="link-created-at" datetime="${formattedDate}">${date}</span>
-
+                ${hyperlink}
                 <span class="link-actions-wrapper">
                     {{if text.length > 0}}
                         <span class="link-edit buttonicon buttonicon-pencil" data-l10n-id="ep_full_hyperlinks.edit_link.title"></span>

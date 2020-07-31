@@ -267,26 +267,26 @@ ep_links.prototype.init = function(){
   });
 
   // When a reply get submitted
-  this.container.parent().on("submit", ".new-link", function(e){
-    e.preventDefault();
+  // this.container.parent().on("submit", ".new-link", function(e){
+  //   e.preventDefault();
 
-    var data = self.getLinkData();
-    data.linkId = $(this).closest('.link-container').data('linkid');
-    data.reply = $(this).find(".link-content").val();
-    data.changeTo = $(this).find(".to-value").val() || null;
-    data.changeFrom = $(this).find(".from-value").text() || null;
-    self.socket.emit('addLinkReply', data, function (){
-      self.getLinkReplies(function(replies){
-        self.linkReplies = replies;
-        self.collectLinkReplies();
+  //   var data = self.getLinkData();
+  //   data.linkId = $(this).closest('.link-container').data('linkid');
+  //   data.reply = $(this).find(".link-content").val();
+  //   data.changeTo = $(this).find(".to-value").val() || null;
+  //   data.changeFrom = $(this).find(".from-value").text() || null;
+  //   self.socket.emit('addLinkReply', data, function (){
+  //     self.getLinkReplies(function(replies){
+  //       self.linkReplies = replies;
+  //       self.collectLinkReplies();
 
-        // Once the new reply is displayed, we clear the form
-        $('iframe[name="ace_outer"]').contents().find('.new-link').removeClass('editing');
-      });
-    });
+  //       // Once the new reply is displayed, we clear the form
+  //       $('iframe[name="ace_outer"]').contents().find('.new-link').removeClass('editing');
+  //     });
+  //   });
 
-    $(this).trigger('reset_reply');
-  });
+  //   $(this).trigger('reset_reply');
+  // });
   this.container.parent().on("reset_reply", ".new-link", function(e){
     // Reset the form
     $(this).find('.link-content').val('');
@@ -434,6 +434,8 @@ ep_links.prototype.collectLinks = function(callback){
       if (isAuthorClassName) self.removeLink(isAuthorClassName[1], it);
       return;
     }
+
+    //showing after inserrting link
     var linkId   = classLinkId[1];
     var linkElm  = container.find('#'+ linkId);
 
@@ -599,6 +601,7 @@ ep_links.prototype.insertLink = function(linkId, link, index){
 
   link.linkId = linkId;
   link.reply = true;
+  console.log(link)
   content = $('#linksTemplate').tmpl(link);
 
   linkL10n.localize(content);
@@ -815,11 +818,10 @@ ep_links.prototype.displayNewLinkForm = function() {
     $.gritter.add({text: html10n.translations["ep_full_hyperlinks.add_link.hint"] || "Please first select the text to link"})
     return;
   }
-
   self.createNewLinkFormIfDontExist(rep);
 
   // Write the text to the changeFrom form
-  $('#newLink').find(".from-value").text(selectedText);
+  //$('#newLink').find(".from-value").text(selectedText);
 
   // Display form
   newLink.showNewLinkPopup();
@@ -834,6 +836,9 @@ ep_links.prototype.displayNewLinkForm = function() {
 
   // Adjust focus on the form
   $('#newLink').find('.link-content').focus();
+  // add selected text to form 
+  $('#newLink').find('#hyperlink-text').val(selectedText);
+
 }
 
 ep_links.prototype.scrollViewportIfSelectedTextIsNotVisible = function($firstSelectedElement){
@@ -904,6 +909,7 @@ ep_links.prototype.createNewLinkFormIfDontExist = function(rep) {
       data.link.changeTo = link.changeTo;
     }
     data.link.text = link.text;
+    data.link.hyperlink = link.hyperlink;
 
     self.saveLink(data, rep);
   });

@@ -35,8 +35,13 @@
   
   /* NEW LINK FORM (included both in popup and reply) */
   .new-link .link-content {
+    padding: 9px !important; 
     width: 100%;
   }
+  .new-link .link-buttons{
+    margin-top: 10px;
+  }
+  
   .link-reply .new-link:not(.editing) .form-more {
     display: none;
   }

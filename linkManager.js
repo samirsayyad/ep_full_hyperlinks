@@ -90,6 +90,7 @@ exports.bulkAddLinks = function(padId, data, callback)
         "author": linkData.author || "empty",
         "name": linkData.name,
         "text": linkData.text,
+        "hyperlink": linkData.hyperlink,
         "changeTo": linkData.changeTo,
         "changeFrom": linkData.changeFrom,
         "timestamp": parseInt(linkData.timestamp) || new Date().getTime()
