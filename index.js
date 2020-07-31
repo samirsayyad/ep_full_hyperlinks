@@ -121,6 +121,8 @@ exports.socketio = function (hook_name, args, cb){
       var padId = data.padId;
       var linkId = data.linkId;
       var linkText = data.linkText;
+      var hyperlink = data.hyperlink;
+
       linkManager.changeLinkText(padId, linkId, linkText, function(err) {
         if(!err){
           socket.broadcast.to(padId).emit('textLinkUpdated', linkId, linkText);

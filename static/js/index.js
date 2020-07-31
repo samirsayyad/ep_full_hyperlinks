@@ -147,12 +147,12 @@ ep_links.prototype.init = function(){
     $linkBox.addClass('editing');
 
     var textBox = self.findLinkText($linkBox).last();
-
+    console.log(textBox)
     // if edit form not already there
     if (textBox.siblings('.link-edit-form').length == 0) {
       // add a form to edit the field
       var data = {};
-      data.text = textBox.text();
+      data.hyperlink = textBox.text();
       var content = $("#editLinkTemplate").tmpl(data);
       // localize the link/reply edit form
       linkL10n.localize(content);
@@ -173,6 +173,7 @@ ep_links.prototype.init = function(){
     data.linkId = linkId;
     data.padId = clientVars.padId;
     data.linkText = linkText;
+    data.hyperlink = linkText;
 
     self.socket.emit('updateLinkText', data, function (err){
       if(!err) {
@@ -450,60 +451,74 @@ ep_links.prototype.collectLinks = function(callback){
         linkL10n.localize(linkElm);
       }
     }
-    var prevLinkElm = linkElm.prev();
-    var linkPos;
+    // var prevLinkElm = linkElm.prev();
+    // var linkPos;
 
-    if (prevLinkElm.length == 0) {
-      linkPos = 0;
-    } else {
-      var prevLinkPos = prevLinkElm.css('top');
-      var prevLinkHeight = prevLinkElm.innerHeight();
+    // if (prevLinkElm.length == 0) {
+    //   linkPos = 0;
+    // } else {
+    //   var prevLinkPos = prevLinkElm.css('top');
+    //   var prevLinkHeight = prevLinkElm.innerHeight();
 
-      linkPos = parseInt(prevLinkPos) + prevLinkHeight + 30;
-    }
+    //   linkPos = parseInt(prevLinkPos) + prevLinkHeight + 30;
+    // }
 
-    linkElm.css({ 'top': linkPos });
+    // linkElm.css({ 'top': linkPos });
   });
 
   // HOVER SIDEBAR LINK
   var hideLinkTimer;
-  this.container.on("mouseover", ".sidebar-link", function(e){
-    // highlight link
-    clearTimeout(hideLinkTimer);
-    linkBoxes.highlightLink(e.currentTarget.id, e);
+  // this.container.on("mouseover", ".sidebar-link", function(e){
+  //   // highlight link
+  //   clearTimeout(hideLinkTimer);
+  //   linkBoxes.highlightLink(e.currentTarget.id, e);
 
-  }).on("mouseout", ".sidebar-link", function(e){
-    // do not hide directly the link, because sometime the mouse get out accidently
-    hideLinkTimer = setTimeout(function() {
-      linkBoxes.hideLink(e.currentTarget.id);
-    },1000);
-  });
+  // }).on("mouseout", ".sidebar-link", function(e){
+  //   // do not hide directly the link, because sometime the mouse get out accidently
+  //   hideLinkTimer = setTimeout(function() {
+  //     linkBoxes.hideLink(e.currentTarget.id);
+  //   },1000);
+  // });
 
   // HOVER OR CLICK THE LINKED TEXT IN THE EDITOR
   // hover event
-  this.padInner.contents().on("mouseover", ".link", function(e){
+  this.padInner.contents().on("click", ".link", function(e){
+    var postion = $(this).position()
+    console.log("we are from link ",$(this))
+    //container.css({"right":postion.right})
     if (container.is(':visible')) { // not on mobile
       clearTimeout(hideLinkTimer);
       var linkId = self.linkIdOf(e);
       linkBoxes.highlightLink(linkId, e, $(this));
     }
   });
+  // this.padInner.contents().on("click", "*", function(e){
+  //   console.log("we are from * ",$(this))
+
+  //   if(!$(this).hasClass("link")){
+  //     linkBoxes.hideAllLinks();
+  //   }
+
+      
+ 
+  // });
+  
 
   // click event
-  this.padInner.contents().on("click", ".link", function(e){
-    var linkId = self.linkIdOf(e);
-    linkBoxes.highlightLink(linkId, e, $(this));
-  });
+  // this.padInner.contents().on("click", ".link", function(e){
+  //   var linkId = self.linkIdOf(e);
+  //   linkBoxes.highlightLink(linkId, e, $(this));
+  // });
 
-  this.padInner.contents().on("mouseleave", ".link", function(e){
-    var linkOpenedByClickOnIcon = linkIcons.isLinkOpenedByClickOnIcon();
-    // only closes link if it was not opened by a click on the icon
-    if (!linkOpenedByClickOnIcon && container.is(':visible')) {
-      hideLinkTimer = setTimeout(function() {
-        self.closeOpenedLink(e);
-      }, 1000);
-    }
-  });
+  // this.padInner.contents().on("click", ".link", function(e){
+  //   var linkOpenedByClickOnIcon = linkIcons.isLinkOpenedByClickOnIcon();
+  //   // only closes link if it was not opened by a click on the icon
+  //   if (!linkOpenedByClickOnIcon && container.is(':visible')) {
+  //     hideLinkTimer = setTimeout(function() {
+  //       self.closeOpenedLink(e);
+  //     }, 1000);
+  //   }
+  // });
 
   self.addListenersToCloseOpenedLink();
 

@@ -32,8 +32,18 @@ var hideLink = function(linkId, hideLinkTitle) {
 };
 
 var hideAllLinks = function() {
-  getLinksContainer().find('.sidebar-link').removeClass('full-display');
-  getPadOuter().find('.link-modal').removeClass('popup-show');
+  // getLinksContainer().find('.sidebar-link').removeClass('full-display');
+  // getPadOuter().find('.link-modal').removeClass('popup-show');
+  var container       = getLinksContainer();
+  var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
+
+  container.find('.sidebar-link').each(function() {
+    inner.contents().find("head .link-style").remove();
+    if ($(this).hasClass("hyperlink-display")){
+      $(this).removeClass('hyperlink-display')
+      $(this).css({top:  parseInt($(this).css("top").split('px')[0]) - 40 + "px"  })
+    }
+  });
 }
 
 var highlightLink = function(linkId, e, editorLink){
@@ -41,21 +51,43 @@ var highlightLink = function(linkId, e, editorLink){
   var linkElm      = container.find('#'+ linkId);
   var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
 
+
+
   if (container.is(":visible")) {
     // hide all other links
     container.find('.sidebar-link').each(function() {
       inner.contents().find("head .link-style").remove();
-      $(this).removeClass('full-display')
+      console.log($(this))
+      if ($(this).attr("data-linkid") != linkId){
+        if ($(this).hasClass("hyperlink-display") ){
+          $(this).removeClass('hyperlink-display')
+          $(this).css({top:  parseInt($(this).css("top").split('px')[0]) - 40 + "px"  })
+        }
+      }
+
     });
 
+    if (!linkElm.hasClass("hyperlink-display")){
+      console.log(linkElm.css("top").split('px')[0]  )
+      linkElm.css({"left":parseInt(editorLink.position().left) + parseInt(linkElm.css("width").split('px')[0]/4) + "px"   })
+      linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 40 + "px"  })
+      linkElm.addClass('hyperlink-display');
+  
+    
+    }else{
+      linkElm.removeClass('hyperlink-display');
+      linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) - 40 + "px"  })
+  
+    }
     // Then highlight new link
-    linkElm.addClass('full-display');
+
     // now if we apply a class such as mouseover to the editor it will go shitty
     // so what we need to do is add CSS for the specific ID to the document...
     // It's fucked up but that's how we do it..
     var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
     inner.contents().find("head").append("<style class='link-style'>."+linkId+"{ color: #a7680c !important }</style>");
   } else {
+    
     // make a full copy of the html, including listeners
     var linkElmCloned = linkElm.clone(true, true);
 
@@ -89,6 +121,7 @@ var highlightLink = function(linkId, e, editorLink){
       targetLeft = containerWidth - modalWitdh - 25;
     }
     var editorLinkHeight = editorLink ? editorLink.outerHeight(true) : 30;
+    console.log(editorLinkHeight,targetTop + editorLinkHeight)
     getPadOuter().find('.link-modal').addClass('popup-show').css({
       left: targetLeft + "px",
       top: targetTop + editorLinkHeight +"px"

@@ -1,18 +1,26 @@
 /* Text linked inside editor */
 #innerdocbody .ace-line .link {
-    background-color: #fff382;
-    color: #222;
+    background-color: none;
+    
+    text-decoration: underline;
+    color: #1155cc !important;
+    cursor: pointer;
+
   }
   #innerdocbody .ace-line .link[data-open="true"]{
-    color: orange !important;
+    /* color: orange !important;
+         */
+    text-decoration: underline;
+    color: #1155cc !important;
+    cursor: pointer;
   }
   
   
   /* Link right side container */
   #links {
-    width: 250px;
+    /* width: 250px; */
     order: 3;
-    position: relative;
+    /* position: absolute; */
   }
   #links:not(.active) {
     display: none;
@@ -25,7 +33,8 @@
   
   .sidebar-link {
     position: absolute;
-    width: 100%;
+    min-width: 270px;
+    visibility: hidden;
   }
   
   /* WITH ICONS */
@@ -60,11 +69,14 @@
   }
   .link-actions-wrapper {
     float: right;
+    width: 22%;
+    padding: 10px;
   }
   
   /* LINK COMPACTED (Visible on right side) */
   .sidebar-link:not(.full-display) .full-display-content {
-    display: none;
+    display: block;
+    /* min-width: 270px; */
   }
   .compact-display-content {
     text-overflow: ellipsis;
@@ -74,13 +86,19 @@
     background-color: #eeeeed;
   }
   
-  /* LINK FULL (when mouse hover) */
-  .sidebar-link.full-display {
+  /* LINK FULL (when mouse click) */
+  .sidebar-link.full-display  {
     z-index: 2;
+  }
+  .sidebar-link.hyperlink-display{
+    display: block;
+    z-index: 2;
+    visibility: visible;
+
   }
   .sidebar-link.full-display .full-display-content {
     display: block;
-    margin-top: -10px;
+    /* margin-top: -10px; */
   }
   .sidebar-link.full-display .compact-display-content {
     display: none;
@@ -95,11 +113,15 @@
   .full-display-content .link-title-wrapper,
   .full-display-content .link-reply {
     padding: 10px;
+    width: 78%;
+    float: left;
   }
   .full-display-content .link-title-wrapper .link-text {
-    display: block;
-    margin-top: 10px;
+    /* display: block; */
+    /* margin-top: 10px; */
     white-space: normal;
+    font-weight: bold;
+
   }
   .full-display-content .link-title-wrapper .link-text.default-text {
     display: none;

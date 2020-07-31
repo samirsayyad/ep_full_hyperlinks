@@ -294,7 +294,7 @@ exports.changeLinkText = function(padId, linkId, linkText, callback){
       if(ERR(err, callback)) return;
 
       //update the link text
-      links[linkId].text = linkText;
+      links[linkId].hyperlink = linkText;
 
       //save the link updated back
       db.set(prefix + padId, links);
