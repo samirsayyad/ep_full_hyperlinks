@@ -4,7 +4,7 @@
 <script id="newLinkTemplate" type="text/html">
     <div id="newLink" class="popup toolbar-popup new-link-popup">
         <div class="popup-content">
-            <h1 data-l10n-id="ep_full_hyperlinks.link">Link</h1>
+            <h1 data-l10n-id="ep_full_hyperlinks.link.modal">Link Create Modal</h1>
 
             {{tmpl "#new-link-form"}}
         </div>
@@ -15,12 +15,10 @@
 <script id="new-link-form" type="text/html">
     <form class="new-link">
 
-        {{if reply}}
-            <input type="text" class='link-content' data-l10n-id="ep_full_hyperlinks.links_template.reply.placeholder">
-        {{else}}
+        
         <input type="text" class="link-content" id="hyperlink-text" placeholder=""/>
         <input type="text" class="link-content"  id="hyperlink-url"  placeholder="http://..."/>
-        {{/if}}
+        
 
         <div class="form-more">
             <div class="link-buttons">
@@ -33,14 +31,15 @@
 
 <!-- Display the link on the right side of the page -->
 <script id="linksTemplate" type="text/html">
-    <div id="${linkId}" data-linkid="${linkId}"
+    <div id="${linkId}" data-linkid="${linkId}" data-hyperlink="${hyperlink}"
          class="sidebar-link link-container {{if changeAccepted}}change-accepted{{/if}}" >
+
 
        
 
         <div class="full-display-content">
             <div class="link-title-wrapper">
-                <a href="${hyperlink}" target="_blank" class="link-text">${hyperlink}</a>
+                
             </div>
             <span class="link-actions-wrapper">
                 
@@ -48,6 +47,10 @@
                 <span class="link-delete buttonicon buttonicon-trash" data-l10n-id="ep_full_hyperlinks.delete_link.title"></span>
             </span>
 
+            <div class="link-title-wrapper">
+                <a href="${hyperlink}" target="_blank" class="link-text">${hyperlink}</a>
+            </div>
+   
  
         </div>
     </div>

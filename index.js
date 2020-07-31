@@ -130,6 +130,11 @@ exports.socketio = function (hook_name, args, cb){
         callback(err);
       });
     });
+    // resolve meta of url
+    socket.on('metaResolver', function (data, callback) {
+      var hyperlink = data.hyperlink;
+      callback("khiar")
+    })
 
     socket.on('addLinkReply', function (data, callback) {
       var padId = data.padId;

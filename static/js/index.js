@@ -411,7 +411,7 @@ ep_links.prototype.findContainers = function(){
   this.outerBody = padOuter.find('#outerdocbody');
 };
 
-// Collect Links and link text content to the links div
+// Collect Links and link text content to the links div - of:t
 ep_links.prototype.collectLinks = function(callback){
   var self        = this;
   var container   = this.container;
@@ -489,7 +489,16 @@ ep_links.prototype.collectLinks = function(callback){
     if (container.is(':visible')) { // not on mobile
       clearTimeout(hideLinkTimer);
       var linkId = self.linkIdOf(e);
-      linkBoxes.highlightLink(linkId, e, $(this));
+      var linkElm  = container.find('#'+ linkId);
+
+      // console.log(e)
+      var hyperlink =linkElm.data("hyperlink") ;
+      console.log(hyperlink)
+      self.socket.emit('metaResolver', {padId: self.padId,hyperlink : hyperlink}, function (res){
+        console.log("metaResolver",res);
+      });
+
+      linkBoxes.highlightLink(linkId, e, $(this) , this.socket);
     }
   });
   // this.padInner.contents().on("click", "*", function(e){

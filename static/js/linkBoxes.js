@@ -72,7 +72,7 @@ var highlightLink = function(linkId, e, editorLink){
       linkElm.css({"left":parseInt(editorLink.position().left) + parseInt(linkElm.css("width").split('px')[0]/4) + "px"   })
       linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 40 + "px"  })
       linkElm.addClass('hyperlink-display');
-  
+      //raise for og:title resolving
     
     }else{
       linkElm.removeClass('hyperlink-display');
