@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "formidable": "*",
+    "meta-resolver": "^0.0.3",
     "socket.io-client": "*"
   },
   "homepage": "https://github.com/samirsayyad/ep_full_hyperlinks#readme"

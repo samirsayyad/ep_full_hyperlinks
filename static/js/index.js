@@ -411,7 +411,7 @@ ep_links.prototype.findContainers = function(){
   this.outerBody = padOuter.find('#outerdocbody');
 };
 
-// Collect Links and link text content to the links div - of:t
+
 ep_links.prototype.collectLinks = function(callback){
   var self        = this;
   var container   = this.container;
@@ -441,6 +441,8 @@ ep_links.prototype.collectLinks = function(callback){
     var linkElm  = container.find('#'+ linkId);
 
     var link     = links[linkId];
+
+
     if(link){
       if (link !== null) {
         // If link is not in sidebar insert it
@@ -482,23 +484,13 @@ ep_links.prototype.collectLinks = function(callback){
 
   // HOVER OR CLICK THE LINKED TEXT IN THE EDITOR
   // hover event
+  
   this.padInner.contents().on("click", ".link", function(e){
-    var postion = $(this).position()
-    console.log("we are from link ",$(this))
-    //container.css({"right":postion.right})
+   
     if (container.is(':visible')) { // not on mobile
       clearTimeout(hideLinkTimer);
       var linkId = self.linkIdOf(e);
-      var linkElm  = container.find('#'+ linkId);
-
-      // console.log(e)
-      var hyperlink =linkElm.data("hyperlink") ;
-      console.log(hyperlink)
-      self.socket.emit('metaResolver', {padId: self.padId,hyperlink : hyperlink}, function (res){
-        console.log("metaResolver",res);
-      });
-
-      linkBoxes.highlightLink(linkId, e, $(this) , this.socket);
+      linkBoxes.highlightLink(linkId, e, $(this) , self.socket);
     }
   });
   // this.padInner.contents().on("click", "*", function(e){
@@ -640,6 +632,7 @@ ep_links.prototype.insertLink = function(linkId, link, index){
   } else {
     linkAfterIndex.before(content);
   }
+  
 
   // insert icon
   linkIcons.addIcon(linkId, link);
@@ -1034,6 +1027,7 @@ ep_links.prototype.saveLink = function(data, rep) {
 
     self.setLink(linkId, link);
     self.collectLinks();
+
   });
 }
 

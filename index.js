@@ -6,6 +6,8 @@ var linkManager = require('./linkManager');
 var links = require('./links');
 var apiUtils = require('./apiUtils');
 var _ = require('ep_etherpad-lite/static/js/underscore');
+var meta = require('meta-resolver');
+const { resolve } = require('ep_full_hyperlinks/node_modules/uri-js');
 
 exports.padRemove = function(hook_name, context, callback) {
   linkManager.deleteLinkReplies(context.padID, function() {
@@ -131,9 +133,16 @@ exports.socketio = function (hook_name, args, cb){
       });
     });
     // resolve meta of url
-    socket.on('metaResolver', function (data, callback) {
+    socket.on('metaResolver', async function (data, callback) {
       var hyperlink = data.hyperlink;
-      callback("khiar")
+      let promise =new Promise((resolve,reject)=>{
+        meta.fetch(hyperlink,[],function(err,meta){
+          resolve(meta)
+        })
+      })
+      let result = await promise
+      console.log(result)
+      callback(result)
     })
 
     socket.on('addLinkReply', function (data, callback) {

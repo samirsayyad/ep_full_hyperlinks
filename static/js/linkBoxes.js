@@ -46,7 +46,7 @@ var hideAllLinks = function() {
   });
 }
 
-var highlightLink = function(linkId, e, editorLink){
+var highlightLink = function(linkId, e, editorLink,socket){
   var container       = getLinksContainer();
   var linkElm      = container.find('#'+ linkId);
   var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
@@ -57,7 +57,6 @@ var highlightLink = function(linkId, e, editorLink){
     // hide all other links
     container.find('.sidebar-link').each(function() {
       inner.contents().find("head .link-style").remove();
-      console.log($(this))
       if ($(this).attr("data-linkid") != linkId){
         if ($(this).hasClass("hyperlink-display") ){
           $(this).removeClass('hyperlink-display')
@@ -67,18 +66,44 @@ var highlightLink = function(linkId, e, editorLink){
 
     });
 
+    console.log(linkElm,"we want show this ? ",linkElm.hasClass("hyperlink-display"))
     if (!linkElm.hasClass("hyperlink-display")){
       console.log(linkElm.css("top").split('px')[0]  )
       linkElm.css({"left":parseInt(editorLink.position().left) + parseInt(linkElm.css("width").split('px')[0]/4) + "px"   })
       linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 40 + "px"  })
       linkElm.addClass('hyperlink-display');
       //raise for og:title resolving
-    
-    }else{
-      linkElm.removeClass('hyperlink-display');
-      linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) - 40 + "px"  })
-  
+      var hyperlink =linkElm.data("hyperlink") ;
+      console.log(hyperlink)
+      socket.emit('metaResolver', {padId: self.padId,hyperlink : hyperlink}, function (res){
+        console.log("metaResolver",res);
+        var ep_hyperlink_title      = linkElm.find('#ep_hyperlink_title');
+        ep_hyperlink_title.text(res.title)
+        var ep_hyperlink_img      = linkElm.find('#ep_hyperlink_img');
+        ep_hyperlink_img.attr('src',res.image);
+
+        var card_loading_hyperlink      = linkElm.find('#card_loading_hyperlink');
+        ep_hyperlink_img.on("load",function(){
+          
+          card_loading_hyperlink.fadeOut( "slow", function() {
+            ep_hyperlink_img.fadeIn()
+            ep_hyperlink_title.fadeIn()
+            
+            // Animation complete.
+          });
+        })
+
+        
+      });
+
+
+
     }
+    // else{
+    //   linkElm.removeClass('hyperlink-display');
+    //   linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) - 40 + "px"  })
+  
+    // }
     // Then highlight new link
 
     // now if we apply a class such as mouseover to the editor it will go shitty
