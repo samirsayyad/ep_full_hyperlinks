@@ -20,10 +20,15 @@ var showLink = function(linkId, e) {
 
 var hideLink = function(linkId, hideLinkTitle) {
   var linkElm = getLinksContainer().find('#'+ linkId);
-  linkElm.removeClass('full-display');
+  if (linkElm.hasClass("hyperlink-display") ){
+    console.log(linkElm.css("top"))
+    linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) - 35 + "px"  })
+    linkElm.removeClass('hyperlink-display');
+  }
+
 
   // hide even the link title
-  if (hideLinkTitle) linkElm.hide();
+  //if (hideLinkTitle) linkElm.fadeOut();
 
   var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
   inner.contents().find("head .link-style").remove();
@@ -41,7 +46,7 @@ var hideAllLinks = function() {
     inner.contents().find("head .link-style").remove();
     if ($(this).hasClass("hyperlink-display")){
       $(this).removeClass('hyperlink-display')
-      $(this).css({top:  parseInt($(this).css("top").split('px')[0]) - 40 + "px"  })
+      
     }
   });
 }
@@ -60,17 +65,17 @@ var highlightLink = function(linkId, e, editorLink,socket){
       if ($(this).attr("data-linkid") != linkId){
         if ($(this).hasClass("hyperlink-display") ){
           $(this).removeClass('hyperlink-display')
-          $(this).css({top:  parseInt($(this).css("top").split('px')[0]) - 40 + "px"  })
+          $(this).css({top:  parseInt($(this).css("top").split('px')[0]) - 35 + "px"  })
         }
       }
 
     });
 
-    console.log(linkElm,"we want show this ? ",linkElm.hasClass("hyperlink-display"))
+    console.log(linkElm,"we want show this ? ",linkElm.hasClass("hyperlink-display"),editorLink)
     if (!linkElm.hasClass("hyperlink-display")){
       console.log(linkElm.css("top").split('px')[0]  )
       linkElm.css({"left":parseInt(editorLink.position().left) + parseInt(linkElm.css("width").split('px')[0]/4) + "px"   })
-      linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 40 + "px"  })
+      linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 35 + "px"  })
       linkElm.addClass('hyperlink-display');
       //raise for og:title resolving
       var hyperlink =linkElm.data("hyperlink") ;

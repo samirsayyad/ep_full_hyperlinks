@@ -102,7 +102,7 @@ var getLinkIds = function(html){
   var linkIds = [];
   _.each(allSpans, function(span){
     var cls = $(span).attr('class');
-    var classLinkId = /(?:^| )(c-[A-Za-z0-9]*)/.exec(cls);
+    var classLinkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
     var linkId = (classLinkId) ? classLinkId[1] : false;
     if(linkId){
       linkIds.push(linkId);

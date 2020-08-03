@@ -1,7 +1,7 @@
 var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 
 var collectContentPre = function(hook, context){
-  var link = /(?:^| )(c-[A-Za-z0-9]*)/.exec(context.cls);
+  var link = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(context.cls);
   var fakeLink = /(?:^| )(fakelink-[A-Za-z0-9]*)/.exec(context.cls);
 
   if(link && link[1]){
@@ -23,6 +23,6 @@ exports.collectContentPre = collectContentPre;
 
 
 exports.generateLinkId = function(){
-   var linkId = "c-" + randomString(16);
+   var linkId = "lc-" + randomString(16);
    return linkId;
 }

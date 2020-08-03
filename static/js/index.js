@@ -421,7 +421,7 @@ ep_links.prototype.collectLinks = function(callback){
   padLink.each(function(it){
     var $this           = $(this);
     var cls             = $this.attr('class');
-    var classLinkId  = /(?:^| )(c-[A-Za-z0-9]*)/.exec(cls);
+    var classLinkId  = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
     var linkId       = (classLinkId) ? classLinkId[1] : null;
     if(!linkId){
       // console.log("returning due to no link id, probably due to a deleted link");
@@ -470,17 +470,18 @@ ep_links.prototype.collectLinks = function(callback){
 
   // HOVER SIDEBAR LINK
   var hideLinkTimer;
-  // this.container.on("mouseover", ".sidebar-link", function(e){
-  //   // highlight link
-  //   clearTimeout(hideLinkTimer);
-  //   linkBoxes.highlightLink(e.currentTarget.id, e);
+  this.container.on("mouseover", ".sidebar-link", function(e){
+    // highlight link
+    clearTimeout(hideLinkTimer);
+    //linkBoxes.highlightLink(e.currentTarget.id, e);
 
-  // }).on("mouseout", ".sidebar-link", function(e){
-  //   // do not hide directly the link, because sometime the mouse get out accidently
-  //   hideLinkTimer = setTimeout(function() {
-  //     linkBoxes.hideLink(e.currentTarget.id);
-  //   },1000);
-  // });
+  }).on("mouseout", ".sidebar-link", function(e){
+    // do not hide directly the link, because sometime the mouse get out accidently
+    hideLinkTimer = setTimeout(function() {
+      console.log("I runned for hiding",e.currentTarget.id)
+      linkBoxes.hideLink(e.currentTarget.id);
+    },1000);
+  });
 
   // HOVER OR CLICK THE LINKED TEXT IN THE EDITOR
   // hover event
@@ -495,10 +496,12 @@ ep_links.prototype.collectLinks = function(callback){
   });
   // this.padInner.contents().on("click", "*", function(e){
   //   console.log("we are from * ",$(this))
+  //   var linkId = self.linkIdOf(e);
+  //   console.log("we are from *****",linkId)
 
-  //   if(!$(this).hasClass("link")){
-  //     linkBoxes.hideAllLinks();
-  //   }
+  //   // if(!$(this).hasClass("link")){
+  //   //   linkBoxes.hideAllLinks();
+  //   // }
 
       
  
@@ -591,7 +594,7 @@ ep_links.prototype.collectLinkReplies = function(callback){
 
 ep_links.prototype.linkIdOf = function(e){
   var cls             = e.currentTarget.classList;
-  var classLinkId  = /(?:^| )(c-[A-Za-z0-9]*)/.exec(cls);
+  var classLinkId  = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
 
   return (classLinkId) ? classLinkId[1] : null;
 };
@@ -647,7 +650,7 @@ ep_links.prototype.setYofLinks = function(){
   var linksToBeShown = [];
 
   $.each(inlineLinks, function(){
-    var linkId = /(?:^| )(c-[A-Za-z0-9]*)/.exec(this.className); // classname is the ID of the link
+    var linkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(this.className); // classname is the ID of the link
     if(!linkId || !linkId[1]) return;
     var linkEle = padOuter.find('#'+linkId[1])
 
@@ -685,7 +688,7 @@ ep_links.prototype.getFirstOcurrenceOfLinkIds = function(){
 ep_links.prototype.getUniqueLinksId = function(padInner){
   var inlineLinks = padInner.find(".link");
   var linksId = _.map(inlineLinks, function(inlineLink){
-   var linkId = /(?:^| )(c-[A-Za-z0-9]*)/.exec(inlineLink.className);
+   var linkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(inlineLink.className);
    // avoid when it has a '.link' that it has a fakeLink class 'fakelink-123' yet.
    if(linkId && linkId[1]) return linkId[1];
   });
@@ -703,7 +706,7 @@ ep_links.prototype.allLinksOnCorrectYPosition = function(){
 
   $.each(inlineLinks, function(){
     var y = this.offsetTop;
-    var linkId = /(?:^| )(c-[A-Za-z0-9]*)/.exec(this.className);
+    var linkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(this.className);
     if(linkId && linkId[1]) {
       if (!linkBoxes.isOnTop(linkId[1], y)) { // found one link on the incorrect place
         allLinksAreCorrect = false;
@@ -723,7 +726,7 @@ ep_links.prototype.localizeExistingLinks = function() {
   padLinks.each(function(it) {
     var $this           = $(this);
     var cls             = $this.attr('class');
-    var classLinkId  = /(?:^| )(c-[A-Za-z0-9]*)/.exec(cls);
+    var classLinkId  = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
     var linkId       = (classLinkId) ? classLinkId[1] : null;
 
     if (linkId !== null) {
