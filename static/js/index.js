@@ -480,7 +480,7 @@ ep_links.prototype.collectLinks = function(callback){
     hideLinkTimer = setTimeout(function() {
       console.log("I runned for hiding",e.currentTarget.id)
       linkBoxes.hideLink(e.currentTarget.id);
-    },1000);
+    },5000);
   });
 
   // HOVER OR CLICK THE LINKED TEXT IN THE EDITOR

@@ -50,13 +50,25 @@
                 <span id="ep_hyperlink_title"></span>
             </div>
             <span class="link-actions-wrapper">
-                
-                <span class="link-edit buttonicon buttonicon-pencil" data-l10n-id="ep_full_hyperlinks.edit_link.title"></span>
+
+                <span class="link-edit buttonicon buttonicon-edit" data-l10n-id="ep_full_hyperlinks.edit_link.title"></span>
                 <span class="link-delete buttonicon buttonicon-trash" data-l10n-id="ep_full_hyperlinks.delete_link.title"></span>
+                <span  class="link-close" data-l10n-id="ep_full_hyperlinks.edit_link.close">&times;</span>
+
             </span>
 
             <div class="link-title-wrapper">
-                <a href="${hyperlink}" target="_blank" class="link-text">${hyperlink}</a>
+                <div class="hyperlink-form-lable-section">
+                    <span class="hyperlink-form-lable" >Link</span>
+                    <input type="url" value="${hyperlink}" class="link-text"><br><br>
+
+                </div>
+                <div class="hyperlink-form-lable-section">
+                    <span  class="hyperlink-form-lable">Text</span>
+                    <input type="text" value="${text}" class="link-text"><br><br>
+
+                </div>
+
             </div>
    
  

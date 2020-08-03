@@ -201,8 +201,25 @@
     /* margin-top: 10px; */
     white-space: normal;
     font-weight: bold;
+    width: 100%;
+    height: 38px;
+    padding: 3px;
+    border :1px solid gray
+}
+  
+.link-close{
+  font-size: 18px;
+  cursor: pointer;
+}
 
-  }
+.hyperlink-form-lable-section .hyperlink-form-lable{
+  background-color: #fff;
+  margin-left: 15px;
+  margin-top: -12px;
+  position: absolute;
+  width: 30px;
+  text-align: center;
+}
   .full-display-content .link-title-wrapper .link-text.default-text {
     display: none;
   }
