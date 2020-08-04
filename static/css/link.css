@@ -241,7 +241,9 @@
   height: 38px;
   padding: 5px 15px;
 }
-
+.hyperlink-form-lable-section{
+  width:auto
+}
 .hyperlink-form-lable-section .hyperlink-form-lable{
   background-color: #fff;
   margin-left: 15px;
@@ -288,6 +290,7 @@
   .suggestion-create textarea.to-value {
     width: 100%;
   }
+  .link-container{right :0}
   .link-container .revert-suggestion-btn { display: none; }
   .link-container.change-accepted .revert-suggestion-btn { display: block; }
   .link-container.change-accepted .approve-suggestion-btn { display: none; }

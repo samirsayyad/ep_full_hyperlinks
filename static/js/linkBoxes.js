@@ -92,6 +92,9 @@ var highlightLink = function(linkId, e, editorLink,socket){
       console.log(linkElm,"hyspe")
 
       var hyperlink =linkElm.data("hyperlink") ;
+      if(!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
+        hyperlink = "http://" + hyperlink;
+      }
       console.log(hyperlink,"hype")
 
 

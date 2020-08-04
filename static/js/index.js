@@ -175,7 +175,9 @@ ep_links.prototype.init = function(){
     var linkId = $linkBox.data('linkid');
     var linkText = $linkForm.find('.link-text-text').val();
     var hyperlink = $linkForm.find('.link-text-hyperlink').val();
-
+    if(!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
+      hyperlink = "http://" + hyperlink;
+    }
     var data = {};
     data.linkId = linkId;
     data.padId = clientVars.padId;

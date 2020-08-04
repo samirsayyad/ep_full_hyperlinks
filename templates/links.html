@@ -4,7 +4,6 @@
 <script id="newLinkTemplate" type="text/html">
     <div id="newLink" class="popup toolbar-popup new-link-popup">
         <div class="popup-content">
-            <h1 data-l10n-id="ep_full_hyperlinks.link.modal">Link Create Modal</h1>
 
             {{tmpl "#new-link-form"}}
         </div>
@@ -59,17 +58,21 @@
 
             <div class="link-title-wrapper">
                 <div class="link-edit-form">
-
-                    <div class="hyperlink-form-lable-section">
-                        <span class="hyperlink-form-lable" >Link</span>
-                        <input type="url" value="${hyperlink}" class="link-text-hyperlink"><br><br>
-
-                    </div>
                     <div class="hyperlink-form-lable-section">
                         <span  class="hyperlink-form-lable">Text</span>
-                        <input type="text" value="${text}" class="link-text-text"> 
+                        <input  disabled="disabled" type="text" value="${text}" class="link-text-text">
+                       
+                         <br><br>
 
                     </div>
+                    <div class="hyperlink-form-lable-section">
+                        <span class="hyperlink-form-lable" >Link</span>
+                        <input type="url" value="${hyperlink}" class="link-text-hyperlink">
+
+                    </div>
+                   
+           
+      
 
                     <button class="btn btn-primary acl-write submit_LCM link-edit-submit" data-l10n-id="ep_full_hyperlinks.links_template.accept_change.save">APPLY</button>
 
