@@ -73,6 +73,17 @@ var highlightLink = function(linkId, e, editorLink,socket){
 
     console.log(linkElm,"we want show this ? ",linkElm.hasClass("hyperlink-display"),editorLink)
     if (!linkElm.hasClass("hyperlink-display")){
+      var ep_hyperlink_title      = linkElm.find('#ep_hyperlink_title');
+      var ep_hyperlink_img      = linkElm.find('#ep_hyperlink_img');
+      var card_loading_hyperlink      = linkElm.find('#card_loading_hyperlink');
+
+      ep_hyperlink_img.hide()
+      ep_hyperlink_title.hide()
+      card_loading_hyperlink.show()
+
+
+
+
       console.log(linkElm.css("top").split('px')[0]  )
       linkElm.css({"left":parseInt(editorLink.position().left) + parseInt(linkElm.css("width").split('px')[0]/4) + "px"   })
       linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 35 + "px"  })
@@ -88,11 +99,10 @@ var highlightLink = function(linkId, e, editorLink,socket){
       socket.emit('metaResolver', {padId: self.padId,hyperlink : hyperlink}, function (res){
         console.log("metaResolver",res);
         if(res){
-          var ep_hyperlink_title      = linkElm.find('#ep_hyperlink_title');
+
           ep_hyperlink_title.text(res.title)
           ep_hyperlink_title.attr('href',hyperlink);
   
-          var ep_hyperlink_img      = linkElm.find('#ep_hyperlink_img');
           var image = null ;
   
           if(res.image )
@@ -122,7 +132,6 @@ var highlightLink = function(linkId, e, editorLink,socket){
           }
           console.log(image,"going to be set ")
   
-          var card_loading_hyperlink      = linkElm.find('#card_loading_hyperlink');
           ep_hyperlink_img.on("load",function(){
             
             card_loading_hyperlink.fadeOut( "slow", function() {

@@ -4,7 +4,7 @@
     "ep_full_hyperlinks.link.edit.modal": "Link Edit Modal",
     "ep_full_hyperlinks.links" : "Links",
     "ep_full_hyperlinks.add_link.title" : "Add new link on selection",
-    "ep_full_hyperlinks.add_link.hint" : "Please first select the text to link",
+    "ep_full_hyperlinks.add_link.hint" : "Please first select the text to insert link",
     "ep_full_hyperlinks.delete_link.title" : "Delete this link",
     "ep_full_hyperlinks.edit_link.title" : "Edit this link",
     "ep_full_hyperlinks.show_links" : "Show Links",
