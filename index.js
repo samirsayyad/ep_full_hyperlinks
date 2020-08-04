@@ -7,7 +7,6 @@ var links = require('./links');
 var apiUtils = require('./apiUtils');
 var _ = require('ep_etherpad-lite/static/js/underscore');
 var meta = require('meta-resolver');
-const { resolve } = require('ep_full_hyperlinks/node_modules/uri-js');
 
 exports.padRemove = function(hook_name, context, callback) {
   linkManager.deleteLinkReplies(context.padID, function() {
