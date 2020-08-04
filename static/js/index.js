@@ -187,6 +187,7 @@ ep_links.prototype.init = function(){
         //$linkForm.remove();
         $linkBox.removeClass('editing');
         self.updateLinkBoxText(linkId, linkText,hyperlink);
+        linkBoxes.hideLink(linkId);
 
         // although the link or reply was saved on the data base successfully, it needs
         // to update the link or link reply variable with the new text saved
