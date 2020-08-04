@@ -68,8 +68,9 @@
     margin-left: 5px;
   }
   .link-actions-wrapper {
-    float: left;
+    float: right;
     padding: 10px;
+    padding-top:12px
   }
   #ep_hyperlink_img{
     width: 32px;
@@ -81,6 +82,7 @@
   }
   #ep_hyperlink_title{
     display: none;
+    margin-top: 5px;
   }
   
 
@@ -188,7 +190,7 @@
     overflow: hidden;
     box-shadow: 0 2px 4px #ddd;
     z-index: 99;
-    width: 280px;
+    width: 350px;
   }
   .full-display-content .link-title-wrapper,
   .full-display-content .link-reply {
@@ -201,15 +203,43 @@
     /* margin-top: 10px; */
     white-space: normal;
     font-weight: bold;
-    width: 100%;
+    width: 230px;
     height: 38px;
     padding: 3px;
     border :1px solid gray
 }
+.full-display-content .link-title-wrapper .link-text-hyperlink {
+  /* display: block; */
+  /* margin-top: 10px; */
+  white-space: normal;
+  font-weight: bold;
+  width: 230px;
+  height: 38px;
+  padding: 3px;
+  border :1px solid gray
+}
+.full-display-content .link-title-wrapper .link-text-text {
+  /* display: block; */
+  /* margin-top: 10px; */
+  white-space: normal;
+  font-weight: bold;
+  width: 230px;
+  height: 38px;
+  padding: 3px;
+  border :1px solid gray
+}
+
   
 .link-close{
   font-size: 18px;
   cursor: pointer;
+}
+.submit_LCM{
+  float: right;
+  margin-top: -38px;
+  margin-right: -74px;
+  height: 38px;
+  padding: 5px 15px;
 }
 
 .hyperlink-form-lable-section .hyperlink-form-lable{

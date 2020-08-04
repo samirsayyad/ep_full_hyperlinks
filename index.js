@@ -125,9 +125,15 @@ exports.socketio = function (hook_name, args, cb){
       var linkText = data.linkText;
       var hyperlink = data.hyperlink;
 
-      linkManager.changeLinkText(padId, linkId, linkText, function(err) {
+      // linkManager.changeLinkText(padId, linkId, linkText, function(err) {
+      //   if(!err){
+      //     socket.broadcast.to(padId).emit('textLinkUpdated', linkId, linkText);
+      //   }
+      //   callback(err);
+      // });
+        linkManager.changeLinkData(data, function(err) {
         if(!err){
-          socket.broadcast.to(padId).emit('textLinkUpdated', linkId, linkText);
+          socket.broadcast.to(padId).emit('textLinkUpdated', linkId, linkText,hyperlink);
         }
         callback(err);
       });

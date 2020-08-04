@@ -116,6 +116,11 @@ ep_links.prototype.init = function(){
 
   // Listen for events to delete a link
   // All this does is remove the link attr on the selection
+  this.container.parent().on("click", ".link-close", function(){
+    var linkId = $(this).closest('.link-container')[0].id;
+    linkBoxes.hideLink(linkId);
+
+  })
   this.container.parent().on("click", ".link-delete", function(){
     var linkId = $(this).closest('.link-container')[0].id;
     self.deleteLink(linkId);
@@ -168,22 +173,24 @@ ep_links.prototype.init = function(){
     var $linkBox = $(this).closest('.link-container');
     var $linkForm = $(this).closest('.link-edit-form');
     var linkId = $linkBox.data('linkid');
-    var linkText = $linkForm.find('.link-edit-text').val();
+    var linkText = $linkForm.find('.link-text-text').val();
+    var hyperlink = $linkForm.find('.link-text-hyperlink').val();
+
     var data = {};
     data.linkId = linkId;
     data.padId = clientVars.padId;
     data.linkText = linkText;
-    data.hyperlink = linkText;
-
+    data.hyperlink = hyperlink;
+    console.log("we are going to update",data)
     self.socket.emit('updateLinkText', data, function (err){
       if(!err) {
-        $linkForm.remove();
+        //$linkForm.remove();
         $linkBox.removeClass('editing');
-        self.updateLinkBoxText(linkId, linkText);
+        self.updateLinkBoxText(linkId, linkText,hyperlink);
 
         // although the link or reply was saved on the data base successfully, it needs
         // to update the link or link reply variable with the new text saved
-        self.setLinkOrReplyNewText(linkId, linkText);
+        self.setLinkOrReplyNewText(linkId, linkText,hyperlink);
       }
     });
   });
@@ -364,7 +371,10 @@ ep_links.prototype.findLinkText = function($linkBox) {
   if (isReply)
     return $linkBox.find(".link-text");
   else
-    return $linkBox.find('.compact-display-content .link-text, .full-display-content .link-title-wrapper .link-text');
+    return $linkBox.find('.compact-display-content .link-text-text, .full-display-content .link-title-wrapper .link-text-text');
+}
+ep_links.prototype.findHyperLinkText = function($linkBox) {
+    return $linkBox.find('.compact-display-content .link-text-hyperlink, .full-display-content .link-title-wrapper .link-text-hyperlink');
 }
 // This function is useful to collect new links on the collaborators
 ep_links.prototype.collectLinksAfterSomeIntervalsOfTime = function() {
@@ -769,11 +779,15 @@ ep_links.prototype.setLinkReply = function(linkReply){
 };
 
 // set the text of the link or link reply
-ep_links.prototype.setLinkOrReplyNewText = function(linkOrReplyId, text){
+ep_links.prototype.setLinkOrReplyNewText = function(linkOrReplyId, text,hyperlink){
   if(this.links[linkOrReplyId]){
     this.links[linkOrReplyId].data.text = text;
+    this.links[linkOrReplyId].data.hyperlink = hyperlink;
+
   }else if(this.linkReplies[linkOrReplyId]){
     this.linkReplies[linkOrReplyId].text = text;
+    this.linkReplies[linkOrReplyId].hyperlink = hyperlink;
+
   }
 };
 
@@ -1146,10 +1160,20 @@ ep_links.prototype.linkRepliesListen = function(){
 
 };
 
-ep_links.prototype.updateLinkBoxText = function (linkId, linkText) {
+ep_links.prototype.updateLinkBoxText = function (linkId, linkText,hyperlink) {
   var $link = this.container.parent().find("[data-linkid='" + linkId + "']");
+  $link.data("hyperlink",hyperlink)
+  
   var textBox = this.findLinkText($link);
-  textBox.text(linkText)
+  console.log(textBox,"is textbpx",textBox)
+  //textBox.text(linkText)
+  textBox.val(linkText)
+
+  var linkBox = this.findHyperLinkText($link);
+  console.log(linkBox,"is linkBox",hyperlink)
+  //linkBox.text(hyperlink)
+  linkBox.val(hyperlink)
+
 }
 
 ep_links.prototype.showChangeAsAccepted = function(linkId){
@@ -1182,8 +1206,8 @@ ep_links.prototype.pushLink = function(eventType, callback){
   var socket = this.socket;
   var self = this;
 
-  socket.on('textLinkUpdated', function (linkId, linkText) {
-    self.updateLinkBoxText(linkId, linkText);
+  socket.on('textLinkUpdated', function (linkId, linkText,hyperlink) {
+    self.updateLinkBoxText(linkId, linkText,hyperlink);
   })
 
   socket.on('linkDeleted', function(linkId){

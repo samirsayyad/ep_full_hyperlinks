@@ -47,7 +47,7 @@
                 </div> 
                 
                 <img id="ep_hyperlink_img"/>
-                <span id="ep_hyperlink_title"></span>
+                <a id="ep_hyperlink_title"></a>
             </div>
             <span class="link-actions-wrapper">
 
@@ -58,17 +58,22 @@
             </span>
 
             <div class="link-title-wrapper">
-                <div class="hyperlink-form-lable-section">
-                    <span class="hyperlink-form-lable" >Link</span>
-                    <input type="url" value="${hyperlink}" class="link-text"><br><br>
+                <div class="link-edit-form">
+
+                    <div class="hyperlink-form-lable-section">
+                        <span class="hyperlink-form-lable" >Link</span>
+                        <input type="url" value="${hyperlink}" class="link-text-hyperlink"><br><br>
+
+                    </div>
+                    <div class="hyperlink-form-lable-section">
+                        <span  class="hyperlink-form-lable">Text</span>
+                        <input type="text" value="${text}" class="link-text-text"> 
+
+                    </div>
+
+                    <button class="btn btn-primary acl-write submit_LCM link-edit-submit" data-l10n-id="ep_full_hyperlinks.links_template.accept_change.save">APPLY</button>
 
                 </div>
-                <div class="hyperlink-form-lable-section">
-                    <span  class="hyperlink-form-lable">Text</span>
-                    <input type="text" value="${text}" class="link-text"><br><br>
-
-                </div>
-
             </div>
    
  
@@ -105,7 +110,7 @@
 
 
 <!-- When click Edit on a link, we insert this template just next to the link so we can edit it -->
-<script id="editLinkTemplate" type="text/html">
+<!-- <script id="editLinkTemplate" type="text/html">
   <div class="link-edit-form">
     <textarea class="link-edit-text">${hyperlink}</textarea>
     <p>
@@ -113,4 +118,4 @@
       <button class="btn btn-default link-edit-cancel" data-l10n-id="ep_full_hyperlinks.links_template.edit_link.cancel">Cancel</button>
     </p>
   </div>
-</script>
+</script> -->

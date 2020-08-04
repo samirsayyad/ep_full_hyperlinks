@@ -305,3 +305,44 @@ exports.changeLinkText = function(padId, linkId, linkText, callback){
     callback(true);
   }
 }
+
+
+
+
+
+exports.changeLinkData = function(data, callback){
+  var linkTextIsNotEmpty = data.linkText.length > 0;
+  if(linkTextIsNotEmpty){
+    // Given a link we update the link text
+    // We need to change readOnly PadIds to Normal PadIds
+    var isReadOnly = data.padId.indexOf("r.") === 0;
+    if(isReadOnly){
+      readOnlyManager.getPadId(data.padId, function(err, rwPadId){
+        data.padId = rwPadId;
+      });
+    };
+
+    // If we're dealing with link replies we need to a different query
+    var prefix = "links:";
+    if(data.linkId.substring(0,7) === "c-reply"){
+      prefix = "link-replies:";
+    }
+
+
+    //get the entry
+    db.get(prefix + data.padId, function(err, links){
+      if(ERR(err, callback)) return;
+
+      //update the link text
+      links[data.linkId].hyperlink = data.hyperlink;
+      links[data.linkId].linkText = data.linkText;
+
+      //save the link updated back
+      db.set(prefix + data.padId, links);
+
+      callback(null);
+    });
+  }else{// don't save link text blank
+    callback(true);
+  }
+}

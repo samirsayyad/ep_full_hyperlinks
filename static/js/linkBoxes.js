@@ -78,26 +78,64 @@ var highlightLink = function(linkId, e, editorLink,socket){
       linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 35 + "px"  })
       linkElm.addClass('hyperlink-display');
       //raise for og:title resolving
+      console.log(linkElm,"hyspe")
+
       var hyperlink =linkElm.data("hyperlink") ;
-      console.log(hyperlink)
+      console.log(hyperlink,"hype")
+
+
+      
       socket.emit('metaResolver', {padId: self.padId,hyperlink : hyperlink}, function (res){
         console.log("metaResolver",res);
-        var ep_hyperlink_title      = linkElm.find('#ep_hyperlink_title');
-        ep_hyperlink_title.text(res.title)
-        var ep_hyperlink_img      = linkElm.find('#ep_hyperlink_img');
-        ep_hyperlink_img.attr('src',res.image);
-
-        var card_loading_hyperlink      = linkElm.find('#card_loading_hyperlink');
-        ep_hyperlink_img.on("load",function(){
-          
-          card_loading_hyperlink.fadeOut( "slow", function() {
-            ep_hyperlink_img.fadeIn()
-            ep_hyperlink_title.fadeIn()
+        if(res){
+          var ep_hyperlink_title      = linkElm.find('#ep_hyperlink_title');
+          ep_hyperlink_title.text(res.title)
+          ep_hyperlink_title.attr('href',hyperlink);
+  
+          var ep_hyperlink_img      = linkElm.find('#ep_hyperlink_img');
+          var image = null ;
+  
+          if(res.image )
+            image = res.image 
             
-            // Animation complete.
-          });
-        })
-
+          else 
+            {
+              if (res.images){
+                console.log(res.images)
+                $.each(res.images,function(key,value){
+                  if(isUrlValid(value) && notInTheseUrls(value)){
+                    image = value;
+                    return false;
+                  }
+                });
+              }
+            }
+          if(isUrlValid(image)){
+            ep_hyperlink_img.attr('src',image);
+          }else{
+            if(isUrlValid(res.url+image)){
+              ep_hyperlink_img.attr('src',res.url+image);
+            }else{
+              ep_hyperlink_img.attr('src',res.uri.scheme+"://"+res.uri.host+image);
+  
+            }
+          }
+          console.log(image,"going to be set ")
+  
+          var card_loading_hyperlink      = linkElm.find('#card_loading_hyperlink');
+          ep_hyperlink_img.on("load",function(){
+            
+            card_loading_hyperlink.fadeOut( "slow", function() {
+              ep_hyperlink_img.fadeIn()
+              ep_hyperlink_title.fadeIn()
+              
+              // Animation complete.
+            })
+          }) 
+        }else{
+          console.log("not loaded",res)
+        }
+        
         
       });
 
@@ -173,6 +211,15 @@ var isOnTop = function(linkId, baseTop) {
   var linkElement = getPadOuter().find('#'+linkId);
   var expectedTop = baseTop + "px";
   return linkElement.css("top") === expectedTop;
+}
+
+var isUrlValid = function(url) {
+  return /^(https?|s?ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url);
+}
+var notInTheseUrls  = function(url) {
+  if(url == "https://www.google.com/tia/tia.png")
+    return false ;
+  return true
 }
 
 // Indicates if event was on one of the elements that does not close link
