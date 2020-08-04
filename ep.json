@@ -1,7 +1,7 @@
 {
     "parts": [
       {
-        "name":"links_page",
+        "name":"full_hyperlinks",
         "pre": ["ep_etherpad-lite/webaccess", "ep_page_view/page_view"],
         "post": ["ep_etherpad-lite/static"],
         "client_hooks": {
