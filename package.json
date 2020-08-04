@@ -23,11 +23,8 @@
   },
   "dependencies": {
     "formidable": "*",
-    "html-metadata-parser": "^1.0.3",
-    "meta-resolver": "^0.0.3",
-    "opengraphjs": "^1.1.0",
-    "socket.io-client": "*",
-    "uri-js": "^4.2.2"
+    "meta-resolver": "0.0.3",
+    "socket.io-client": "*"
   },
   "homepage": "https://github.com/samirsayyad/ep_full_hyperlinks#readme"
 }
