@@ -46,6 +46,8 @@
   .new-link .link-content {
     padding: 9px !important; 
     width: 100%;
+    background-color:white;
+    border: 1px solid gray;
   }
   .new-link .link-buttons{
     margin-top: 10px;

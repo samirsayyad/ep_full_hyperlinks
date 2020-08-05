@@ -14,10 +14,22 @@
 <script id="new-link-form" type="text/html">
     <form class="new-link">
 
-        
-        <input type="text" class="link-content" id="hyperlink-text" placeholder=""/>
-        <input type="text" class="link-content"  id="hyperlink-url"  placeholder="http://..."/>
-        
+        <div class="link-edit-form">
+            <div class="hyperlink-form-lable-section">
+                <span  class="hyperlink-form-lable">Text</span>
+                <input  disabled="disabled" type="text"  id="hyperlink-text"  class="link-content">
+               
+                 <br> 
+
+            </div>
+            <div class="hyperlink-form-lable-section">
+                <span class="hyperlink-form-lable" >Link</span>
+                <input type="url" id="hyperlink-url" placeholder="http://..." class="link-content">
+
+            </div>
+       
+
+        </div>
 
         <div class="form-more">
             <div class="link-buttons">
