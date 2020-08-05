@@ -1075,6 +1075,7 @@ ep_links.prototype.buildLink = function(linkId, linkData){
   data.padId = this.padId;
   data.linkId = linkId;
   data.text = linkData.text;
+  data.hyperlink = linkData.hyperlink;
   data.changeTo = linkData.changeTo
   data.changeFrom = linkData.changeFrom;
   data.name = linkData.name;
