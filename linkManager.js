@@ -311,8 +311,8 @@ exports.changeLinkText = function(padId, linkId, linkText, callback){
 
 
 exports.changeLinkData = function(data, callback){
-  var linkTextIsNotEmpty = data.linkText.length > 0;
-  if(linkTextIsNotEmpty){
+  //var linkTextIsNotEmpty = data.linkText.length > 0;
+  if( data.linkText){
     // Given a link we update the link text
     // We need to change readOnly PadIds to Normal PadIds
     var isReadOnly = data.padId.indexOf("r.") === 0;

@@ -148,7 +148,6 @@ exports.socketio = function (hook_name, args, cb){
         })
       })
       let result = await promise
-      console.log(result)
       callback(result)
     })
 

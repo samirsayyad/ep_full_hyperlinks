@@ -33,7 +33,6 @@ var submitNewLink = function(callback) {
   var form = $('#newLink');
   var link = buildLinkFrom(form);
   //@todo samir add url validation
-  console.log(link,"submitNewLink")
   if (link.text.length > 0 || link.changeTo && link.changeTo.length > 0) {
     form.find('.link-content, .to-value').removeClass('error');
     hideNewLinkPopup();

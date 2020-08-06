@@ -29,7 +29,6 @@ exports.addTextOnClipboard = function(e, ace, padInner, removeSelection, links, 
     linksData = buildLinksData(html, links);
     var htmlToCopy = replaceLinkIdsWithFakeIds(linksData, html)
     linksData = JSON.stringify(linksData);
-    console.log(linksData)
     var replyData = getReplyData(replies, linkIds);
     replyData = JSON.stringify(replyData);
     e.originalEvent.clipboardData.setData('text/objectReply', replyData);

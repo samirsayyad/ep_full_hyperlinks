@@ -152,7 +152,6 @@ ep_links.prototype.init = function(){
     $linkBox.addClass('editing');
 
     var textBox = self.findLinkText($linkBox).last();
-    console.log(textBox)
     // if edit form not already there
     if (textBox.siblings('.link-edit-form').length == 0) {
       // add a form to edit the field
@@ -183,7 +182,6 @@ ep_links.prototype.init = function(){
     data.padId = clientVars.padId;
     data.linkText = linkText;
     data.hyperlink = hyperlink;
-    console.log("we are going to update",data)
     self.socket.emit('updateLinkText', data, function (err){
       if(!err) {
         //$linkForm.remove();
@@ -491,7 +489,6 @@ ep_links.prototype.collectLinks = function(callback){
   }).on("mouseout", ".sidebar-link", function(e){
     // do not hide directly the link, because sometime the mouse get out accidently
     hideLinkTimer = setTimeout(function() {
-      console.log("I runned for hiding",e.currentTarget.id)
       linkBoxes.hideLink(e.currentTarget.id);
     },5000);
   });
@@ -633,7 +630,6 @@ ep_links.prototype.insertLink = function(linkId, link, index){
 
   link.linkId = linkId;
   link.reply = true;
-  console.log(link)
   content = $('#linksTemplate').tmpl(link);
 
   linkL10n.localize(content);
@@ -1169,12 +1165,10 @@ ep_links.prototype.updateLinkBoxText = function (linkId, linkText,hyperlink) {
   $link.data("hyperlink",hyperlink)
   
   var textBox = this.findLinkText($link);
-  console.log(textBox,"is textbpx",textBox)
   //textBox.text(linkText)
   textBox.val(linkText)
 
   var linkBox = this.findHyperLinkText($link);
-  console.log(linkBox,"is linkBox",hyperlink)
   //linkBox.text(hyperlink)
   linkBox.val(hyperlink)
 

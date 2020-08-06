@@ -60,13 +60,6 @@
                 <img id="ep_hyperlink_img"/>
                 <a target="_blank" id="ep_hyperlink_title"></a>
             </div>
-            <span class="link-actions-wrapper">
-
-                <span class="link-edit buttonicon buttonicon-edit" data-l10n-id="ep_full_hyperlinks.edit_link.title"></span>
-                <img src="../static/plugins/ep_full_hyperlinks/static/img/breakLine.png" class="link-delete buttonicon" />
-                <span  class="link-close" data-l10n-id="ep_full_hyperlinks.edit_link.close">&times;</span>
-
-            </span>
 
             <div class="link-title-wrapper">
                 <div class="link-edit-form">
@@ -83,13 +76,21 @@
 
                     </div>
                    
-           
-      
-
-                    <button class="btn btn-primary acl-write submit_LCM link-edit-submit" data-l10n-id="ep_full_hyperlinks.links_template.accept_change.save">APPLY</button>
+    
 
                 </div>
             </div>
+
+
+            <div class="form-more">
+                <div class="link-buttons">
+                    <input type="submit" id="link-edit-btn" class="btn btn-primary link-edit-submit" value="Apply" data-l10n-id="ep_full_hyperlinks.links_template.accept_change.save" />
+                    <input type="reset" id="link-delete" class="btn btn-default btn-cancel-reply link-delete" value="Unlink" data-l10n-id="ep_full_hyperlinks.links_template.unlink.value" />
+                    <input type="reset" id="link-close" class="btn btn-default btn-cancel-reply link-close" value="Close" data-l10n-id="ep_full_hyperlinks.links_template.close.value" />
+
+                </div>
+            </div>
+ 
    
  
         </div>

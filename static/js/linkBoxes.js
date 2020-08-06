@@ -21,7 +21,6 @@ var showLink = function(linkId, e) {
 var hideLink = function(linkId, hideLinkTitle) {
   var linkElm = getLinksContainer().find('#'+ linkId);
   if (linkElm.hasClass("hyperlink-display") ){
-    console.log(linkElm.css("top"))
     linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) - 35 + "px"  })
     linkElm.removeClass('hyperlink-display');
   }
@@ -71,7 +70,6 @@ var highlightLink = function(linkId, e, editorLink,socket){
 
     });
 
-    console.log(linkElm,"we want show this ? ",linkElm.hasClass("hyperlink-display"),editorLink)
     if (!linkElm.hasClass("hyperlink-display")){
       var ep_hyperlink_title      = linkElm.find('#ep_hyperlink_title');
       var ep_hyperlink_img      = linkElm.find('#ep_hyperlink_img');
@@ -84,23 +82,19 @@ var highlightLink = function(linkId, e, editorLink,socket){
 
 
 
-      console.log(linkElm.css("top").split('px')[0]  )
-      linkElm.css({"left":parseInt(editorLink.position().left) + parseInt(linkElm.css("width").split('px')[0]/4) + "px"   })
+      linkElm.css({"left":parseInt(editorLink.position().left) + "px"   })
       linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 35 + "px"  })
       linkElm.addClass('hyperlink-display');
       //raise for og:title resolving
-      console.log(linkElm,"hyspe")
 
       var hyperlink =linkElm.data("hyperlink") ;
       if(!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
         hyperlink = "http://" + hyperlink;
       }
-      console.log(hyperlink,"hype")
 
 
       
       socket.emit('metaResolver', {padId: self.padId,hyperlink : hyperlink}, function (res){
-        console.log("metaResolver",res);
         if(res){
 
           ep_hyperlink_title.text(res.title)
@@ -114,7 +108,6 @@ var highlightLink = function(linkId, e, editorLink,socket){
           else 
             {
               if (res.images){
-                console.log(res.images)
                 $.each(res.images,function(key,value){
                   if(isUrlValid(value) && notInTheseUrls(value)){
                     image = value;
@@ -133,7 +126,6 @@ var highlightLink = function(linkId, e, editorLink,socket){
   
             }
           }
-          console.log(image,"going to be set ")
   
           ep_hyperlink_img.on("load",function(){
             
@@ -144,8 +136,6 @@ var highlightLink = function(linkId, e, editorLink,socket){
               // Animation complete.
             })
           }) 
-        }else{
-          console.log("not loaded",res)
         }
         
         
@@ -201,7 +191,6 @@ var highlightLink = function(linkId, e, editorLink,socket){
       targetLeft = containerWidth - modalWitdh - 25;
     }
     var editorLinkHeight = editorLink ? editorLink.outerHeight(true) : 30;
-    console.log(editorLinkHeight,targetTop + editorLinkHeight)
     getPadOuter().find('.link-modal').addClass('popup-show').css({
       left: targetLeft + "px",
       top: targetTop + editorLinkHeight +"px"
