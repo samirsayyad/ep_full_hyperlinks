@@ -9,7 +9,7 @@ var buildLinkFrom = function(form) {
   var changeTo   = form.find('.to-value').val() || null;
   var link    = {};
   if(!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
-    hyperlink = "http://" + hyperlink;
+    hyperlink = "https://" + hyperlink;
   }
   link.text = text;
   link.hyperlink = hyperlink;

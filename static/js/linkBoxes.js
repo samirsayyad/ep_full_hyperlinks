@@ -89,7 +89,7 @@ var highlightLink = function(linkId, e, editorLink,socket){
 
       var hyperlink =linkElm.data("hyperlink") ;
       if(!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
-        hyperlink = "http://" + hyperlink;
+        hyperlink = "https://" + hyperlink;
       }
 
 

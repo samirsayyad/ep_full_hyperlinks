@@ -61,7 +61,7 @@ var broadcastUrlFor = function(endPoint) {
   if(settings.ssl) {
     url += "https://";
   } else {
-    url += "http://";
+    url += "https://";
   }
   url += settings.ip + ":" + settings.port + endPoint;
 
