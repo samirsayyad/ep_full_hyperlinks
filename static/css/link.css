@@ -256,7 +256,11 @@
   margin: 0!important;
 }
 .link-title-wrapper{
-  margin-bottom: 20px
+  margin-bottom: 15px;
+  margin-top:15px
+}
+.link-title-wrapper-meta{
+  margin-bottom: 15px
 }
 .full-display-link .link-title-wrapper .link-text-text {
   white-space: normal;
@@ -273,6 +277,7 @@
   height: 51px;
   /* width: 100%; */
   margin: 0!important;
+  background-color: #f2f4f4;
 }
 input:-internal-autofill-selected {
   background-color: white;
