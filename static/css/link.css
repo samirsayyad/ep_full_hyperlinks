@@ -44,10 +44,15 @@
   
   /* NEW LINK FORM (included both in popup and reply) */
   .new-link .link-content {
-    padding: 9px !important; 
-    width: 100%;
-    background-color:white;
+
     border: 1px solid gray;
+    padding-left: 7px!important;
+    padding-top: 24px!important;
+    padding-bottom: 0!important;
+    padding-right: 0!important;
+    height: 51px;
+    width: 100%;
+    margin: 0 !important;
   }
   .new-link .link-buttons{
     margin-top: 10px;
@@ -58,6 +63,9 @@
   }
   input.error, textarea.error {
     border-color: red;
+  }
+  .form-more{
+    margin-top: 22px;
   }
   
   /* LINK GENERAL STYLE */
@@ -157,7 +165,7 @@
       } 
   
   /* LINK COMPACTED (Visible on right side) */
-  .sidebar-link:not(.full-display) .full-display-content {
+  .sidebar-link:not(.full-display) .full-display-link {
     display: block;
     /* min-width: 270px; */
   }
@@ -179,28 +187,29 @@
     visibility: visible;
 
   }
-  .sidebar-link.full-display .full-display-content {
+  .sidebar-link.full-display .full-display-link {
     display: block;
     /* margin-top: -10px; */
   }
   .sidebar-link.full-display .compact-display-content {
     display: none;
   }
-  .full-display-content {
-    background-color: white;
+  .full-display-link {
+    background-color: #fff;
     border-radius: 5px;
     overflow: hidden;
     box-shadow: 0 2px 4px #ddd;
     z-index: 99;
-    width: 350px;
+    width: 378px;
+    padding: 12px;
   }
-  .full-display-content .link-title-wrapper,
-  .full-display-content .link-reply {
+  .full-display-link .link-title-wrapper,
+  .full-display-link .link-reply {
     padding: 10px;
     width: 78%;
     float: left;
   }
-  .full-display-content .link-title-wrapper .link-text {
+  .full-display-link .link-title-wrapper .link-text {
     /* display: block; */
     /* margin-top: 10px; */
     white-space: normal;
@@ -210,27 +219,43 @@
     padding: 3px;
     border :1px solid gray
 }
-.full-display-content .link-title-wrapper .link-text-hyperlink {
+.full-display-link .link-title-wrapper .link-text-hyperlink {
   /* display: block; */
   /* margin-top: 10px; */
   white-space: normal;
-  font-weight: bold;
+  font-weight: 700;
   width: 230px;
   height: 38px;
-  padding: 3px;
-  border :1px solid gray
+  /* padding: 3px; */
+  border: 1px solid gray;
+  border: 1px solid gray;
+  padding-left: 7px!important;
+  padding-top: 24px!important;
+  padding-bottom: 0!important;
+  padding-right: 0!important;
+  height: 51px;
+  /* width: 100%; */
+  margin: 0!important;
 }
-.full-display-content .link-title-wrapper .link-text-text {
-  /* display: block; */
-  /* margin-top: 10px; */
+.full-display-link .link-title-wrapper .link-text-text {
   white-space: normal;
-  font-weight: bold;
+  font-weight: 700;
   width: 230px;
   height: 38px;
-  padding: 3px;
-  border :1px solid gray
+  /* padding: 3px; */
+  border: 1px solid gray;
+  border: 1px solid gray;
+  padding-left: 7px!important;
+  padding-top: 24px!important;
+  padding-bottom: 0!important;
+  padding-right: 0!important;
+  height: 51px;
+  /* width: 100%; */
+  margin: 0!important;
 }
-
+input:-internal-autofill-selected {
+  background-color: white;
+}
   
 .link-close{
   font-size: 22px;
@@ -247,14 +272,25 @@
   width:auto
 }
 .hyperlink-form-lable-section .hyperlink-form-lable{
-  background-color: #fff;
-  margin-left: 15px;
-  margin-top: -12px;
+  margin-left: 8px;
+  margin-top: 4px;
   position: absolute;
   width: 30px;
   text-align: center;
+  font-weight: 700;
+  color: #0074fd;
 }
-  .full-display-content .link-title-wrapper .link-text.default-text {
+.hyperlink-form-lable-section .hyperlink-form-lable-disabled{
+  
+  margin-left: 8px;
+  margin-top: 4px;
+  position: absolute;
+  width: 30px;
+  text-align: center;
+  font-weight: 700;
+  color : gray;
+}
+  .full-display-link .link-title-wrapper .link-text.default-text {
     display: none;
   }
   
@@ -355,7 +391,7 @@
   .link-modal-link .compact-display-content {
     display: none;
   }
-  .link-modal-link .full-display-content {
+  .link-modal-link .full-display-link {
     display: block !important;
     margin: 0;
   }

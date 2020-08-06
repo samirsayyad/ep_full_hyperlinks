@@ -374,10 +374,10 @@ ep_links.prototype.findLinkText = function($linkBox) {
   if (isReply)
     return $linkBox.find(".link-text");
   else
-    return $linkBox.find('.compact-display-content .link-text-text, .full-display-content .link-title-wrapper .link-text-text');
+    return $linkBox.find('.compact-display-content .link-text-text, .full-display-link .link-title-wrapper .link-text-text');
 }
 ep_links.prototype.findHyperLinkText = function($linkBox) {
-    return $linkBox.find('.compact-display-content .link-text-hyperlink, .full-display-content .link-title-wrapper .link-text-hyperlink');
+    return $linkBox.find('.compact-display-content .link-text-hyperlink, .full-display-link .link-title-wrapper .link-text-hyperlink');
 }
 // This function is useful to collect new links on the collaborators
 ep_links.prototype.collectLinksAfterSomeIntervalsOfTime = function() {
