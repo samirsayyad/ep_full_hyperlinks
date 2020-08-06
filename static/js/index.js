@@ -171,9 +171,12 @@ ep_links.prototype.init = function(){
     e.stopPropagation();
     var $linkBox = $(this).closest('.link-container');
     var $linkForm = $(this).closest('.link-edit-form');
+    console.log($linkForm)
     var linkId = $linkBox.data('linkid');
     var linkText = $linkForm.find('.link-text-text').val();
     var hyperlink = $linkForm.find('.link-text-hyperlink').val();
+    console.log(data,linkId,hyperlink)
+
     if(!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
       hyperlink = "http://" + hyperlink;
     }

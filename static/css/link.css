@@ -66,7 +66,7 @@
     height: 51px;
     width: 100%;
     margin: 0 !important;
-    background-color: gray;
+    /* background-color: gray; */
     font-weight: 700;
   }
   .new-link .link-buttons{
@@ -83,7 +83,7 @@
     border-color: red;
   }
   .form-more{
-    margin-top: 22px;
+    margin-top: 12px;
   }
   
   /* LINK GENERAL STYLE */
@@ -395,9 +395,7 @@ input:-internal-autofill-selected {
   .link-edit-form + .link-text {
     display: none !important;
   }
-  .link-edit-form{
-    padding-top: 35px;
-  }
+
   /* MODAL FOR MOBILES */
   .link-modal {
     bottom: auto !important;
