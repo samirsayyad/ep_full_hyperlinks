@@ -53,6 +53,21 @@
     height: 51px;
     width: 100%;
     margin: 0 !important;
+    background-color: white;
+    font-weight: 700;
+  }
+  .new-link .link-content-disabled {
+
+    border: 1px solid gray;
+    padding-left: 7px!important;
+    padding-top: 24px!important;
+    padding-bottom: 0!important;
+    padding-right: 0!important;
+    height: 51px;
+    width: 100%;
+    margin: 0 !important;
+    background-color: gray;
+    font-weight: 700;
   }
   .new-link .link-buttons{
     margin-top: 10px;
@@ -239,6 +254,9 @@
   height: 51px;
   /* width: 100%; */
   margin: 0!important;
+}
+.link-title-wrapper{
+  margin-bottom: 20px
 }
 .full-display-link .link-title-wrapper .link-text-text {
   white-space: normal;
