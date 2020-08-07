@@ -35,6 +35,7 @@
     position: absolute;
     min-width: 270px;
     visibility: hidden;
+    z-index: 999000;
   }
   
   /* WITH ICONS */
