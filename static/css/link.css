@@ -205,6 +205,9 @@
     visibility: visible;
 
   }
+  .disable-link{
+    pointer-events: none; cursor: default;
+  }
   .sidebar-link.full-display .full-display-link {
     display: block;
     /* margin-top: -10px; */
@@ -217,7 +220,7 @@
     border-radius: 5px;
     overflow: hidden;
     box-shadow: 0 2px 4px #ddd;
-    z-index: 99;
+    z-index: 99000;
     width: 279px;
     padding: 12px;
   }

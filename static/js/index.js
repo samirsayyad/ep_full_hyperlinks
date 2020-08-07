@@ -629,10 +629,18 @@ ep_links.prototype.insertContainers = function(){
 ep_links.prototype.insertLink = function(linkId, link, index){
   var content           = null;
   var container         = this.container;
+  var padId             = this.padId
   var linkAfterIndex = container.find('.sidebar-link').eq(index);
 
   link.linkId = linkId;
   link.reply = true;
+  if(link.hyperlink.indexOf("/p/"+padId)  >= 0){
+    link.ignore = true;
+  }else{
+    link.ignore = false;
+
+  }
+  console.log("going to shoiw ", link)
   content = $('#linksTemplate').tmpl(link);
 
   linkL10n.localize(content);
