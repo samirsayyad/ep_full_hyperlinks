@@ -55,7 +55,6 @@
     width: 100%;
     margin: 0 !important;
     background-color: white;
-    font-weight: 700;
   }
   .new-link .link-content-disabled {
 
@@ -68,7 +67,6 @@
     width: 100%;
     margin: 0 !important;
     /* background-color: gray; */
-    font-weight: 700;
   }
   .new-link .link-buttons{
     margin-top: 10px;
@@ -247,7 +245,6 @@
   /* display: block; */
   /* margin-top: 10px; */
   white-space: normal;
-  font-weight: 700;
   width: 100%;
   height: 38px;
   /* padding: 3px; */
@@ -270,7 +267,6 @@
 }
 .full-display-link .link-title-wrapper .link-text-text {
   white-space: normal;
-  font-weight: 700;
   width: 100%;
   height: 38px;
   /* padding: 3px; */
