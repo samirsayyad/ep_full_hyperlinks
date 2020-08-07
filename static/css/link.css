@@ -198,11 +198,11 @@
   
   /* LINK FULL (when mouse click) */
   .sidebar-link.full-display  {
-    z-index: 2;
+    z-index: 999000;
   }
   .sidebar-link.hyperlink-display{
     display: block;
-    z-index: 2;
+    z-index: 999000;
     visibility: visible;
 
   }
@@ -221,7 +221,7 @@
     border-radius: 5px;
     overflow: hidden;
     box-shadow: 0 2px 4px #ddd;
-    z-index: 99000;
+    z-index: 999000;
     width: 279px;
     padding: 12px;
   }
