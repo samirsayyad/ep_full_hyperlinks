@@ -112,6 +112,8 @@
   #ep_hyperlink_title{
     display: none;
     margin-top: 5px;
+    color: #15c!important;
+    font-weight: bold;
   }
   
 
