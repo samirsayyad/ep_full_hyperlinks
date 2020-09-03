@@ -171,11 +171,10 @@ ep_links.prototype.init = function(){
     e.stopPropagation();
     var $linkBox = $(this).closest('.link-container');
     var $linkForm = $(this).closest('.link-edit-form');
-    console.log($linkForm)
     var linkId = $linkBox.data('linkid');
     var linkText = $linkForm.find('.link-text-text').val();
     var hyperlink = $linkForm.find('.link-text-hyperlink').val();
-    console.log(data,linkId,hyperlink)
+
 
     if(!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
       hyperlink = "http://" + hyperlink;
@@ -500,7 +499,6 @@ ep_links.prototype.collectLinks = function(callback){
   // hover event
   
   this.padInner.contents().on("click", ".link", function(e){
-   
     if (container.is(':visible')) { // not on mobile
       clearTimeout(hideLinkTimer);
       var linkId = self.linkIdOf(e);
@@ -640,7 +638,6 @@ ep_links.prototype.insertLink = function(linkId, link, index){
     link.ignore = false;
 
   }
-  console.log("going to shoiw ", link)
   content = $('#linksTemplate').tmpl(link);
 
   linkL10n.localize(content);

@@ -55,8 +55,6 @@ var highlightLink = function(linkId, e, editorLink,socket){
   var linkElm      = container.find('#'+ linkId);
   var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
 
-
-
   if (container.is(":visible")) {
     // hide all other links
     container.find('.sidebar-link').each(function() {
@@ -82,7 +80,7 @@ var highlightLink = function(linkId, e, editorLink,socket){
 
 
 
-      linkElm.css({"left":parseInt(editorLink.position().left) +parseInt(linkElm.css("width").split('px')[0]/4) + "px"   })
+      linkElm.css({"left":parseInt(editorLink.position().left) +parseInt(linkElm.css("width").split('px')[0]) + "px"   })
       linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 35 + "px"  })
       linkElm.addClass('hyperlink-display');
       //raise for og:title resolving

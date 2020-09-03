@@ -33,7 +33,7 @@
   
   .sidebar-link {
     position: absolute;
-    min-width: 270px;
+    width: 286px;
     visibility: hidden;
     z-index: 999000;
   }
