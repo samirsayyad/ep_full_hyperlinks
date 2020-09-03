@@ -360,7 +360,7 @@ ep_links.prototype.init = function(){
     });
 
     self.padInner.contents().on("cut", function(e) {
-      events.addTextOnClipboard(e, self.ace, self.padInner, true);
+      events.addTextOnClipboard(e, self.ace, self.padInner, true,self.links, self.linkReplies);
     });
 
     self.padInner.contents().on("paste", function(e) {
