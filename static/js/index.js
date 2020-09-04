@@ -502,7 +502,7 @@ ep_links.prototype.collectLinks = function(callback){
     if (container.is(':visible')) { // not on mobile
       clearTimeout(hideLinkTimer);
       var linkId = self.linkIdOf(e);
-      linkBoxes.highlightLink(linkId, e, $(this) , self.socket);
+      linkBoxes.highlightLink(linkId, e, $(this) , self.socket , self.padId);
     }
   });
   // this.padInner.contents().on("click", "*", function(e){
@@ -623,21 +623,29 @@ ep_links.prototype.insertContainers = function(){
   this.container = this.padOuter.find('#links');
 };
 
+
 // Insert a link node
 ep_links.prototype.insertLink = function(linkId, link, index){
   var content           = null;
   var container         = this.container;
   var padId             = this.padId
   var linkAfterIndex = container.find('.sidebar-link').eq(index);
-
+  link.headerId = null
   link.linkId = linkId;
   link.reply = true;
-  if(link.hyperlink.indexOf("/p/"+padId)  >= 0){
-    link.ignore = true;
-  }else{
-    link.ignore = false;
+  link.internal = false;
+  link.ignore = false;
 
+  if(link.hyperlink.indexOf("/p/"+padId)  >= 0){
+    link.headerId = getUrlVars(link.hyperlink)['id'] ;
+    if (link.headerId)
+      link.internal = true;
+    else
+      link.ignore = true;
+
+    console.log(link)
   }
+
   content = $('#linksTemplate').tmpl(link);
 
   linkL10n.localize(content);
@@ -1317,6 +1325,19 @@ exports.postAceInit           = hooks.postAceInit;
 exports.aceAttribsToClasses   = hooks.aceAttribsToClasses;
 exports.aceEditEvent          = hooks.aceEditEvent;
 
+
+function getUrlVars(url)
+{
+    var vars = [], hash;
+    var hashes = url.slice(url.indexOf('?') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+    }
+    return vars;
+}
 // Given a CSS selector and a target element (in this case pad inner)
 // return the rep as an array of array of tuples IE [[[0,1],[0,2]], [[1,3],[1,5]]]
 // We have to return an array of a array of tuples because there can be multiple reps

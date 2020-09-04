@@ -50,7 +50,7 @@ var hideAllLinks = function() {
   });
 }
 
-var highlightLink = function(linkId, e, editorLink,socket){
+var highlightLink = function(linkId, e, editorLink,socket,padId){
   var container       = getLinksContainer();
   var linkElm      = container.find('#'+ linkId);
   var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
@@ -90,9 +90,7 @@ var highlightLink = function(linkId, e, editorLink,socket){
         hyperlink = "https://" + hyperlink;
       }
 
-
-      
-      socket.emit('metaResolver', {padId: self.padId,hyperlink : hyperlink}, function (res){
+      socket.emit('metaResolver', {padId: padId,hyperlink : hyperlink}, function (res){
         if(res){
 
           ep_hyperlink_title.text(res.title)

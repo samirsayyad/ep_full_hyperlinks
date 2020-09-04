@@ -58,7 +58,7 @@
                 </div> 
                 
                 <img id="ep_hyperlink_img"/>
-                <a class="{{if ignore==true}}disable-link{{/if}}" target="_blank" id="ep_hyperlink_title"></a>
+                <a data-id="${headerId}" data-join="{{if internal==true}}VIDEO{{/if}}" data-action="{{if internal==true}}JOIN{{/if}}"   class="{{if ignore==true}}disable-link{{/if}}{{if internal==true}}btn_roomHandler{{/if}}" target="{{if internal==false}}_blank{{/if}}" id="ep_hyperlink_title"></a>
             </div>
 
             <div class="link-title-wrapper">
