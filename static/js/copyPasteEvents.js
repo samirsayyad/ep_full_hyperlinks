@@ -184,12 +184,14 @@ var buildCloseTags = function(tags){
 var getTagsInSelection = function(htmlObject){
   var tags = [];
   var tag;
-  while($(htmlObject)[0].localName !== "span"){
-    var html = $(htmlObject).prop('outerHTML');
-    var stylingTagRegex = /<(b|i|u|s)>/.exec(html);
-    tag = stylingTagRegex ? stylingTagRegex[1] : "";
-    tags.push(tag);
-    htmlObject = $(htmlObject).parent();
+  if($(htmlObject)[0].hasOwnProperty("localName")){
+    while($(htmlObject)[0].localName !== "span"){
+      var html = $(htmlObject).prop('outerHTML');
+      var stylingTagRegex = /<(b|i|u|s)>/.exec(html);
+      tag = stylingTagRegex ? stylingTagRegex[1] : "";
+      tags.push(tag);
+      htmlObject = $(htmlObject).parent();
+    }
   }
   return tags;
 };
