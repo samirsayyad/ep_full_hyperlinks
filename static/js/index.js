@@ -636,7 +636,7 @@ ep_links.prototype.insertLink = function(linkId, link, index){
   link.internal = false;
   link.ignore = false;
 
-  if(link.hyperlink.indexOf("/p/"+padId)  >= 0){
+  if(link.hyperlink.indexOf("/"+padId)  >= 0){
     link.headerId = getUrlVars(link.hyperlink)['id'] ;
     if (link.headerId)
       link.internal = true;
