@@ -4,6 +4,7 @@ var linkL10n = require('ep_full_hyperlinks/static/js/linkL10n');
 // Create a link object with data filled on the given form
 var buildLinkFrom = function(form) {
   var text       = form.find('#hyperlink-text').val();
+  var oldText       = form.find('#hyperlink-text-hidden').val();
   var hyperlink       = form.find('#hyperlink-url').val();
   var changeFrom = form.find('.from-value').text();
   var changeTo   = form.find('.to-value').val() || null;
@@ -12,13 +13,14 @@ var buildLinkFrom = function(form) {
     hyperlink = "https://" + hyperlink;
   }
   link.text = text;
+  link.oldText = oldText;
   link.hyperlink = hyperlink;
 
   if(changeTo){
     link.changeFrom = changeFrom;
     link.changeTo = changeTo;
   }
-
+  console.log(link,"buildLinkFrom")
   return link;
 }
 
@@ -29,6 +31,7 @@ var cancelNewLink = function(){
 
 // Callback for new link Submit
 var submitNewLink = function(callback) {
+  console.log("link-create-btn")
   var index = 0;
   var form = $('#newLink');
   var link = buildLinkFrom(form);
@@ -72,7 +75,7 @@ var insertNewLinkPopupIfDontExist = function(link, callback) {
   newLinkPopup.find('#link-reset').on('click', function() {
     cancelNewLink();
   });
-  // Create btn
+  // Create btn // link-create-btn
   $('#newLink').on("submit", function(e) {
     e.preventDefault();
     return submitNewLink(callback);

@@ -1,3 +1,6 @@
+*{
+  font-family: Roboto,RobotoDraft,Helvetica,Arial,sans-serif;
+}
 /* Text linked inside editor */
 #innerdocbody .ace-line .link {
     background-color: none;
@@ -296,26 +299,27 @@ input:-internal-autofill-selected {
   padding: 5px 15px;
 }
 .hyperlink-form-lable-section{
-  width:auto
+  width:445px;
+  height: 67px;
 }
 .hyperlink-form-lable-section .hyperlink-form-lable{
-  margin-left: 8px;
-  margin-top: 4px;
-  position: absolute;
-  width: 30px;
-  text-align: center;
-  font-weight: 700;
-  color: #0074fd;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16px;
+  color: #696969;
+  float: left;
+  width: 100%;
 }
 .hyperlink-form-lable-section .hyperlink-form-lable-disabled{
   
-  margin-left: 8px;
-  margin-top: 4px;
-  position: absolute;
-  width: 30px;
-  text-align: center;
-  font-weight: 700;
-  color : gray;
+  font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    color: #696969;
+    float: left;
+    width: 100%;
 }
   .full-display-link .link-title-wrapper .link-text.default-text {
     display: none;
@@ -396,6 +400,10 @@ input:-internal-autofill-selected {
   }
   
   /* EDITING LINK */
+  .link-edit-form{
+    width: 100%;
+    height: 140px;
+  }
   .link-edit-text {
     width: 100%;
   }
@@ -457,3 +465,63 @@ input:-internal-autofill-selected {
     height: 33px;
  
   }
+
+#newLink{
+  width: 477px;
+}
+#hyperlink-text{
+  margin: 8px 0 0 0!important;
+  height: 35px;
+  width: 320px;
+  float: left;
+  background: #efefef;
+  box-shadow: 0 2px 0 rgba(0,0,0,.25);
+  border-radius: 4px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16px;
+  color: #474747;
+  border: 0;
+  padding: 10px 7px 9px 7px!important;
+}
+#hyperlink-url{
+  margin: 8px 0 0 0!important;
+  height: 35px;
+  width: 320px;
+  float: left;
+  background: #efefef;
+  box-shadow: 0 2px 0 rgba(0,0,0,.25);
+  border-radius: 4px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16px;
+  color: #474747;
+  border: 0;
+  padding: 10px 7px 9px 7px !important;
+}
+
+.hyperlink-popup{
+  padding: 16px;
+}
+#link-create-btn{
+  width: 111px;
+  height: 35px;
+  font-weight: 700;
+  border: 0 none;
+  cursor: pointer;
+  float: left;
+  background: #3873e0;
+  box-shadow: 0 2px 0 #2255b5;
+  border-radius: 4px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 21px;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+  margin: 8px 0px 0px 12px;
+}

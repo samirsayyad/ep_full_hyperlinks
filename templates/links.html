@@ -3,7 +3,7 @@
 <!-- Popup displayed so that we can create a link -->
 <script id="newLinkTemplate" type="text/html">
     <div id="newLink" class="popup toolbar-popup new-link-popup">
-        <div class="popup-content">
+        <div class="popup-content hyperlink-popup">
 
             {{tmpl "#new-link-form"}}
         </div>
@@ -17,26 +17,28 @@
         <div class="link-edit-form">
             <div class="hyperlink-form-lable-section">
                 <span  class="hyperlink-form-lable-disabled">Text</span>
-                <input  disabled="disabled" type="text"  id="hyperlink-text"  class="link-content-disabled">
-               
+                <input type="text"  id="hyperlink-text"  class="link-content-disabled">
+                <input type="hidden" id="hyperlink-text-hidden">
+
                  <br> 
 
             </div>
-            <div class="hyperlink-form-lable-section">
+            <div class="hyperlink-form-lable-section" style="margin-top:10px">
                 <span class="hyperlink-form-lable" >Link</span>
                 <input type="text" id="hyperlink-url" placeholder="http://..." class="link-content">
+                <input type="submit" id="link-create-btn" class="btn btn-primary" value="Apply" data-l10n-id="ep_full_hyperlinks.links_template.{{if link}}apply{{else}}apply{{/if}}.value" />
 
             </div>
        
 
         </div>
-
+<!-- 
         <div class="form-more">
             <div class="link-buttons">
                 <input type="submit" id="link-create-btn" class="btn btn-primary" value="Link" data-l10n-id="ep_full_hyperlinks.links_template.{{if link}}link{{else}}link{{/if}}.value" />
                 <input type="reset" id="link-reset" class="btn btn-default btn-cancel-reply" value="Cancel" data-l10n-id="ep_full_hyperlinks.links_template.cancel.value" />
             </div>
-        </div>
+        </div> -->
     </form>
 </script>
 

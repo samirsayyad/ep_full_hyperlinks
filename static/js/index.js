@@ -887,6 +887,7 @@ ep_links.prototype.displayNewLinkForm = function() {
   $('#newLink').find('.link-content').focus();
   // add selected text to form 
   $('#newLink').find('#hyperlink-text').val(selectedText);
+  $('#newLink').find('#hyperlink-text-hidden').val(selectedText);
 
 }
 
@@ -957,6 +958,7 @@ ep_links.prototype.createNewLinkFormIfDontExist = function(rep) {
       data.link.changeFrom = link.changeFrom;
       data.link.changeTo = link.changeTo;
     }
+    data.link.oldText = link.oldText;
     data.link.text = link.text;
     data.link.hyperlink = link.hyperlink;
 
@@ -1050,9 +1052,22 @@ ep_links.prototype.saveLink = function(data, rep) {
   var self = this;
   self.socket.emit('addLink', data, function (linkId, link){
     link.linkId = linkId;
-
+    console.log(data)
     self.ace.callWithAce(function (ace){
-      // console.log('addLink :: ', rep, link);
+      console.log('addLink :: ', rep);
+
+      console.log('addLink :: ', rep.selEnd);
+      if(data.link.text !== data.link.oldText){
+        ace.ace_replaceRange(rep.selStart, rep.selEnd, data.link.text);
+        if(data.link.oldText.length > data.link.text.length) {
+          rep.selEnd[1] += data.link.oldText.length - data.link.text.length
+        }else if (data.link.oldText.length < data.link.text.length){
+          rep.selEnd[1] += data.link.text.length - data.link.oldText.length
+        }
+      }
+      
+      console.log('addLink :: then ', rep.selEnd);
+
       ace.ace_performSelectionChange(rep.selStart, rep.selEnd, true);
       ace.ace_setAttributeOnSelection('link', linkId);
     },'insertLink', true);

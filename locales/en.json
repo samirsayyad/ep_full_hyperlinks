@@ -1,5 +1,6 @@
 {
     "ep_full_hyperlinks.link" : "Link",
+    "ep_full_hyperlinks.apply" : "Apply",
     "ep_full_hyperlinks.link.modal" : "Link Create Modal",
     "ep_full_hyperlinks.link.edit.modal": "Link Edit Modal",
     "ep_full_hyperlinks.links" : "Links",
