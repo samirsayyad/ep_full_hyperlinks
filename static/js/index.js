@@ -1345,15 +1345,12 @@ exports.acePostWriteDomLineHTML = function (name, context) {
     hasHyperlink.each(function(){
       const href = $(this).attr('href');
       if(href.indexOf("header=") >=0 && href.indexOf("id=")>=0){
-        const urlParams = new URLSearchParams(href);
-        const headerId = urlParams.get('id');
-        const target = urlParams.get('target');
-        const join = urlParams.get('join');
-        $(this).attr({
-          'data-join': join,
-          'data-action': target,
-          'data-id': headerId,
-        }).addClass('btn_roomHandler');
+        $(this).on('click', function(event){
+          event.stopImmediatePropagation();
+          event.preventDefault();
+          const href = $(this).attr("href");
+				  WRTC_Room.joinByQueryString(href);
+        });
       }
     })
   }
