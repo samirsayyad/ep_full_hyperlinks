@@ -120,7 +120,9 @@
     padding-left: 6px;
     padding-right: 6px;
     vertical-align: baseline;
-    width: 200px;
+    width: 189px;
+    min-width: 189px;
+
     text-decoration: none !important;
     font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
 
@@ -568,20 +570,30 @@ input:-internal-autofill-selected {
 .ep_hyperlink_docs_bubble_button{
   background-color: transparent;
   background-image: none;
-  height: 18px;
-  width: 18px;
+  height: 32px;
+  width: 32px;
   border-radius: 50%;
-  border-width: 0px;
-  border-style: solid;
+  border-width: 0;
   border-color: transparent;
-  box-shadow: none;
+  /* box-shadow: none; */
   background-clip: padding-box;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   min-width: unset;
-  margin-right: 0px;
   padding: 5px;
+  justify-content: center;
+  text-align: center;
+  display: flex;
 }
 .ep_hyperlink_docs_bubble_button_container{
   display: flex;
 }
+
+.ep_hyperlink_docs_bubble_button:active , .ep_hyperlink_docs_bubble_button:focus{
+  outline: none;
+}
+ 
+.ep_hyperlink_docs_bubble_button:hover{
+  background-color: #f0f0f0;
+}
+ 
