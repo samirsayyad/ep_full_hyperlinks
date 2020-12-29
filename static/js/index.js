@@ -482,18 +482,20 @@ ep_links.prototype.collectLinks = function(callback){
   });
 
   // HOVER SIDEBAR LINK
-  var hideLinkTimer;
-  this.container.on("mouseover", ".sidebar-link", function(e){
-    // highlight link
-    clearTimeout(hideLinkTimer);
-    //linkBoxes.highlightLink(e.currentTarget.id, e);
 
-  }).on("mouseout", ".sidebar-link", function(e){
-    // do not hide directly the link, because sometime the mouse get out accidently
-    hideLinkTimer = setTimeout(function() {
-      linkBoxes.hideLink(e.currentTarget.id);
-    },5000);
-  });
+  //@@@@@@@@@@@@@@@@ get back just for dev
+  var hideLinkTimer;
+  // this.container.on("mouseover", ".sidebar-link", function(e){
+  //   // highlight link
+  //   clearTimeout(hideLinkTimer);
+  //   //linkBoxes.highlightLink(e.currentTarget.id, e);
+
+  // }).on("mouseout", ".sidebar-link", function(e){
+  //   // do not hide directly the link, because sometime the mouse get out accidently
+  //   hideLinkTimer = setTimeout(function() {
+  //     linkBoxes.hideLink(e.currentTarget.id);
+  //   },5000);
+  // });
 
   // HOVER OR CLICK THE LINKED TEXT IN THE EDITOR
   // hover event

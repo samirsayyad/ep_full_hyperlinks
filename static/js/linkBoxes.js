@@ -69,12 +69,24 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
     });
 
     if (!linkElm.hasClass("hyperlink-display")){
+
+      var loaded= linkElm.data("loaded")
+
+      if(loaded){
+        linkElm.css({"left":parseInt(editorLink.position().left) +parseInt(linkElm.css("width").split('px')[0]) + "px"   })
+        linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 35 + "px"  })
+        linkElm.addClass('hyperlink-display');
+        return false;
+      }
+        
+        
       var ep_hyperlink_title      = linkElm.find('#ep_hyperlink_title');
       var ep_hyperlink_img      = linkElm.find('#ep_hyperlink_img');
-      var card_loading_hyperlink      = linkElm.find('#card_loading_hyperlink');
-
+      var ep_hyperlink_description  = linkElm.find("#ep_hyperlink_description")
+      var card_loading_hyperlink  = linkElm.find("#card_loading_hyperlink")
+      
       ep_hyperlink_img.hide()
-      ep_hyperlink_title.hide()
+      ep_hyperlink_title.show()
       card_loading_hyperlink.show()
 
 
@@ -92,8 +104,7 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
 
       socket.emit('metaResolver', {padId: padId,hyperlink : hyperlink}, function (res){
         if(res){
-
-          ep_hyperlink_title.text(res.title)
+          console.log(res)
           ep_hyperlink_title.attr('href',hyperlink);
   
           var image = null ;
@@ -125,12 +136,18 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
   
           ep_hyperlink_img.on("load",function(){
             
-            card_loading_hyperlink.fadeOut( "slow", function() {
+            card_loading_hyperlink.fadeOut(500,function(){
               ep_hyperlink_img.fadeIn()
-              ep_hyperlink_title.fadeIn()
+              ep_hyperlink_title.text(res.title)
+              ep_hyperlink_description.text(res.url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0])
+              linkElm.attr({"data-loaded":true})
+            })
+
+            
+             // ep_hyperlink_title.fadeIn()
               
               // Animation complete.
-            })
+
           }) 
         }
         
