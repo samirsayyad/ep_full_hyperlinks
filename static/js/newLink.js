@@ -20,7 +20,6 @@ var buildLinkFrom = function(form) {
     link.changeFrom = changeFrom;
     link.changeTo = changeTo;
   }
-  console.log(link,"buildLinkFrom")
   return link;
 }
 

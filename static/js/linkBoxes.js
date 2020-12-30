@@ -50,6 +50,50 @@ var hideAllLinks = function() {
   });
 }
 
+var selectText = function(linkElm) {
+  console.log(linkElm)
+  // if (document.selection) { // IE
+  //     var range = document.body.createTextRange();
+  //     range.moveToElementText(linkElm[0]);
+  //     range.select();
+  // } else if (window.getSelection) {
+  //     var range = document.createRange();
+  //     range.selectNode(linkElm[0]);
+  //     window.getSelection().removeAllRanges();
+  //     window.getSelection().addRange(range);
+  // }
+  // window.getSelection()
+  // .selectAllChildren(
+  //   linkElm[0]
+  // );
+
+
+  // var elem   = linkElm[0];
+  // var select = window.getSelection();
+  // var range  = document.createRange();
+ 
+  // range.selectNodeContents(elem);
+  // select.addRange(range);
+
+
+
+  var doc = document
+  , text = linkElm[0]
+  , range, selection;   
+  console.log(text)
+  if (doc.body.createTextRange) {
+    range = document.body.createTextRange();
+    range.moveToElementText(text);
+    range.select();
+  } else if (window.getSelection) {
+    selection = window.getSelection();        
+    range = document.createRange();
+    range.selectNodeContents(text);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+}
+
 var highlightLink = function(linkId, e, editorLink,socket,padId){
   var container       = getLinksContainer();
   var linkElm      = container.find('#'+ linkId);
@@ -68,14 +112,18 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
 
     });
 
+
+
+
     if (!linkElm.hasClass("hyperlink-display")){
 
       var loaded= linkElm.data("loaded")
-
+      selectText(linkElm)
       if(loaded){
         linkElm.css({"left":parseInt(editorLink.position().left) +parseInt(linkElm.css("width").split('px')[0]) + "px"   })
         linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 35 + "px"  })
         linkElm.addClass('hyperlink-display');
+
         return false;
       }
         
@@ -252,3 +300,4 @@ exports.highlightLink = highlightLink;
 exports.adjustTopOf = adjustTopOf;
 exports.isOnTop = isOnTop;
 exports.shouldNotCloseLink = shouldNotCloseLink;
+exports.selectText = selectText;

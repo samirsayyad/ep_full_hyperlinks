@@ -50,7 +50,7 @@
 
        
 
-        <div class="full-display-link">
+        <div class="full-display-link" id="show-form-${linkId}">
             <div class="link-title-wrapper-meta">
                 <div id="card_loading_hyperlink" class="card"> 
                     <div class="card__image loading"></div> 
@@ -61,52 +61,77 @@
 
 
                 <div class="ep_hyperlink_docs_bubble_button_container">
-                    <div role="button" class="ep_hyperlink_docs_bubble_button" tabindex="0" data-tooltip="Copy link" aria-label="Copy link">
+                    <div  data-hyperlink="${hyperlink}" role="button" class="ep_hyperlink_docs_bubble_button_copy" tabindex="0" data-tooltip="Copy link" aria-label="Copy link">
                         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="18px" height="18px" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g transform="translate(0 24) scale(1 -1)"><path d="M19 21H8V7h11m0-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2m-3-4H4a2 2 0 0 0-2 2v14h2V3h12V1z" fill="#000000"/></g><rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" /></svg>
                     </div>
-                    <div role="button" class="ep_hyperlink_docs_bubble_button" tabindex="0" data-tooltip="Edit link" aria-label="Edit link">
+                    <div role="button" class="ep_hyperlink_docs_bubble_button_edit" tabindex="0" data-tooltip="Edit link" aria-label="Edit link">
                         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="18px" height="18px" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83a.996.996 0 0 0 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="#5f6368"/></svg>
                     </div>
-                    <div role="button" class="ep_hyperlink_docs_bubble_button" tabindex="0" data-tooltip="Remove link" aria-label="Remove link">
+                    <div role="button"  class="ep_hyperlink_docs_bubble_button_delete" tabindex="0" data-tooltip="Remove link" aria-label="Remove link">
                         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="18px" height="18px" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M17 7h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1c0 1.43-.98 2.63-2.31 2.98l1.46 1.46C20.88 15.61 22 13.95 22 12c0-2.76-2.24-5-5-5zm-1 4h-2.19l2 2H16zM2 4.27l3.11 3.11A4.991 4.991 0 0 0 2 12c0 2.76 2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1c0-1.59 1.21-2.9 2.76-3.07L8.73 11H8v2h2.73L13 15.27V17h1.73l4.01 4L20 19.74L3.27 3L2 4.27z" fill="#5f6368"/><rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" /></svg>
                     </div>
                     
                 </div>
             </div>
             <p class="ep_hyperlink_description" id="ep_hyperlink_description"></p>
+        </div>
 
-            <div class="link-title-wrapper" style="display:none">
-                <div class="link-edit-form">
-                    <div class="hyperlink-form-lable-section">
-                        <span  class="hyperlink-form-lable-disabled">Text</span>
-                        <input  disabled="disabled" type="text" value="${text}" class="link-text-text">
-                       
-                         <br><br>
+        <div class="link-title-wrapper" id="edit-form-${linkId}">
+            <div class="link-edit-form">
 
-                    </div>
-                    <div class="hyperlink-form-lable-section">
-                        <span class="hyperlink-form-lable" >Link</span>
-                        <input type="text" value="${hyperlink}" class="link-text-hyperlink">
 
-                    </div>
+
+
+
+                <div class="hyperlink-form-lable-section">
+                    <span  class="hyperlink-form-lable-disabled">Text</span>
+                    <input type="text"  class="link-text-text" id="hyperlink-text"  value="${text}"  />
+                    <input type="hidden" value="${text}" class="link-text-text-old" id="hyperlink-text-hidden-${linkId}">
+
+                     <br> 
+    
+                </div>
+                <div class="hyperlink-form-lable-section" style="margin-top:10px">
+                    <span class="hyperlink-form-lable" >Link</span>
+                    <input type="text"  value="${hyperlink}" placeholder="http://..." class="link-text-hyperlink" />
+                    <input type="submit" id="link-edit-btn" class="btn btn-primary link-edit-submit" value="Apply" data-l10n-id="ep_full_hyperlinks.links_template.{{if link}}apply{{else}}apply{{/if}}.value" />
+    
+                </div>
+
+
+
+
+
+
+
+
+
+<!-- 
+
+
+                <div class="hyperlink-form-lable-section">
+                    <span  class="hyperlink-form-lable-disabled">Text</span>
+                    <input  disabled="disabled" type="text" value="${text}" class="link-text-text">
                    
-                    <div class="form-more" style="margin-top:21px">
-                        <div class="link-buttons">
-                            <input type="submit" id="link-edit-btn" class="btn btn-primary link-edit-submit" value="Apply" data-l10n-id="ep_full_hyperlinks.links_template.accept_change.save" />
-                            <input type="reset" id="link-delete" class="btn btn-default btn-cancel-reply link-delete" value="Unlink" data-l10n-id="ep_full_hyperlinks.links_template.unlink.value" />
-                            <input type="reset" id="link-close" class="btn btn-default btn-cancel-reply link-close" value="Close" data-l10n-id="ep_full_hyperlinks.links_template.close.value" />
-        
-                        </div>
-                    </div>
+                     <br><br>
 
                 </div>
+                <div class="hyperlink-form-lable-section">
+                    <span class="hyperlink-form-lable" >Link</span>
+                    <input type="text" value="${hyperlink}" class="link-text-hyperlink">
+
+                </div>
+               
+                <div class="form-more" style="margin-top:21px">
+                    <div class="link-buttons">
+                        <input type="submit" id="link-edit-btn" class="btn btn-primary link-edit-submit" value="Apply" data-l10n-id="ep_full_hyperlinks.links_template.accept_change.save" />
+                        <input type="reset" id="link-delete" class="btn btn-default btn-cancel-reply link-delete" value="Unlink" data-l10n-id="ep_full_hyperlinks.links_template.unlink.value" />
+                        <input type="reset" id="link-close" class="btn btn-default btn-cancel-reply link-close" value="Close" data-l10n-id="ep_full_hyperlinks.links_template.close.value" />
+    
+                    </div>
+                </div> -->
+
             </div>
-
-
-           
- 
-   
- 
         </div>
     </div>
 </script>
@@ -121,21 +146,21 @@
 </script>
 
 <!-- SubTemplate to dislay a suggestion -->
-<script id="display-suggestion" type="text/html">
+<!-- <script id="display-suggestion" type="text/html"> -->
     <!-- When link contains a suggestion, we display it with an approval button -->
-    {{if changeTo}}
+    <!-- {{if changeTo}}
     <form class="link-changeTo-form suggestion-display">
         <span class="from-label" data-l10n-id="ep_full_hyperlinks.links_template.suggested_change_from">Suggested Change From</span>
         <span class="from-value">${changeFrom}</span>
         <span class="to-label" data-l10n-id="ep_full_hyperlinks.links_template.to">To</span>
-        <span class="to-value">${changeTo}</span>
+        <span class="to-value">${changeTo}</span> -->
         <!-- Approve/revert button -->
-        <input type="Submit" class="btn btn-primary approve-suggestion-btn acl-write" value="Accept Change" data-l10n-id="ep_full_hyperlinks.links_template.accept_change.value">
-        <input type="Submit" class="btn btn-default revert-suggestion-btn acl-write" value="Revert Change" data-l10n-id="ep_full_hyperlinks.links_template.revert_change.value">
-
+        <!-- <input type="Submit" class="btn btn-primary approve-suggestion-btn acl-write" value="Accept Change" data-l10n-id="ep_full_hyperlinks.links_template.accept_change.value">
+        <input type="Submit" class="btn btn-default revert-suggestion-btn acl-write" value="Revert Change" data-l10n-id="ep_full_hyperlinks.links_template.revert_change.value"> -->
+<!-- 
     </form>
     {{/if}}
-</script>
+</script> -->
 
 
 

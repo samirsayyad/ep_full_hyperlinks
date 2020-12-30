@@ -17,6 +17,7 @@ var newLink = require('ep_full_hyperlinks/static/js/newLink');
 var preLinkMark = require('ep_full_hyperlinks/static/js/preLinkMark');
 var linkL10n = require('ep_full_hyperlinks/static/js/linkL10n');
 var events = require('ep_full_hyperlinks/static/js/copyPasteEvents');
+var caretPosition= require('ep_etherpad-lite/static/js/caretPosition')
 var getLinkIdOnFirstPositionSelected = events.getLinkIdOnFirstPositionSelected;
 var hasLinkOnSelection = events.hasLinkOnSelection;
 var browser = require('ep_etherpad-lite/static/js/browser');
@@ -121,7 +122,8 @@ ep_links.prototype.init = function(){
     linkBoxes.hideLink(linkId);
 
   })
-  this.container.parent().on("click", ".link-delete", function(){
+  // it was link-delete
+  this.container.parent().on("click", ".ep_hyperlink_docs_bubble_button_delete", function(){
     var linkId = $(this).closest('.link-container')[0].id;
     self.deleteLink(linkId);
     var padOuter = $('iframe[name="ace_outer"]').contents();
@@ -147,26 +149,27 @@ ep_links.prototype.init = function(){
 
   // Listen for events to edit a link
   // Here, it adds a form to edit the link text
-  this.container.parent().on("click", ".link-edit", function(){
-    var $linkBox = $(this).closest('.link-container');
-    $linkBox.addClass('editing');
+  // this.container.parent().on("click", ".link-edit", function(){
+  //   var $linkBox = $(this).closest('.link-container');
+  //   $linkBox.addClass('editing');
 
-    var textBox = self.findLinkText($linkBox).last();
-    // if edit form not already there
-    if (textBox.siblings('.link-edit-form').length == 0) {
-      // add a form to edit the field
-      var data = {};
-      data.hyperlink = textBox.text();
-      var content = $("#editLinkTemplate").tmpl(data);
-      // localize the link/reply edit form
-      linkL10n.localize(content);
-      // insert form
-      textBox.before(content);
-    }
-  });
+  //   var textBox = self.findLinkText($linkBox).last();
+  //   // if edit form not already there
+  //   if (textBox.siblings('.link-edit-form').length == 0) {
+  //     // add a form to edit the field
+  //     var data = {};
+  //     data.hyperlink = textBox.text();
+  //     var content = $("#editLinkTemplate").tmpl(data);
+  //     // localize the link/reply edit form
+  //     linkL10n.localize(content);
+  //     // insert form
+  //     textBox.before(content);
+  //   }
+  // });
 
   // submit the edition on the text and update the link text
   this.container.parent().on("click", ".link-edit-submit", function(e){
+    console.log("called?")
     e.preventDefault();
     e.stopPropagation();
     var $linkBox = $(this).closest('.link-container');
@@ -174,7 +177,7 @@ ep_links.prototype.init = function(){
     var linkId = $linkBox.data('linkid');
     var linkText = $linkForm.find('.link-text-text').val();
     var hyperlink = $linkForm.find('.link-text-hyperlink').val();
-
+    var oldLinkText = $linkForm.find('.link-text-text-old').val();
 
     if(!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
       hyperlink = "http://" + hyperlink;
@@ -183,6 +186,7 @@ ep_links.prototype.init = function(){
     data.linkId = linkId;
     data.padId = clientVars.padId;
     data.linkText = linkText;
+    data.oldLinkText = oldLinkText;
     data.hyperlink = hyperlink;
     self.socket.emit('updateLinkText', data, function (err){
       if(!err) {
@@ -191,6 +195,9 @@ ep_links.prototype.init = function(){
         self.updateLinkBoxText(linkId, linkText,hyperlink);
         linkBoxes.hideLink(linkId);
 
+        //reverting modal to show because we change it to edit mode
+        self.padOuter.find("#show-form-"+linkId).show()
+        self.padOuter.find("#edit-form-"+linkId).hide()
         // although the link or reply was saved on the data base successfully, it needs
         // to update the link or link reply variable with the new text saved
         self.setLinkOrReplyNewText(linkId, linkText,hyperlink);
@@ -198,74 +205,74 @@ ep_links.prototype.init = function(){
     });
   });
 
-  // hide the edit form and make the link author and text visible again
-  this.container.parent().on("click", ".link-edit-cancel", function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    var $linkBox = $(this).closest('.link-container');
-    var textBox = self.findLinkText($linkBox).last();
-    textBox.siblings('.link-edit-form').remove();
-    $linkBox.removeClass('editing');
-  });
+  // // hide the edit form and make the link author and text visible again
+  // this.container.parent().on("click", ".link-edit-cancel", function(e){
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  //   var $linkBox = $(this).closest('.link-container');
+  //   var textBox = self.findLinkText($linkBox).last();
+  //   textBox.siblings('.link-edit-form').remove();
+  //   $linkBox.removeClass('editing');
+  // });
 
   // Listen for include suggested change toggle
-  this.container.parent().on("change", '.suggestion-checkbox', function(){
-    var parentLink = $(this).closest('.link-container');
-    var parentSuggest = $(this).closest('.link-reply');
+  // this.container.parent().on("change", '.suggestion-checkbox', function(){
+  //   var parentLink = $(this).closest('.link-container');
+  //   var parentSuggest = $(this).closest('.link-reply');
 
-    if($(this).is(':checked')){
-      var linkId = parentLink.data('linkid');
-      var padOuter = $('iframe[name="ace_outer"]').contents();
-      var padInner = padOuter.find('iframe[name="ace_inner"]');
+  //   if($(this).is(':checked')){
+  //     var linkId = parentLink.data('linkid');
+  //     var padOuter = $('iframe[name="ace_outer"]').contents();
+  //     var padInner = padOuter.find('iframe[name="ace_inner"]');
 
-      var currentString = padInner.contents().find("."+linkId).html();
+  //     var currentString = padInner.contents().find("."+linkId).html();
 
-      parentSuggest.find(".from-value").html(currentString);
-      parentSuggest.find('.suggestion').show();
-    }else{
-      parentSuggest.find('.suggestion').hide();
-    }
-  });
+  //     parentSuggest.find(".from-value").html(currentString);
+  //     parentSuggest.find('.suggestion').show();
+  //   }else{
+  //     parentSuggest.find('.suggestion').hide();
+  //   }
+  // });
 
   // User accepts or revert a change
-  this.container.parent().on("submit", ".link-changeTo-form", function(e){
-    e.preventDefault();
-    var data = self.getLinkData();
-    var linkEl = $(this).closest('.link-container');
-    data.linkId = linkEl.data('linkid');
-    var padOuter = $('iframe[name="ace_outer"]').contents();
-    var padInner = padOuter.find('iframe[name="ace_inner"]').contents();
+  // this.container.parent().on("submit", ".link-changeTo-form", function(e){
+  //   e.preventDefault();
+  //   var data = self.getLinkData();
+  //   var linkEl = $(this).closest('.link-container');
+  //   data.linkId = linkEl.data('linkid');
+  //   var padOuter = $('iframe[name="ace_outer"]').contents();
+  //   var padInner = padOuter.find('iframe[name="ace_inner"]').contents();
 
-    // Are we reverting a change?
-    var isRevert = linkEl.hasClass("change-accepted");
-    var newString = isRevert ? $(this).find(".from-value").html() : $(this).find(".to-value").html();
+  //   // Are we reverting a change?
+  //   var isRevert = linkEl.hasClass("change-accepted");
+  //   var newString = isRevert ? $(this).find(".from-value").html() : $(this).find(".to-value").html();
 
-    // In case of suggested change is inside a reply, the parentId is different from the linkId (=replyId)
-    var parentId = $(this).closest('.sidebar-link').data('linkid');
-    // Nuke all that aren't first lines of this link
-    padInner.find("."+parentId+":not(:first)").html("");
+  //   // In case of suggested change is inside a reply, the parentId is different from the linkId (=replyId)
+  //   var parentId = $(this).closest('.sidebar-link').data('linkid');
+  //   // Nuke all that aren't first lines of this link
+  //   padInner.find("."+parentId+":not(:first)").html("");
 
-    var padLinkSpan = padInner.find("."+parentId).first();
-    newString = newString.replace(/(?:\r\n|\r)/g, '<br />');
+  //   var padLinkSpan = padInner.find("."+parentId).first();
+  //   newString = newString.replace(/(?:\r\n|\r)/g, '<br />');
 
-    // Write the new pad contents
-    padLinkSpan.html(newString);
+  //   // Write the new pad contents
+  //   padLinkSpan.html(newString);
 
-    if(isRevert){
-      // Tell all users this change was reverted
-      self.socket.emit('revertChange', data, function (){});
-      self.showChangeAsReverted(data.linkId);
-    }else{
-      // Tell all users this change was accepted
-      self.socket.emit('acceptChange', data, function (){});
-      // Update our own links container with the accepted change
-      self.showChangeAsAccepted(data.linkId);
-    }
+  //   if(isRevert){
+  //     // Tell all users this change was reverted
+  //     self.socket.emit('revertChange', data, function (){});
+  //     self.showChangeAsReverted(data.linkId);
+  //   }else{
+  //     // Tell all users this change was accepted
+  //     self.socket.emit('acceptChange', data, function (){});
+  //     // Update our own links container with the accepted change
+  //     self.showChangeAsAccepted(data.linkId);
+  //   }
 
-    // TODO: we need ace editor to commit the change so other people get it
-    // currently after approving or reverting, you need to do other thing on the pad
-    // for ace to commit
-  });
+  //   // TODO: we need ace editor to commit the change so other people get it
+  //   // currently after approving or reverting, you need to do other thing on the pad
+  //   // for ace to commit
+  // });
 
   // When input reply is focused we display more option
   this.container.parent().on("focus", ".link-content", function(e){
@@ -276,6 +283,28 @@ ep_links.prototype.init = function(){
     $(this).find('.suggestion-checkbox').prop('checked', false);
     $(this).find('.new-link').removeClass('editing');
   });
+
+  
+  this.container.on("click", ".ep_hyperlink_docs_bubble_button_edit", function(e){
+    var linkId = $(this).closest('.link-container')[0].id;
+    console.log(linkId)
+    self.padOuter.find("#show-form-"+linkId).hide()
+    self.padOuter.find("#edit-form-"+linkId).show()
+
+  })
+  this.container.on("click", ".ep_hyperlink_docs_bubble_button_copy", function(e){
+    var dummy = document.createElement('input');
+    document.body.appendChild(dummy);
+		dummy.value = this.getAttribute("data-hyperlink");
+		dummy.select();
+		document.execCommand('copy');
+		document.body.removeChild(dummy);
+		$.gritter.add({
+			text:'Link copied to clipboard',
+      });
+      var linkId = $(this).closest('.link-container')[0].id;
+      linkBoxes.hideLink(linkId);
+  })
 
   // When a reply get submitted
   // this.container.parent().on("submit", ".new-link", function(e){
@@ -430,7 +459,6 @@ ep_links.prototype.collectLinks = function(callback){
   var container   = this.container;
   var links    = this.links;
   var padLink  = this.padInner.contents().find('.link');
-
   padLink.each(function(it){
     var $this           = $(this);
     var cls             = $this.attr('class');
@@ -496,14 +524,20 @@ ep_links.prototype.collectLinks = function(callback){
   //     linkBoxes.hideLink(e.currentTarget.id);
   //   },5000);
   // });
+  //
+  
+  
 
   // HOVER OR CLICK THE LINKED TEXT IN THE EDITOR
   // hover event
   
   this.padInner.contents().on("click", ".link", function(e){
     if (container.is(':visible')) { // not on mobile
+      e.preventDefault();
+
       clearTimeout(hideLinkTimer);
       var linkId = self.linkIdOf(e);
+      linkBoxes.selectText($(this))
       linkBoxes.highlightLink(linkId, e, $(this) , self.socket , self.padId);
     }
   });
@@ -848,27 +882,35 @@ ep_links.prototype.getLinkData = function (){
 ep_links.prototype.deleteLink = function(linkId){
   $('iframe[name="ace_outer"]').contents().find('#' + linkId).remove();
 }
-
+// start modal of new link
 ep_links.prototype.displayNewLinkForm = function() {
   var self = this;
   var rep = {};
   var ace = this.ace;
-
   ace.callWithAce(function(ace) {
     var saveRep = ace.ace_getRep();
-
     rep.lines    = saveRep.lines;
     rep.selStart = saveRep.selStart;
     rep.selEnd   = saveRep.selEnd;
   },'saveLinkedSelection', true);
 
   var selectedText = self.getSelectedText(rep);
+
   // we have nothing selected, do nothing
   var noTextSelected = (selectedText.length === 0);
   if (noTextSelected) {
     $.gritter.add({text: html10n.translations["ep_full_hyperlinks.add_link.hint"] || "Please first select the text to link"})
     return;
   }
+
+  
+  
+  // var s = window.getSelection();
+  // oRange = s.getRangeAt(0); //get the text range
+  // console.log(oRange)
+  // oRect = oRange.getBoundingClientRect();
+
+
   self.createNewLinkFormIfDontExist(rep);
 
   // Write the text to the changeFrom form
@@ -1056,9 +1098,6 @@ ep_links.prototype.saveLink = function(data, rep) {
     link.linkId = linkId;
     console.log(data)
     self.ace.callWithAce(function (ace){
-      console.log('addLink :: ', rep);
-
-      console.log('addLink :: ', rep.selEnd);
       if(data.link.text !== data.link.oldText){
         ace.ace_replaceRange(rep.selStart, rep.selEnd, data.link.text);
         if(data.link.oldText.length > data.link.text.length) {
@@ -1067,9 +1106,6 @@ ep_links.prototype.saveLink = function(data, rep) {
           rep.selEnd[1] += data.link.text.length - data.link.oldText.length
         }
       }
-      
-      console.log('addLink :: then ', rep.selEnd);
-
       ace.ace_performSelectionChange(rep.selStart, rep.selEnd, true);
       ace.ace_setAttributeOnSelection('link', linkId);
     },'insertLink', true);
