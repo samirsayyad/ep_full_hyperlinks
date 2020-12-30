@@ -198,6 +198,7 @@ ep_links.prototype.init = function(){
         //reverting modal to show because we change it to edit mode
         self.padOuter.find("#show-form-"+linkId).show()
         self.padOuter.find("#edit-form-"+linkId).hide()
+        $linkBox.attr({"data-loaded":false})
         // although the link or reply was saved on the data base successfully, it needs
         // to update the link or link reply variable with the new text saved
         self.setLinkOrReplyNewText(linkId, linkText,hyperlink);
@@ -513,18 +514,18 @@ ep_links.prototype.collectLinks = function(callback){
 
   //@@@@@@@@@@@@@@@@ get back just for dev
   var hideLinkTimer;
-  // this.container.on("mouseover", ".sidebar-link", function(e){
-  //   // highlight link
-  //   clearTimeout(hideLinkTimer);
-  //   //linkBoxes.highlightLink(e.currentTarget.id, e);
+  this.container.on("mouseover", ".sidebar-link", function(e){
+    // highlight link
+    clearTimeout(hideLinkTimer);
+    //linkBoxes.highlightLink(e.currentTarget.id, e);
 
-  // }).on("mouseout", ".sidebar-link", function(e){
-  //   // do not hide directly the link, because sometime the mouse get out accidently
-  //   hideLinkTimer = setTimeout(function() {
-  //     linkBoxes.hideLink(e.currentTarget.id);
-  //   },5000);
-  // });
-  //
+  }).on("mouseout", ".sidebar-link", function(e){
+    // do not hide directly the link, because sometime the mouse get out accidently
+    hideLinkTimer = setTimeout(function() {
+      linkBoxes.hideLink(e.currentTarget.id);
+    },5000);
+  });
+  
   
   
 
@@ -534,7 +535,6 @@ ep_links.prototype.collectLinks = function(callback){
   this.padInner.contents().on("click", ".link", function(e){
     if (container.is(':visible')) { // not on mobile
       e.preventDefault();
-
       clearTimeout(hideLinkTimer);
       var linkId = self.linkIdOf(e);
       linkBoxes.selectText($(this))

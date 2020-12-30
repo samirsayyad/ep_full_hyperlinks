@@ -122,7 +122,9 @@
     vertical-align: baseline;
     width: 189px;
     min-width: 189px;
-
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
     text-decoration: none !important;
     font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
 

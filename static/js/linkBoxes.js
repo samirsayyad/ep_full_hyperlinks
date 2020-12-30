@@ -23,6 +23,9 @@ var hideLink = function(linkId, hideLinkTitle) {
   if (linkElm.hasClass("hyperlink-display") ){
     linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) - 35 + "px"  })
     linkElm.removeClass('hyperlink-display');
+    linkElm.css({"width":"324px"})
+    padOuter.find("#edit-form-"+linkId).hide()
+    padOuter.find("#show-form-"+linkId).show()
   }
 
 
@@ -45,7 +48,10 @@ var hideAllLinks = function() {
     inner.contents().find("head .link-style").remove();
     if ($(this).hasClass("hyperlink-display")){
       $(this).removeClass('hyperlink-display')
-      
+      $(this).css({"width":"324px"})
+      padOuter.find("#edit-form-"+$(this).attr("data-linkid")).hide()
+      padOuter.find("#show-form-"+$(this).attr("data-linkid")).show()
+      $(this).css({top:  parseInt($(this).css("top").split('px')[0]) - 35 + "px"  })
     }
   });
 }
@@ -106,6 +112,11 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
       if ($(this).attr("data-linkid") != linkId){
         if ($(this).hasClass("hyperlink-display") ){
           $(this).removeClass('hyperlink-display')
+
+          //back to default showing
+          padOuter.find("#edit-form-"+$(this).attr("data-linkid")).hide()
+          padOuter.find("#show-form-"+$(this).attr("data-linkid")).show()
+
           $(this).css({top:  parseInt($(this).css("top").split('px')[0]) - 35 + "px"  })
         }
       }
@@ -116,91 +127,94 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
 
 
     if (!linkElm.hasClass("hyperlink-display")){
+      linkElm.css({"width":"324px"}) // because of need to determine exact size for putting best area
 
       var loaded= linkElm.data("loaded")
-      selectText(linkElm)
+      console.log("loadded",loaded)
       if(loaded){
         linkElm.css({"left":parseInt(editorLink.position().left) +parseInt(linkElm.css("width").split('px')[0]) + "px"   })
         linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 35 + "px"  })
         linkElm.addClass('hyperlink-display');
 
-        return false;
-      }
-        
-        
-      var ep_hyperlink_title      = linkElm.find('#ep_hyperlink_title');
-      var ep_hyperlink_img      = linkElm.find('#ep_hyperlink_img');
-      var ep_hyperlink_description  = linkElm.find("#ep_hyperlink_description")
-      var card_loading_hyperlink  = linkElm.find("#card_loading_hyperlink")
+      }else{
+
       
-      ep_hyperlink_img.hide()
-      ep_hyperlink_title.show()
-      card_loading_hyperlink.show()
+        
+        
+        var ep_hyperlink_title      = linkElm.find('#ep_hyperlink_title');
+        var ep_hyperlink_img      = linkElm.find('#ep_hyperlink_img');
+        var ep_hyperlink_description  = linkElm.find("#ep_hyperlink_description")
+        var card_loading_hyperlink  = linkElm.find("#card_loading_hyperlink")
+        
+        ep_hyperlink_img.hide()
+        ep_hyperlink_title.show()
+        card_loading_hyperlink.show()
 
 
 
 
-      linkElm.css({"left":parseInt(editorLink.position().left) +parseInt(linkElm.css("width").split('px')[0]) + "px"   })
-      linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 35 + "px"  })
-      linkElm.addClass('hyperlink-display');
-      //raise for og:title resolving
+        linkElm.css({"left":parseInt(editorLink.position().left) +parseInt(linkElm.css("width").split('px')[0]) + "px"   })
+        linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 35 + "px"  })
+        linkElm.addClass('hyperlink-display');
+        //raise for og:title resolving
 
-      var hyperlink =linkElm.data("hyperlink") ;
-      if(!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
-        hyperlink = "https://" + hyperlink;
-      }
+        var hyperlink =linkElm.data("hyperlink") ;
+        if(!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
+          hyperlink = "https://" + hyperlink;
+        }
 
-      socket.emit('metaResolver', {padId: padId,hyperlink : hyperlink}, function (res){
-        if(res){
-          console.log(res)
-          ep_hyperlink_title.attr('href',hyperlink);
-  
-          var image = null ;
-  
-          if(res.image )
-            image = res.image 
-            
-          else 
-            {
-              if (res.images){
-                $.each(res.images,function(key,value){
-                  if(isUrlValid(value) && notInTheseUrls(value)){
-                    image = value;
-                    return false;
-                  }
-                });
+        socket.emit('metaResolver', {padId: padId,hyperlink : hyperlink}, function (res){
+          if(res){
+            console.log(res)
+            ep_hyperlink_title.attr('href',hyperlink);
+    
+            var image = null ;
+    
+            if(res.image )
+              image = res.image 
+              
+            else 
+              {
+                if (res.images){
+                  $.each(res.images,function(key,value){
+                    if(isUrlValid(value) && notInTheseUrls(value)){
+                      image = value;
+                      return false;
+                    }
+                  });
+                }
+              }
+            if(isUrlValid(image)){
+              ep_hyperlink_img.attr('src',image);
+            }else{
+              if(isUrlValid(res.url+image)){
+                ep_hyperlink_img.attr('src',res.url+image);
+              }else{
+                ep_hyperlink_img.attr('src',res.uri.scheme+"://"+res.uri.host+image);
+    
               }
             }
-          if(isUrlValid(image)){
-            ep_hyperlink_img.attr('src',image);
-          }else{
-            if(isUrlValid(res.url+image)){
-              ep_hyperlink_img.attr('src',res.url+image);
-            }else{
-              ep_hyperlink_img.attr('src',res.uri.scheme+"://"+res.uri.host+image);
-  
-            }
-          }
-  
-          ep_hyperlink_img.on("load",function(){
-            
-            card_loading_hyperlink.fadeOut(500,function(){
-              ep_hyperlink_img.fadeIn()
-              ep_hyperlink_title.text(res.title)
-              ep_hyperlink_description.text(res.url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0])
-              linkElm.attr({"data-loaded":true})
-            })
-
-            
-             // ep_hyperlink_title.fadeIn()
+    
+            ep_hyperlink_img.on("load",function(){
               
-              // Animation complete.
+              card_loading_hyperlink.fadeOut(500,function(){
+                ep_hyperlink_img.fadeIn()
+                ep_hyperlink_title.text(res.title)
+                ep_hyperlink_description.text(res.url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0])
+                linkElm.attr({"data-loaded":true})
+              })
 
-          }) 
-        }
-        
-        
-      });
+              
+              // ep_hyperlink_title.fadeIn()
+                
+                // Animation complete.
+
+            }) 
+          }
+          
+          
+        });
+      }
 
 
 
