@@ -179,6 +179,42 @@ ep_links.prototype.init = function(){
     var hyperlink = $linkForm.find('.link-text-hyperlink').val();
     var oldLinkText = $linkForm.find('.link-text-text-old').val();
 
+    var padOuter = $('iframe[name="ace_outer"]').contents();
+    var padInner = padOuter.find('iframe[name="ace_inner"]');
+    var selector = "."+linkId;
+    var ace = self.ace
+    ace.callWithAce(function (aceTop){
+
+
+      var repArr = aceTop.ace_getRepFromSelector(selector, padInner);
+//      console.log("repArrm1",repArr,"selEnd",repArr[0][1][1])
+
+      if(oldLinkText !== linkText){
+        aceTop.ace_replaceRange(repArr[0][0], repArr[0][1],linkText);
+        if(oldLinkText.length > linkText.length) {
+          repArr[0][1][1] -= oldLinkText.length - linkText.length
+        }else if (oldLinkText.length < linkText.length){
+          repArr[0][1][1] += linkText.length - oldLinkText.length
+        }
+      }
+      ace.callWithAce(function (ace){
+        ace.ace_performSelectionChange(repArr[0][0],repArr[0][1],true);
+        ace.ace_setAttributeOnSelection('link', linkId);
+  
+        // Note that this is the correct way of doing it, instead of there being
+        // a linkId we now flag it as "link-deleted"
+      });
+    
+      // var attributeManager = aceTop.documentAttributeManager;
+      // var saveRep = aceTop.ace_getRep();
+      // rep.lines    = saveRep.lines;
+      // rep.selStart = saveRep.selStart;
+      // rep.selEnd   = saveRep.selEnd;
+      // console.log(saveRep)
+      // console.log("attrib",attributeManager.getAttributesOnPosition(rep.selStart[0], rep.selStart[1]))
+    },"editLinkedSelection",true);
+
+
     if(!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
       hyperlink = "http://" + hyperlink;
     }
@@ -679,8 +715,8 @@ ep_links.prototype.insertLink = function(linkId, link, index){
     else
       link.ignore = true;
 
-    console.log(link)
   }
+  console.log("link",link)
 
   content = $('#linksTemplate').tmpl(link);
 
@@ -1101,7 +1137,7 @@ ep_links.prototype.saveLink = function(data, rep) {
       if(data.link.text !== data.link.oldText){
         ace.ace_replaceRange(rep.selStart, rep.selEnd, data.link.text);
         if(data.link.oldText.length > data.link.text.length) {
-          rep.selEnd[1] += data.link.oldText.length - data.link.text.length
+          rep.selEnd[1] -= data.link.oldText.length - data.link.text.length
         }else if (data.link.oldText.length < data.link.text.length){
           rep.selEnd[1] += data.link.text.length - data.link.oldText.length
         }
