@@ -30,7 +30,6 @@ var cancelNewLink = function(){
 
 // Callback for new link Submit
 var submitNewLink = function(callback) {
-  console.log("link-create-btn")
   var index = 0;
   var form = $('#newLink');
   var link = buildLinkFrom(form);

@@ -76,7 +76,6 @@ ep_links.prototype.init = function(){
 
   this.getLinkReplies(function (replies){
     if (!$.isEmptyObject(replies)){
-      // console.log("collecting link replies");
       self.linkReplies = replies;
       self.collectLinkReplies();
     }
@@ -87,7 +86,6 @@ ep_links.prototype.init = function(){
   // Init add push event
   this.pushLink('add', function (linkId, link){
     self.setLink(linkId, link);
-    // console.log('pushLink', link);
     self.collectLinksAfterSomeIntervalsOfTime();
   });
 
@@ -122,6 +120,7 @@ ep_links.prototype.init = function(){
     linkBoxes.hideLink(linkId);
 
   })
+
   // it was link-delete
   this.container.parent().on("click", ".ep_hyperlink_docs_bubble_button_delete", function(){
     var linkId = $(this).closest('.link-container')[0].id;
@@ -169,7 +168,6 @@ ep_links.prototype.init = function(){
 
   // submit the edition on the text and update the link text
   this.container.parent().on("click", ".link-edit-submit", function(e){
-    console.log("called?")
     e.preventDefault();
     e.stopPropagation();
     var $linkBox = $(this).closest('.link-container');
@@ -178,7 +176,7 @@ ep_links.prototype.init = function(){
     var linkText = $linkForm.find('.link-text-text').val();
     var hyperlink = $linkForm.find('.link-text-hyperlink').val();
     var oldLinkText = $linkForm.find('.link-text-text-old').val();
-
+    $linkForm.find('.link-text-text-old').val(linkText)
     var padOuter = $('iframe[name="ace_outer"]').contents();
     var padInner = padOuter.find('iframe[name="ace_inner"]');
     var selector = "."+linkId;
@@ -187,8 +185,6 @@ ep_links.prototype.init = function(){
 
 
       var repArr = aceTop.ace_getRepFromSelector(selector, padInner);
-//      console.log("repArrm1",repArr,"selEnd",repArr[0][1][1])
-
       if(oldLinkText !== linkText){
         aceTop.ace_replaceRange(repArr[0][0], repArr[0][1],linkText);
         if(oldLinkText.length > linkText.length) {
@@ -205,13 +201,6 @@ ep_links.prototype.init = function(){
         // a linkId we now flag it as "link-deleted"
       });
     
-      // var attributeManager = aceTop.documentAttributeManager;
-      // var saveRep = aceTop.ace_getRep();
-      // rep.lines    = saveRep.lines;
-      // rep.selStart = saveRep.selStart;
-      // rep.selEnd   = saveRep.selEnd;
-      // console.log(saveRep)
-      // console.log("attrib",attributeManager.getAttributesOnPosition(rep.selStart[0], rep.selStart[1]))
     },"editLinkedSelection",true);
 
 
@@ -324,7 +313,6 @@ ep_links.prototype.init = function(){
   
   this.container.on("click", ".ep_hyperlink_docs_bubble_button_edit", function(e){
     var linkId = $(this).closest('.link-container')[0].id;
-    console.log(linkId)
     self.padOuter.find("#show-form-"+linkId).hide()
     self.padOuter.find("#edit-form-"+linkId).show()
 
@@ -502,7 +490,6 @@ ep_links.prototype.collectLinks = function(callback){
     var classLinkId  = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
     var linkId       = (classLinkId) ? classLinkId[1] : null;
     if(!linkId){
-      // console.log("returning due to no link id, probably due to a deleted link");
       return;
     }
 
@@ -559,7 +546,7 @@ ep_links.prototype.collectLinks = function(callback){
     // do not hide directly the link, because sometime the mouse get out accidently
     hideLinkTimer = setTimeout(function() {
       linkBoxes.hideLink(e.currentTarget.id);
-    },5000);
+    },3000);
   });
   
   
@@ -567,13 +554,12 @@ ep_links.prototype.collectLinks = function(callback){
 
   // HOVER OR CLICK THE LINKED TEXT IN THE EDITOR
   // hover event
-  
+
   this.padInner.contents().on("click", ".link", function(e){
     if (container.is(':visible')) { // not on mobile
       e.preventDefault();
       clearTimeout(hideLinkTimer);
       var linkId = self.linkIdOf(e);
-      linkBoxes.selectText($(this))
       linkBoxes.highlightLink(linkId, e, $(this) , self.socket , self.padId);
     }
   });
@@ -630,8 +616,10 @@ ep_links.prototype.addListenersToCloseOpenedLink = function() {
 
 // Close link that is opened
 ep_links.prototype.closeOpenedLink = function(e) {
-  var linkId = this.linkIdOf(e);
-  linkBoxes.hideLink(linkId);
+  // var linkId = this.linkIdOf(e);
+  // linkBoxes.hideLink(linkId);
+  // it was using like above but I decide check hideAllLink
+  linkBoxes.hideAllLinks()
 }
 
 // Close link if event target was outside of link or on a link icon
@@ -716,8 +704,6 @@ ep_links.prototype.insertLink = function(linkId, link, index){
       link.ignore = true;
 
   }
-  console.log("link",link)
-
   content = $('#linksTemplate').tmpl(link);
 
   linkL10n.localize(content);
@@ -735,7 +721,7 @@ ep_links.prototype.insertLink = function(linkId, link, index){
   
 
   // insert icon
-  linkIcons.addIcon(linkId, link);
+  //linkIcons.addIcon(linkId, link);
 };
 
 // Set all links to be inline with their target REP
@@ -1132,7 +1118,6 @@ ep_links.prototype.saveLink = function(data, rep) {
   var self = this;
   self.socket.emit('addLink', data, function (linkId, link){
     link.linkId = linkId;
-    console.log(data)
     self.ace.callWithAce(function (ace){
       if(data.link.text !== data.link.oldText){
         ace.ace_replaceRange(rep.selStart, rep.selEnd, data.link.text);
@@ -1267,7 +1252,7 @@ ep_links.prototype.linkRepliesListen = function(){
 
 ep_links.prototype.updateLinkBoxText = function (linkId, linkText,hyperlink) {
   var $link = this.container.parent().find("[data-linkid='" + linkId + "']");
-  $link.data("hyperlink",hyperlink)
+  $link.attr("data-hyperlink",hyperlink)
   
   var textBox = this.findLinkText($link);
   //textBox.text(linkText)

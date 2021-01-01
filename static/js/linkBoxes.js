@@ -19,9 +19,13 @@ var showLink = function(linkId, e) {
 };
 
 var hideLink = function(linkId, hideLinkTitle) {
+  console.log("hideLink")
+
   var linkElm = getLinksContainer().find('#'+ linkId);
   if (linkElm.hasClass("hyperlink-display") ){
-    linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) - 35 + "px"  })
+    //linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) - 35 + "px"  })
+    console.log("data",linkElm.attr("data-basetop"))
+    linkElm.css({top: linkElm.attr("data-basetop")+ "px"  })
     linkElm.removeClass('hyperlink-display');
     linkElm.css({"width":"324px"})
     padOuter.find("#edit-form-"+linkId).hide()
@@ -39,6 +43,7 @@ var hideLink = function(linkId, hideLinkTitle) {
 };
 
 var hideAllLinks = function() {
+  console.log("hideAllLinks")
   // getLinksContainer().find('.sidebar-link').removeClass('full-display');
   // getPadOuter().find('.link-modal').removeClass('popup-show');
   var container       = getLinksContainer();
@@ -51,56 +56,16 @@ var hideAllLinks = function() {
       $(this).css({"width":"324px"})
       padOuter.find("#edit-form-"+$(this).attr("data-linkid")).hide()
       padOuter.find("#show-form-"+$(this).attr("data-linkid")).show()
-      $(this).css({top:  parseInt($(this).css("top").split('px')[0]) - 35 + "px"  })
+      //$(this).css({top:  parseInt($(this).css("top").split('px')[0]) - 35 + "px"  })
+
+      $(this).css({top:  $(this).attr("data-basetop")+ "px"  })
+
     }
   });
 }
 
-var selectText = function(linkElm) {
-  console.log(linkElm)
-  // if (document.selection) { // IE
-  //     var range = document.body.createTextRange();
-  //     range.moveToElementText(linkElm[0]);
-  //     range.select();
-  // } else if (window.getSelection) {
-  //     var range = document.createRange();
-  //     range.selectNode(linkElm[0]);
-  //     window.getSelection().removeAllRanges();
-  //     window.getSelection().addRange(range);
-  // }
-  // window.getSelection()
-  // .selectAllChildren(
-  //   linkElm[0]
-  // );
-
-
-  // var elem   = linkElm[0];
-  // var select = window.getSelection();
-  // var range  = document.createRange();
- 
-  // range.selectNodeContents(elem);
-  // select.addRange(range);
-
-
-
-  var doc = document
-  , text = linkElm[0]
-  , range, selection;   
-  console.log(text)
-  if (doc.body.createTextRange) {
-    range = document.body.createTextRange();
-    range.moveToElementText(text);
-    range.select();
-  } else if (window.getSelection) {
-    selection = window.getSelection();        
-    range = document.createRange();
-    range.selectNodeContents(text);
-    selection.removeAllRanges();
-    selection.addRange(range);
-  }
-}
-
 var highlightLink = function(linkId, e, editorLink,socket,padId){
+  console.log("highlightLink")
   var container       = getLinksContainer();
   var linkElm      = container.find('#'+ linkId);
   var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
@@ -117,7 +82,10 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
           padOuter.find("#edit-form-"+$(this).attr("data-linkid")).hide()
           padOuter.find("#show-form-"+$(this).attr("data-linkid")).show()
 
-          $(this).css({top:  parseInt($(this).css("top").split('px')[0]) - 35 + "px"  })
+          //$(this).css({top:  parseInt($(this).css("top").split('px')[0]) - 35 + "px"  })
+
+          $(this).css({top:  linkElm.attr("data-basetop")+ "px"  })
+
         }
       }
 
@@ -129,8 +97,7 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
     if (!linkElm.hasClass("hyperlink-display")){
       linkElm.css({"width":"324px"}) // because of need to determine exact size for putting best area
 
-      var loaded= linkElm.data("loaded")
-      console.log("loadded",loaded)
+      var loaded= linkElm.attr("data-loaded")
       if(loaded){
         linkElm.css({"left":parseInt(editorLink.position().left) +parseInt(linkElm.css("width").split('px')[0]) + "px"   })
         linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 35 + "px"  })
@@ -158,14 +125,13 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
         linkElm.addClass('hyperlink-display');
         //raise for og:title resolving
 
-        var hyperlink =linkElm.data("hyperlink") ;
+        var hyperlink =linkElm.attr("data-hyperlink") ;
         if(!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
           hyperlink = "https://" + hyperlink;
         }
 
         socket.emit('metaResolver', {padId: padId,hyperlink : hyperlink}, function (res){
           if(res){
-            console.log(res)
             ep_hyperlink_title.attr('href',hyperlink);
     
             var image = null ;
@@ -278,6 +244,7 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
 var adjustTopOf = function(linkId, baseTop) {
   var linkElement = getPadOuter().find('#'+linkId);
   linkElement.css("top", baseTop+"px");
+  linkElement.attr("data-basetop", baseTop);
 
   return linkElement;
 }
@@ -314,4 +281,3 @@ exports.highlightLink = highlightLink;
 exports.adjustTopOf = adjustTopOf;
 exports.isOnTop = isOnTop;
 exports.shouldNotCloseLink = shouldNotCloseLink;
-exports.selectText = selectText;

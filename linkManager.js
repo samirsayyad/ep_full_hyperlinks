@@ -332,7 +332,6 @@ exports.changeLinkData = function(data, callback){
     //get the entry
     db.get(prefix + data.padId, function(err, links){
       if(ERR(err, callback)) return;
-      console.log("data",data)
       //update the link text
       links[data.linkId].hyperlink = data.hyperlink;
       links[data.linkId].text = data.linkText;
