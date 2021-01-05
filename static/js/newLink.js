@@ -93,9 +93,17 @@ var showNewLinkPopup = function() {
 
   // Show popup
   $('#newLink').addClass("popup-show");
+  
 
   // mark selected text, so it is clear to user which text range the link is being applied to
   pad.plugins.ep_full_hyperlinks.preLinkMarker.markSelectedText();
+  
+  //focus on hyperlink input
+  
+
+  setTimeout(function() {$('#newLink').find('.link-content').focus().select(); }, 500);
+
+  
 }
 
 var hideNewLinkPopup = function() {
