@@ -1396,25 +1396,6 @@ exports.aceEditorCSS          = hooks.aceEditorCSS;
 exports.postAceInit           = hooks.postAceInit;
 exports.aceAttribsToClasses   = hooks.aceAttribsToClasses;
 exports.aceEditEvent          = hooks.aceEditEvent;
-exports.acePostWriteDomLineHTML = function (name, context) {
-  const hasHyperlink = $(context.node).find("a");
-  if(hasHyperlink.length>0){
-    hasHyperlink.each(function(){
-      const href = $(this).attr('href');
-      if(href.indexOf("header=") >=0 && href.indexOf("id=")>=0){
-        $(this).on('click', function(event){
-          event.stopImmediatePropagation();
-          event.preventDefault();
-          const href = $(this).attr("href");
-				  WRTC_Room.joinByQueryString(href);
-        });
-      }
-    })
-  }
-}
-// exports.aceRegisterBlockElements = function () {
-//   return spans;
-// };
 
 function getUrlVars(url)
 {
