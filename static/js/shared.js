@@ -17,6 +17,15 @@ var collectContentPre = function(hook, context){
     var linkId = mapFakeLinks[fakeLinkId];
     context.cc.doAttrib(context.state, "link::" + linkId);
   }
+
+  // const tname = context.tname;
+  // const state = context.state;
+  // const lineAttributes = state.lineAttributes;
+  // const tagIndex = tname;
+  // const fonts = ['link'];
+  // if (fonts.indexOf(tname) !== -1) {
+  //   context.cc.doAttrib(state, tname);
+  // }
 };
 
 exports.collectContentPre = collectContentPre;
