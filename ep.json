@@ -10,8 +10,7 @@
           "aceAttribsToClasses": "ep_full_hyperlinks/static/js/index",
           "aceEditorCSS": "ep_full_hyperlinks/static/js/index",
           "aceEditEvent": "ep_full_hyperlinks/static/js/index",
-          "aceInitialized": "ep_full_hyperlinks/static/js/index",
-          "acePostWriteDomLineHTML": "ep_full_hyperlinks/static/js/index"
+          "aceInitialized": "ep_full_hyperlinks/static/js/index"
         },
         "hooks": {
           "padRemove": "ep_full_hyperlinks/index",
