@@ -21,7 +21,7 @@ var caretPosition= require('ep_etherpad-lite/static/js/caretPosition')
 var getLinkIdOnFirstPositionSelected = events.getLinkIdOnFirstPositionSelected;
 var hasLinkOnSelection = events.hasLinkOnSelection;
 var browser = require('ep_etherpad-lite/static/js/browser');
-
+var spans = ['link']
 var cssFiles = ['ep_full_hyperlinks/static/css/link.css', 'ep_full_hyperlinks/static/css/linkIcon.css'];
 
 var UPDATE_LINK_LINE_POSITION_EVENT = 'updateLinkLinePosition';
@@ -1360,6 +1360,7 @@ var hooks = {
     if(eventType == "setup" || eventType == "setBaseText" || eventType == "importText") return;
     
     if(context.callstack.docTextChanged && pad.plugins.ep_full_hyperlinks){
+      console.log("context.callstack.docTextChanged && pad.plugins.ep_full_hyperlinks")
       pad.plugins.ep_full_hyperlinks.setYofLinks();
     }
 
@@ -1378,20 +1379,17 @@ var hooks = {
   },
 
   // Insert links classes
-  aceAttribsToClasses: function(hook, context){
+  aceAttribsToClasses: function(hook, context,cb){
     if(context.key === 'link' && context.value !== "link-deleted") {
-      return ['link', context.value];
+      return cb(['link', context.value]);
     }
     // only read marks made by current user
     if(context.key === preLinkMark.MARK_CLASS && context.value === clientVars.userId) {
-      return [preLinkMark.MARK_CLASS, context.value];
+      return cb([preLinkMark.MARK_CLASS, context.value]);
     }
   },
 
-  aceEditorCSS: function(){
-    return cssFiles;
-  }
-
+  aceEditorCSS: (hookName, context, cb) => cb(cssFiles),
 };
 
 exports.aceEditorCSS          = hooks.aceEditorCSS;
@@ -1414,6 +1412,9 @@ exports.acePostWriteDomLineHTML = function (name, context) {
     })
   }
 }
+// exports.aceRegisterBlockElements = function () {
+//   return spans;
+// };
 
 function getUrlVars(url)
 {

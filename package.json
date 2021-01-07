@@ -16,7 +16,10 @@
     "ep_full_hyperlink",
     "hyperlink"
   ],
-  "author": "Samir Sayyad",
+  "author": {
+		"name": "Samir Sayyad",
+		"email": "samir.saiad@gmail.com"
+	},
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/samirsayyad/ep_full_hyperlinks/issues"
