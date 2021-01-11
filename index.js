@@ -192,6 +192,7 @@ exports.socketio = function (hook_name, args, cb){
     });
 
   });
+  return cb()
 };
 
 exports.eejsBlock_dd_insert = function (hook_name, args, cb) {
@@ -323,6 +324,8 @@ exports.expressCreateServer = function (hook_name, args, callback) {
       }
     });
   });
+
+  return callback;
 
 }
 
