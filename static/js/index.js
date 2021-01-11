@@ -1381,15 +1381,15 @@ var hooks = {
   // Insert links classes
   aceAttribsToClasses: function(hook, context,cb){
     if(context.key === 'link' && context.value !== "link-deleted") {
-      return cb(['link', context.value]);
+      return ['link', context.value];
     }
     // only read marks made by current user
     if(context.key === preLinkMark.MARK_CLASS && context.value === clientVars.userId) {
-      return cb([preLinkMark.MARK_CLASS, context.value]);
+      return [preLinkMark.MARK_CLASS, context.value];
     }
   },
 
-  aceEditorCSS: (hookName, context, cb) => cb(cssFiles),
+  aceEditorCSS: (hookName, context, cb) => cssFiles,
 };
 
 exports.aceEditorCSS          = hooks.aceEditorCSS;
