@@ -8,36 +8,39 @@ var apiUtils = require('./apiUtils');
 var _ = require('ep_etherpad-lite/static/js/underscore');
 var meta = require('meta-resolver');
 
-exports.padRemove = function(hook_name, context, callback) {
+exports.padRemove = (hook_name, context, callback) => {
   linkManager.deleteLinkReplies(context.padID, function() {
     linkManager.deleteLinks(context.padID, callback);
   });
+  return [];
+
 }
-exports.padCopy = function(hook_name, context, callback) {
+exports.padCopy = (hook_name, context, callback) => {
   linkManager.copyLinks(context.originalPad.id, context.destinationID, function() {
     linkManager.copyLinkReplies(context.originalPad.id, context.destinationID, callback);
   });
+  return [];
 }
 
-exports.handleMessageSecurity = function(hook_name, context, callback){
+exports.handleMessageSecurity = (hook_name, context, callback) =>{
   if(context.message && context.message.data && context.message.data.apool){
     var apool = context.message.data.apool;
     if(apool.numToAttrib && apool.numToAttrib[0] && apool.numToAttrib[0][0]){
       if(apool.numToAttrib[0][0] === "link"){
         // Link change, allow it to override readonly security model!!
-        callback(true);
+        return true;
       }else{
-        callback();
+        return false;
       }
     }else{
-      callback();
+      return false;
     }
   }else{
-    callback();
+    return false;
   }
 };
 
-exports.socketio = function (hook_name, args, cb){
+exports.socketio = (hook_name, args, cb) =>{
   var app = args.app;
   var io = args.io;
   var pushLink;
@@ -45,48 +48,48 @@ exports.socketio = function (hook_name, args, cb){
 
   var linkSocket = io
   .of('/link')
-  .on('connection', function (socket) {
+  .on('connection',  (socket)  =>{
 
     // Join the rooms
-    socket.on('getLinks', function (data, callback) {
+    socket.on('getLinks', (data, callback)  => {
       var padId = data.padId;
       socket.join(padId);
-      linkManager.getLinks(padId, function (err, links){
+      linkManager.getLinks(padId,  (err, links)  =>{
         callback(links);
       });
     });
 
-    socket.on('getLinkReplies', function (data, callback) {
+    socket.on('getLinkReplies',  (data, callback) => {
       var padId = data.padId;
-      linkManager.getLinkReplies(padId, function (err, replies){
+      linkManager.getLinkReplies(padId,  (err, replies)  =>{
         callback(replies);
       });
     });
 
     // On add events
-    socket.on('addLink', function (data, callback) {
+    socket.on('addLink',  (data, callback) =>{
       var padId = data.padId;
       var content = data.link;
-      linkManager.addLink(padId, content, function (err, linkId, link){
+      linkManager.addLink(padId, content,  (err, linkId, link)=>{
         socket.broadcast.to(padId).emit('pushAddLink', linkId, link);
         callback(linkId, link);
       });
     });
 
-    socket.on('deleteLink', function(data, callback) {
+    socket.on('deleteLink', (data, callback)=> {
       // delete the link on the database
-      linkManager.deleteLink(data.padId, data.linkId, function (){
+      linkManager.deleteLink(data.padId, data.linkId, ()=>{
         // Broadcast to all other users that this link was deleted
         socket.broadcast.to(data.padId).emit('linkDeleted', data.linkId);
       });
 
     });
 
-    socket.on('revertChange', function(data, callback) {
+    socket.on('revertChange', (data, callback) =>{
       // Broadcast to all other users that this change was accepted.
       // Note that linkId here can either be the linkId or replyId..
       var padId = data.padId;
-      linkManager.changeAcceptedState(padId, data.linkId, false, function(){
+      linkManager.changeAcceptedState(padId, data.linkId, false, ()=>{
         socket.broadcast.to(padId).emit('changeReverted', data.linkId);
       });
     });
@@ -108,15 +111,15 @@ exports.socketio = function (hook_name, args, cb){
       });
     });
 
-    socket.on('bulkAddLinkReplies', function(padId, data, callback){
-      linkManager.bulkAddLinkReplies(padId, data, function (err, repliesId, replies){
+    socket.on('bulkAddLinkReplies', (padId, data, callback)=>{
+      linkManager.bulkAddLinkReplies(padId, data, (err, repliesId, replies)=>{
         socket.broadcast.to(padId).emit('pushAddLinkReply', repliesId, replies);
         var repliesWithReplyId = _.zip(repliesId, replies);
         callback(repliesWithReplyId);
       });
     });
 
-    socket.on('updateLinkText', function(data, callback) {
+    socket.on('updateLinkText', (data, callback) =>{
       // Broadcast to all other users that the link text was changed.
       // Note that linkId here can either be the linkId or replyId..
       var padId = data.padId;
@@ -132,7 +135,7 @@ exports.socketio = function (hook_name, args, cb){
       //   }
       //   callback(err);
       // });
-        linkManager.changeLinkData(data, function(err) {
+        linkManager.changeLinkData(data, (err) => {
         if(!err){
           socket.broadcast.to(padId).emit('textLinkUpdated', linkId, linkText,hyperlink);
         }
@@ -140,10 +143,10 @@ exports.socketio = function (hook_name, args, cb){
       });
     });
     // resolve meta of url
-    socket.on('metaResolver', async function (data, callback) {
+    socket.on('metaResolver', async (data, callback) =>{
       var hyperlink = data.hyperlink;
       let promise =new Promise((resolve,reject)=>{
-        meta.fetch(hyperlink,[],function(err,meta){
+        meta.fetch(hyperlink,[],(err,meta) =>{
           resolve(meta)
         })
       })
@@ -151,7 +154,7 @@ exports.socketio = function (hook_name, args, cb){
       callback(result)
     })
 
-    socket.on('addLinkReply', function (data, callback) {
+    socket.on('addLinkReply', (data, callback)  =>{
       var padId = data.padId;
       var content = data.reply;
       var changeTo = data.changeTo || null;
@@ -159,7 +162,7 @@ exports.socketio = function (hook_name, args, cb){
       var changeAccepted = data.changeAccepted || null;
       var changeReverted = data.changeReverted || null;
       var linkId = data.linkId;
-      linkManager.addLinkReply(padId, data, function (err, replyId, reply, changeTo, changeFrom, changeAccepted, changeReverted){
+      linkManager.addLinkReply(padId, data,  (err, replyId, reply, changeTo, changeFrom, changeAccepted, changeReverted) =>{
         reply.replyId = replyId;
         socket.broadcast.to(padId).emit('pushAddLinkReply', replyId, reply, changeTo, changeFrom, changeAccepted, changeReverted);
         callback(replyId, reply);
@@ -167,7 +170,7 @@ exports.socketio = function (hook_name, args, cb){
     });
 
     // link added via API
-    socket.on('apiAddLinks', function (data) {
+    socket.on('apiAddLinks', (data)  =>{
       var padId = data.padId;
       var linkIds = data.linkIds;
       var links = data.links;
@@ -178,7 +181,7 @@ exports.socketio = function (hook_name, args, cb){
     });
 
     // link reply added via API
-    socket.on('apiAddLinkReplies', function (data) {
+    socket.on('apiAddLinkReplies',  (data) => {
       var padId = data.padId;
       var replyIds = data.replyIds;
       var replies = data.replies;
@@ -192,46 +195,46 @@ exports.socketio = function (hook_name, args, cb){
     });
 
   });
-  return cb()
+  return []
 };
 
-exports.eejsBlock_dd_insert = function (hook_name, args, cb) {
+exports.eejsBlock_dd_insert = (hook_name, args, cb)  =>{
   args.content = args.content + eejs.require("ep_full_hyperlinks/templates/menuButtons.ejs");
-  return cb();
+  return [];
 };
 
-exports.eejsBlock_mySettings = function (hook_name, args, cb) {
+exports.eejsBlock_mySettings = (hook_name, args, cb)  =>{
   args.content = args.content + eejs.require("ep_full_hyperlinks/templates/settings.ejs");
-  return cb();
+  return [];
 };
 
-exports.eejsBlock_editbarMenuLeft = function (hook_name, args, cb) {
+exports.eejsBlock_editbarMenuLeft = (hook_name, args, cb)  =>{
   args.content = args.content + eejs.require("ep_full_hyperlinks/templates/linkBarButtons.ejs");
-  return cb();
+  return [];
 };
 
-exports.eejsBlock_scripts = function (hook_name, args, cb) {
+exports.eejsBlock_scripts = (hook_name, args, cb)  =>{
   args.content = args.content + eejs.require("ep_full_hyperlinks/templates/links.html", {}, module);
   args.content = args.content + eejs.require("ep_full_hyperlinks/templates/linkIcons.html", {}, module);
-  return cb();
+  return [];
 };
 
-exports.eejsBlock_styles = function (hook_name, args, cb) {
+exports.eejsBlock_styles =  (hook_name, args, cb)  =>{
   args.content = args.content + eejs.require("ep_full_hyperlinks/templates/styles.html", {}, module);
-  return cb();
+  return [];
 };
 
-exports.clientVars = function (hook, context, cb) {
+exports.clientVars = (hook, context, cb) => {
   var displayLinkAsIcon = settings.ep_full_hyperlinks ? settings.ep_full_hyperlinks.displayLinkAsIcon : false;
   var highlightSelectedText = settings.ep_full_hyperlinks ? settings.ep_full_hyperlinks.highlightSelectedText : false;
-  return cb({
+  return {
     "displayLinkAsIcon": displayLinkAsIcon,
     "highlightSelectedText": highlightSelectedText,
-  });
+  };
 };
 
-exports.expressCreateServer = function (hook_name, args, callback) {
-  args.app.get('/p/:pad/:rev?/links', function(req, res) {
+exports.expressCreateServer = (hook_name, args, callback) => {
+  args.app.get('/p/:pad/:rev?/links', (req, res)  =>{
     var fields = req.query;
     // check the api key
     if(!apiUtils.validateApiKey(fields, res)) return;
@@ -248,7 +251,7 @@ exports.expressCreateServer = function (hook_name, args, callback) {
     });
   });
 
-  args.app.post('/p/:pad/:rev?/links', function(req, res) {
+  args.app.post('/p/:pad/:rev?/links', (req, res)  =>{
     new formidable.IncomingForm().parse(req, function (err, fields, files) {
       // check the api key
       if(!apiUtils.validateApiKey(fields, res)) return;
@@ -277,7 +280,7 @@ exports.expressCreateServer = function (hook_name, args, callback) {
     });
   });
 
-  args.app.get('/p/:pad/:rev?/linkReplies', function(req, res){
+  args.app.get('/p/:pad/:rev?/linkReplies', (req, res) =>{
     //it's the same thing as the formidable's fields
     var fields = req.query;
     // check the api key
@@ -296,7 +299,7 @@ exports.expressCreateServer = function (hook_name, args, callback) {
     });
   });
 
-  args.app.post('/p/:pad/:rev?/linkReplies', function(req, res) {
+  args.app.post('/p/:pad/:rev?/linkReplies', (req, res) => {
     new formidable.IncomingForm().parse(req, function (err, fields, files) {
       // check the api key
       if(!apiUtils.validateApiKey(fields, res)) return;
@@ -325,11 +328,11 @@ exports.expressCreateServer = function (hook_name, args, callback) {
     });
   });
 
-  return callback;
+  return [];
 
 }
 
-var broadcastLinksAdded = function(padId, linkIds, links) {
+var broadcastLinksAdded = (padId, linkIds, links)  =>{
   var socket = clientIO.connect(broadcastUrl);
 
   var data = {
@@ -341,7 +344,7 @@ var broadcastLinksAdded = function(padId, linkIds, links) {
   socket.emit('apiAddLinks', data);
 }
 
-var broadcastLinkRepliesAdded = function(padId, replyIds, replies) {
+var broadcastLinkRepliesAdded = (padId, replyIds, replies)  =>{
   var socket = clientIO.connect(broadcastUrl);
 
   var data = {
