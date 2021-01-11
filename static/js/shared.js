@@ -1,6 +1,6 @@
 var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 
-var collectContentPre = function(hook, context){
+var collectContentPre = (hook, context)=>{
   var link = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(context.cls);
   var fakeLink = /(?:^| )(fakelink-[A-Za-z0-9]*)/.exec(context.cls);
 
@@ -26,6 +26,8 @@ var collectContentPre = function(hook, context){
   // if (fonts.indexOf(tname) !== -1) {
   //   context.cc.doAttrib(state, tname);
   // }
+
+  return[]
 };
 
 exports.collectContentPre = collectContentPre;
