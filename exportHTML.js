@@ -3,11 +3,11 @@ var _ = require('ep_etherpad-lite/static/js/underscore');
 
 
 // Add the props to be supported in export
-exports.exportHtmlAdditionalTagsWithData = function(hook, pad, cb){
+exports.exportHtmlAdditionalTagsWithData = (hook, pad, cb)=>{
   var links_used = findAllLinkUsedOn(pad);
   var tags = transformLinksIntoTags(links_used);
 
-  cb(tags);
+  return tags
 };
 
 // Iterate over pad attributes to find only the link ones
@@ -35,8 +35,9 @@ function transformLinksIntoTags(link_names) {
 //   cb(rewriteLine);
 // }
 
-exports.getLineHTMLForExport = function (hook, context) {
+exports.getLineHTMLForExport = (hook, context) =>{
   rewriteLine(context);
+  return []
 }
 
 

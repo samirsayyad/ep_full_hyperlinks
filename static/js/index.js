@@ -1332,7 +1332,7 @@ ep_links.prototype.pushLink = function(eventType, callback){
 var hooks = {
 
   // Init pad links
-  postAceInit: function(hook, context){
+  postAceInit: (hook, context)=>{
     if(!pad.plugins) pad.plugins = {};
     var Links = new ep_links(context);
     pad.plugins.ep_full_hyperlinks = Links;
@@ -1345,9 +1345,10 @@ var hooks = {
         class_name: "error"
       })
     }
+    return[];
   },
 
-  aceEditEvent: function(hook, context){
+  aceEditEvent: (hook, context)=>{
     if(!pad.plugins) pad.plugins = {};
     // first check if some text is being marked/unmarked to add link to it
     var eventType = context.callstack.editEvent.eventType;
@@ -1376,20 +1377,22 @@ var hooks = {
         });
       }
     }
+    return [];
   },
 
   // Insert links classes
-  aceAttribsToClasses: function(hook, context,cb){
+  aceAttribsToClasses: (hook, context,cb)=>{
     if(context.key === 'link' && context.value !== "link-deleted") {
-      return cb(['link', context.value]);
+      return ['link', context.value];
     }
     // only read marks made by current user
     if(context.key === preLinkMark.MARK_CLASS && context.value === clientVars.userId) {
-      return cb([preLinkMark.MARK_CLASS, context.value]);
+      return [preLinkMark.MARK_CLASS, context.value];
     }
+    return[];
   },
 
-  aceEditorCSS: (hookName, context, cb) => cb(cssFiles),
+  aceEditorCSS: (hookName, context, cb) => cssFiles,
 };
 
 exports.aceEditorCSS          = hooks.aceEditorCSS;
