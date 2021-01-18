@@ -268,7 +268,7 @@ var notInTheseUrls  = function(url) {
 // Indicates if event was on one of the elements that does not close link
 var shouldNotCloseLink = function(e) {
   // a link box
-  if ($(e.target).closest('.sidebar-link').length || $(e.target).closest('.link-modal').length) { // the link modal
+  if ($(e.target).closest('.link').length || $(e.target).closest('.link-modal').length) { // the link modal
     return true;
   }
   return false;
