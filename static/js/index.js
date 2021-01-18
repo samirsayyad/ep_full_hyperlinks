@@ -121,30 +121,8 @@ ep_links.prototype.init = function(){
 
   })
 
-  // it was link-delete
-  this.container.parent().on("click", ".ep_hyperlink_docs_bubble_button_delete", function(){
-    var linkId = $(this).closest('.link-container')[0].id;
-    self.deleteLink(linkId);
-    var padOuter = $('iframe[name="ace_outer"]').contents();
-    var padInner = padOuter.find('iframe[name="ace_inner"]');
-    var selector = "."+linkId;
-    var ace = self.ace;
-    ace.callWithAce(function(aceTop){
-      var repArr = aceTop.ace_getRepFromSelector(selector, padInner);
-      // rep is an array of reps..  I will need to iterate over each to do something meaningful..
-      $.each(repArr, function(index, rep){
-        // I don't think we need this nested call
-        ace.callWithAce(function (ace){
-          ace.ace_performSelectionChange(rep[0],rep[1],true);
-          ace.ace_setAttributeOnSelection('link', 'link-deleted');
-          // Note that this is the correct way of doing it, instead of there being
-          // a linkId we now flag it as "link-deleted"
-        });
-      });
-    },'deleteLinkedSelection', true);
-    // dispatch event
-    self.socket.emit('deleteLink', {padId: self.padId, linkId: linkId}, function (){});
-  });
+
+  
 
   // Listen for events to edit a link
   // Here, it adds a form to edit the link text
@@ -309,15 +287,15 @@ ep_links.prototype.init = function(){
     $(this).find('.suggestion-checkbox').prop('checked', false);
     $(this).find('.new-link').removeClass('editing');
   });
-
-  
-  this.container.on("click", ".ep_hyperlink_docs_bubble_button_edit", function(e){
+  this.container.parent().on("click", ".ep_hyperlink_docs_bubble_button_edit", function(e){
+    console.log("what the ?")
     var linkId = $(this).closest('.link-container')[0].id;
     self.padOuter.find("#show-form-"+linkId).hide()
     self.padOuter.find("#edit-form-"+linkId).show()
 
   })
-  this.container.on("click", ".ep_hyperlink_docs_bubble_button_copy", function(e){
+
+  this.container.parent().on("click", ".ep_hyperlink_docs_bubble_button_copy", function(e){
     var dummy = document.createElement('input');
     document.body.appendChild(dummy);
 		dummy.value = this.getAttribute("data-hyperlink");
@@ -330,6 +308,31 @@ ep_links.prototype.init = function(){
       var linkId = $(this).closest('.link-container')[0].id;
       linkBoxes.hideLink(linkId);
   })
+  
+  // it was link-delete
+  this.container.parent().on("click", ".ep_hyperlink_docs_bubble_button_delete", function(){
+    var linkId = $(this).closest('.link-container')[0].id;
+    self.deleteLink(linkId);
+    var padOuter = $('iframe[name="ace_outer"]').contents();
+    var padInner = padOuter.find('iframe[name="ace_inner"]');
+    var selector = "."+linkId;
+    var ace = self.ace;
+    ace.callWithAce(function(aceTop){
+      var repArr = aceTop.ace_getRepFromSelector(selector, padInner);
+      // rep is an array of reps..  I will need to iterate over each to do something meaningful..
+      $.each(repArr, function(index, rep){
+        // I don't think we need this nested call
+        ace.callWithAce(function (ace){
+          ace.ace_performSelectionChange(rep[0],rep[1],true);
+          ace.ace_setAttributeOnSelection('link', 'link-deleted');
+          // Note that this is the correct way of doing it, instead of there being
+          // a linkId we now flag it as "link-deleted"
+        });
+      });
+    },'deleteLinkedSelection', true);
+    // dispatch event
+    self.socket.emit('deleteLink', {padId: self.padId, linkId: linkId}, function (){});
+  });
 
   // When a reply get submitted
   // this.container.parent().on("submit", ".new-link", function(e){
@@ -563,6 +566,9 @@ ep_links.prototype.collectLinks = function(callback){
       linkBoxes.highlightLink(linkId, e, $(this) , self.socket , self.padId);
     }
   });
+
+
+
   // this.padInner.contents().on("click", "*", function(e){
   //   console.log("we are from * ",$(this))
   //   var linkId = self.linkIdOf(e);
