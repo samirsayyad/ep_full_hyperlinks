@@ -61,7 +61,6 @@ var hideAllLinks = function() {
 }
 
 var highlightLink = function(linkId, e, editorLink,socket,padId){
-  log("highlightLink")
   var container       = getLinksContainer();
   var linkElm      = container.find('#'+ linkId);
   var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
