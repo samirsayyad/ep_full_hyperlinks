@@ -146,7 +146,7 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
             if(result.last !== true){
               socket.emit('metaResolver', {padId: padId,hyperlink : hyperlink,last:true}, metaResolverCallBack);
             }else{
-              ep_hyperlink_img.attr('src',"../static/plugins/ep_full_hyperlinks/static/img/notmeta.svg");  
+              ep_hyperlink_img.attr('src',"../static/plugins/ep_full_hyperlinks/static/img/nometa.png");  
               ep_hyperlink_img.on("load",function(){
                 card_loading_hyperlink.fadeOut(500,function(){
                   ep_hyperlink_img.fadeIn()
