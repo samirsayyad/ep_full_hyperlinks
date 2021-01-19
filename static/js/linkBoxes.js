@@ -19,12 +19,9 @@ var showLink = function(linkId, e) {
 };
 
 var hideLink = function(linkId, hideLinkTitle) {
-  console.log("hideLink")
-
   var linkElm = getLinksContainer().find('#'+ linkId);
   if (linkElm.hasClass("hyperlink-display") ){
     //linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) - 35 + "px"  })
-    console.log("data",linkElm.attr("data-basetop"))
     linkElm.css({top: linkElm.attr("data-basetop")+ "px"  })
     linkElm.removeClass('hyperlink-display');
     linkElm.css({"width":"324px"})
@@ -43,7 +40,6 @@ var hideLink = function(linkId, hideLinkTitle) {
 };
 
 var hideAllLinks = function() {
-  console.log("hideAllLinks")
   // getLinksContainer().find('.sidebar-link').removeClass('full-display');
   // getPadOuter().find('.link-modal').removeClass('popup-show');
   var container       = getLinksContainer();
@@ -65,7 +61,7 @@ var hideAllLinks = function() {
 }
 
 var highlightLink = function(linkId, e, editorLink,socket,padId){
-  console.log("highlightLink")
+  log("highlightLink")
   var container       = getLinksContainer();
   var linkElm      = container.find('#'+ linkId);
   var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
@@ -130,56 +126,104 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
           hyperlink = "https://" + hyperlink;
         }
 
-        socket.emit('metaResolver', {padId: padId,hyperlink : hyperlink}, function (res){
-          if(res){
-            ep_hyperlink_title.attr('href',hyperlink);
-    
-            var image = null ;
-    
-            if(res.image )
-              image = res.image 
-              
-            else 
-              {
-                if (res.images){
-                  $.each(res.images,function(key,value){
-                    if(isUrlValid(value) && notInTheseUrls(value)){
-                      image = value;
-                      return false;
-                    }
-                  });
-                }
-              }
-            if(isUrlValid(image)){
-              ep_hyperlink_img.attr('src',image);
-            }else{
-              if(isUrlValid(res.url+image)){
-                ep_hyperlink_img.attr('src',res.url+image);
-              }else{
-                ep_hyperlink_img.attr('src',res.uri.scheme+"://"+res.uri.host+image);
-    
-              }
-            }
-    
+        //........
+        const metaResolverCallBack = function (result){
+          ep_hyperlink_title.attr('href',hyperlink);
+
+          if(result.metadata.image && result.metadata.title){
+            ep_hyperlink_img.attr('src',result.metadata.image);  
             ep_hyperlink_img.on("load",function(){
-              
               card_loading_hyperlink.fadeOut(500,function(){
                 ep_hyperlink_img.fadeIn()
-                ep_hyperlink_title.text(res.title)
-                ep_hyperlink_description.text(res.url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0])
+                ep_hyperlink_title.text(result.metadata.title)
+                ep_hyperlink_description.text(result.metadata.url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0])
                 linkElm.attr({"data-loaded":true})
               })
+            })
+          }else{
+            var url = new URL(hyperlink);
+            hyperlink = "https://" + url.hostname;
+            if(result.last !== true){
+              socket.emit('metaResolver', {padId: padId,hyperlink : hyperlink,last:true}, metaResolverCallBack);
+            }else{
+              ep_hyperlink_img.attr('src',"../static/plugins/ep_full_hyperlinks/static/img/notmeta.svg");  
+              ep_hyperlink_img.on("load",function(){
+                card_loading_hyperlink.fadeOut(500,function(){
+                  ep_hyperlink_img.fadeIn()
+                  ep_hyperlink_description.text(hyperlink.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0])
+                  linkElm.attr({"data-loaded":true})
+                })
+              })
+
+            }
+          } 
+
+
+
+          ////////////// meta resolver
+          // if(res){
+          //   ep_hyperlink_title.attr('href',hyperlink);
+    
+          //   var image = null ;
+    
+          //   if(res.image ){
+          //     image = res.image 
+          //   }
+          //   else {
+          //     if (res.images){
+          //       $.each(res.images,function(key,value){
+          //         if(isUrlValid(value) && notInTheseUrls(value)){
+          //           image = value;
+          //           return false;
+          //         }
+          //       });
+          //     }
+          //   }
+          //   if(isUrlValid(image)){
+          //     ep_hyperlink_img.attr('src',image);
+          //   }else{
+          //     if(isUrlValid(res.url+image)){
+          //       ep_hyperlink_img.attr('src',res.url+image);
+          //     }else{
+          //       if (isUrlValid(res.uri.scheme+"://"+res.uri.host+image)){
+          //         ep_hyperlink_img.attr('src',res.uri.scheme+"://"+res.uri.host+image);
+          //       }else{
+          //         if (isUrlValid(res["forem:logo"])){
+          //           ep_hyperlink_img.attr('src',res["forem:logo"]);
+          //         }else{
+          //           ep_hyperlink_img.attr('src',"#");
+          //         }
+          //       }
+          //     }
+          //   }
+    
+          //   ep_hyperlink_img.on("load",function(){
+              
+          //     card_loading_hyperlink.fadeOut(500,function(){
+          //       ep_hyperlink_img.fadeIn()
+          //       ep_hyperlink_title.text(res.title)
+          //       ep_hyperlink_description.text(res.url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0])
+          //       linkElm.attr({"data-loaded":true})
+          //     })
 
               
-              // ep_hyperlink_title.fadeIn()
+          //     // ep_hyperlink_title.fadeIn()
                 
-                // Animation complete.
+          //       // Animation complete.
 
-            }) 
-          }
-          
-          
-        });
+          //   }) 
+          // }else{
+          //   console.log("res rtide")
+          //   var url = new URL(hyperlink);
+          //   hyperlink = "https://" + url.hostname;
+          //   socket.emit('metaResolver', {padId: padId,hyperlink : hyperlink}, metaResolverCallBack);
+          // }
+        }
+        //........
+
+
+
+        socket.emit('metaResolver', {padId: padId,hyperlink : hyperlink,last:false}, metaResolverCallBack);
       }
 
 

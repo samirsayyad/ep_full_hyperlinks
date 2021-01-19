@@ -6,7 +6,15 @@ var linkManager = require('./linkManager');
 var links = require('./links');
 var apiUtils = require('./apiUtils');
 var _ = require('ep_etherpad-lite/static/js/underscore');
-var meta = require('meta-resolver');
+//var meta = require('meta-resolver');
+const metascraper = require('metascraper')([
+  require('metascraper-description')(),
+  require('metascraper-image')(),
+  require('metascraper-logo')(),
+  require('metascraper-title')(),
+  require('metascraper-url')()
+])
+const got = require('got')
 
 exports.padRemove = (hook_name, context, callback) => {
   linkManager.deleteLinkReplies(context.padID, function() {
@@ -144,14 +152,19 @@ exports.socketio = (hook_name, args, cb) =>{
     });
     // resolve meta of url
     socket.on('metaResolver', async (data, callback) =>{
-      var hyperlink = data.hyperlink;
-      let promise =new Promise((resolve,reject)=>{
-        meta.fetch(hyperlink,[],(err,meta) =>{
-          resolve(meta)
-        })
+      // var hyperlink = data.hyperlink;
+      // let promise =new Promise((resolve,reject)=>{
+      //   meta.fetch(hyperlink,[],(err,meta) =>{
+      //     resolve(meta)
+      //   })
+      // })
+      // let result = await promise
+      const { body: html, url } = await got(data.hyperlink)
+      const metadata = await metascraper({ html, url })
+      callback({
+        metadata:metadata,
+        last : data.last
       })
-      let result = await promise
-      callback(result)
     })
 
     socket.on('addLinkReply', (data, callback)  =>{

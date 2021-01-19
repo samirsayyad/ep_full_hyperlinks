@@ -288,7 +288,6 @@ ep_links.prototype.init = function(){
     $(this).find('.new-link').removeClass('editing');
   });
   this.container.parent().on("click", ".ep_hyperlink_docs_bubble_button_edit", function(e){
-    console.log("what the ?")
     var linkId = $(this).closest('.link-container')[0].id;
     self.padOuter.find("#show-form-"+linkId).hide()
     self.padOuter.find("#edit-form-"+linkId).show()
@@ -1367,7 +1366,6 @@ var hooks = {
     if(eventType == "setup" || eventType == "setBaseText" || eventType == "importText") return;
     
     if(context.callstack.docTextChanged && pad.plugins.ep_full_hyperlinks){
-      console.log("context.callstack.docTextChanged && pad.plugins.ep_full_hyperlinks")
       pad.plugins.ep_full_hyperlinks.setYofLinks();
     }
 

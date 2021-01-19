@@ -17,16 +17,23 @@
     "hyperlink"
   ],
   "author": {
-		"name": "Samir Sayyad",
-		"email": "samir.saiad@gmail.com"
-	},
+    "name": "Samir Sayyad",
+    "email": "samir.saiad@gmail.com"
+  },
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/samirsayyad/ep_full_hyperlinks/issues"
   },
   "dependencies": {
     "formidable": "*",
+    "got": "^11.8.1",
     "meta-resolver": "0.0.3",
+    "metascraper": "^5.16.13",
+    "metascraper-description": "^5.16.13",
+    "metascraper-image": "^5.16.13",
+    "metascraper-logo": "^5.16.13",
+    "metascraper-title": "^5.16.13",
+    "metascraper-url": "^5.16.13",
     "socket.io-client": "*"
   },
   "homepage": "https://github.com/samirsayyad/ep_full_hyperlinks#readme"
