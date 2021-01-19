@@ -159,12 +159,20 @@ exports.socketio = (hook_name, args, cb) =>{
       //   })
       // })
       // let result = await promise
-      const { body: html, url } = await got(data.hyperlink)
-      const metadata = await metascraper({ html, url })
-      callback({
-        metadata:metadata,
-        last : data.last
-      })
+      try{
+        const { body: html, url } = await got(data.hyperlink)
+        const metadata = await metascraper({ html, url })
+        callback({
+          metadata:metadata,
+          last : data.last
+        })
+      }catch(e){
+        callback({
+          metadata:false,
+          last : data.last
+        })
+      }
+
     })
 
     socket.on('addLinkReply', (data, callback)  =>{
