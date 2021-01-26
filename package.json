@@ -4,7 +4,9 @@
   "description": "etherpad plugin ep_full_hyperlink hyperlink",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"lint": "eslint --fix .",
+    "lint:dry": "eslint --fix-dry-run ."
   },
   "repository": {
     "type": "git",
@@ -24,6 +26,14 @@
   "bugs": {
     "url": "https://github.com/samirsayyad/ep_full_hyperlinks/issues"
   },
+  "eslintConfig": {
+    "root": true,
+    "extends": "etherpad/plugin",
+    "ignorePatterns": [
+      "/static/dist/**/*.js"
+    ],
+    "globals": {}
+  },
   "dependencies": {
     "formidable": "*",
     "got": "^11.8.1",
@@ -36,5 +46,13 @@
     "metascraper-url": "^5.16.13",
     "socket.io-client": "*"
   },
-  "homepage": "https://github.com/samirsayyad/ep_full_hyperlinks#readme"
+  "homepage": "https://github.com/samirsayyad/ep_full_hyperlinks#readme",
+  "devDependencies": {
+    "eslint": "^7.18.0",
+    "eslint-config-etherpad": "^1.0.23",
+    "eslint-plugin-mocha": "^8.0.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-promise": "^4.2.1"
+  }
 }

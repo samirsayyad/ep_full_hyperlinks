@@ -1,21 +1,21 @@
 var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 
-var collectContentPre = (hook, context)=>{
-  var link = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(context.cls);
-  var fakeLink = /(?:^| )(fakelink-[A-Za-z0-9]*)/.exec(context.cls);
+var collectContentPre = (hook, context) => {
+  const link = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(context.cls);
+  const fakeLink = /(?:^| )(fakelink-[A-Za-z0-9]*)/.exec(context.cls);
 
-  if(link && link[1]){
-    context.cc.doAttrib(context.state, "link::" + link[1]);
+  if (link && link[1]) {
+    context.cc.doAttrib(context.state, `link::${link[1]}`);
   }
 
   // a fake link is a link copied from this or another pad. To avoid conflicts
   // with existing links, a fake linkId is used, so then we generate a new one
   // when the link is saved
-  if(fakeLink){
-    var mapFakeLinks = pad.plugins.ep_full_hyperlinks.getMapfakeLinks();
-    var fakeLinkId = fakeLink[1];
-    var linkId = mapFakeLinks[fakeLinkId];
-    context.cc.doAttrib(context.state, "link::" + linkId);
+  if (fakeLink) {
+    const mapFakeLinks = pad.plugins.ep_full_hyperlinks.getMapfakeLinks();
+    const fakeLinkId = fakeLink[1];
+    const linkId = mapFakeLinks[fakeLinkId];
+    context.cc.doAttrib(context.state, `link::${linkId}`);
   }
 
   // const tname = context.tname;
@@ -27,13 +27,13 @@ var collectContentPre = (hook, context)=>{
   //   context.cc.doAttrib(state, tname);
   // }
 
-  return[]
+  return [];
 };
 
 exports.collectContentPre = collectContentPre;
 
 
-exports.generateLinkId = function(){
-   var linkId = "lc-" + randomString(16);
-   return linkId;
-}
+exports.generateLinkId = function () {
+  const linkId = `lc-${randomString(16)}`;
+  return linkId;
+};
