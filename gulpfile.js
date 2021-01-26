@@ -22,8 +22,6 @@ const jsfiles = {
 
 const jsPlugins = []
 
-// var randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
-// var _ = require('ep_etherpad-lite/static/js/underscore');
 const etherpadModule = [`
 	const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 	const _ = require('ep_etherpad-lite/static/js/underscore');
@@ -33,16 +31,15 @@ const cssFiles = ['./static/css/**/*.css']
 const imageFiles = ['./static/img/*']
 
 const gulpifyJs = () => gulp.src([
-	...jsPlugins,
-	...Object.entries(jsfiles).map((x) => x[1])
-])
-    // .pipe(mode.production(sourcemaps.init()))
+		...jsPlugins,
+		...Object.entries(jsfiles).map((x) => x[1])
+	]).pipe(mode.production(sourcemaps.init()))
 		.pipe(concat('ep.full.hyperlinks.mini.js'))
 		.pipe(inject.prepend(`${etherpadModule} \n`))
     .pipe(inject.append(`return {\n${Object.entries(jsfiles).map((x) => `${x[0]}\n`)}}\n`))
     .pipe(inject.wrap('exports.moduleList = (()=>{\n', '})();'))
-    // .pipe(mode.production(uglify(/* options */)))
-    // .pipe(mode.production(sourcemaps.write('.')))
+    .pipe(mode.production(uglify(/* options */)))
+    .pipe(mode.production(sourcemaps.write('.')))
     .pipe(gulp.dest('./static/dist/js'));
 
 gulp.task('js', gulpifyJs);
@@ -53,6 +50,31 @@ gulp.task('minify-css', () => {
     .pipe(gulp.dest('static/dist/css'));
 });
 
+gulp.task('minify-image', () => {
+	return gulp.src(imageFiles)
+        .pipe(imagemin())
+        .pipe(gulp.dest('static/dist/img'))
+})
+
+gulp.task('bump', () => gulp.src('./package.json')
+    .pipe(bump())
+    .pipe(gulp.dest('./')));
+
+gulp.task('git:publish', () => gulp.src([
+  './static/dist/js/ep.full.hyperlinks.mini.js',
+  './static/dist/js/ep.full.hyperlinks.mini.js.map',
+  './package.json',
+])
+    .pipe(git.add())
+    .pipe(git.commit('build, version')));
+
+gulp.task('git:push', (cb) => {
+  git.push('origin', (err) => {
+    if (err) throw err;
+    cb();
+  });
+});
+
 gulp.task('watch', () => {
 	const watchFiles = [
 		...Object.entries(jsfiles).map((x) => x[1]),
@@ -60,3 +82,5 @@ gulp.task('watch', () => {
 	]
   gulp.watch(watchFiles, gulp.series(['js', 'minify-css']));
 });
+
+gulp.task('build', gulp.series(['js','minify-css', 'minify-image', 'bump', 'git:publish', 'git:push']));

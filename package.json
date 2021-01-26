@@ -1,10 +1,12 @@
 {
   "name": "ep_full_hyperlinks",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "etherpad plugin ep_full_hyperlink hyperlink",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "gulp js minify-css minify-image",
+    "build:prod": "gulp build --production",
     "lint": "eslint --fix .",
     "lint:dry": "eslint --fix-dry-run ."
   },

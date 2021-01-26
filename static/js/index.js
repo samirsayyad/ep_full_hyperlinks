@@ -16,7 +16,7 @@ const {
 const getLinkIdOnFirstPositionSelected = events.getLinkIdOnFirstPositionSelected;
 const hasLinkOnSelection = events.hasLinkOnSelection;
 const browser = require('ep_etherpad-lite/static/js/browser');
-const cssFiles = ['ep_full_hyperlinks/static/css/link.css', 'ep_full_hyperlinks/static/css/linkIcon.css'];
+const cssFiles = ['ep_full_hyperlinks/static/css/link.css', 'ep_full_hyperlinks/static/dist/css/linkIcon.css'];
 const UPDATE_LINK_LINE_POSITION_EVENT = 'updateLinkLinePosition';
 
 /** **********************************************************************/
