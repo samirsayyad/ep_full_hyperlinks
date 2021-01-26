@@ -4,8 +4,8 @@
   "description": "etherpad plugin ep_full_hyperlink hyperlink",
   "main": "index.js",
   "scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"lint": "eslint --fix .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --fix .",
     "lint:dry": "eslint --fix-dry-run ."
   },
   "repository": {
@@ -32,7 +32,9 @@
     "ignorePatterns": [
       "/static/dist/**/*.js"
     ],
-    "globals": {}
+    "globals": {
+			"ep_etherpad-lite": true
+		}
   },
   "dependencies": {
     "formidable": "*",
@@ -53,6 +55,16 @@
     "eslint-plugin-mocha": "^8.0.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prefer-arrow": "^1.2.3",
-    "eslint-plugin-promise": "^4.2.1"
+    "eslint-plugin-promise": "^4.2.1",
+    "gulp": "^4.0.2",
+    "gulp-bump": "^3.2.0",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-git": "^2.10.1",
+    "gulp-imagemin": "^7.1.0",
+    "gulp-inject-string": "^1.1.2",
+    "gulp-mode": "^1.0.2",
+    "gulp-sourcemaps": "^3.0.0",
+    "gulp-uglify-es": "^2.0.0"
   }
 }

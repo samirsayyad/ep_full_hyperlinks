@@ -1,30 +1,23 @@
-/* TODO:
-- lable reply textarea
-- Make the chekbox appear above the suggested changes even when activated
-*/
 
+const _ = require('ep_etherpad-lite/static/js/underscore');
+const padcookie = require('ep_etherpad-lite/static/js/pad_cookie').padcookie;
 
-var _, $, jQuery;
+const {
+	timeFormat,
+	linkBoxes,
+	linkIcons,
+	newLink,
+	preLinkMark,
+	linkL10n,
+	events,
+	shared
+} = require('../dist/js/ep.full.hyperlinks.mini').moduleList;
 
-var shared = require('./shared');
-var $ = require('ep_etherpad-lite/static/js/rjquery').$;
-var _ = require('ep_etherpad-lite/static/js/underscore');
-var padcookie = require('ep_etherpad-lite/static/js/pad_cookie').padcookie;
-var prettyDate = require('ep_full_hyperlinks/static/js/timeFormat').prettyDate;
-var linkBoxes = require('ep_full_hyperlinks/static/js/linkBoxes');
-var linkIcons = require('ep_full_hyperlinks/static/js/linkIcons');
-var newLink = require('ep_full_hyperlinks/static/js/newLink');
-var preLinkMark = require('ep_full_hyperlinks/static/js/preLinkMark');
-var linkL10n = require('ep_full_hyperlinks/static/js/linkL10n');
-var events = require('ep_full_hyperlinks/static/js/copyPasteEvents');
-var caretPosition = require('ep_etherpad-lite/static/js/caretPosition');
-var getLinkIdOnFirstPositionSelected = events.getLinkIdOnFirstPositionSelected;
-var hasLinkOnSelection = events.hasLinkOnSelection;
-var browser = require('ep_etherpad-lite/static/js/browser');
-var spans = ['link'];
-var cssFiles = ['ep_full_hyperlinks/static/css/link.css', 'ep_full_hyperlinks/static/css/linkIcon.css'];
-
-var UPDATE_LINK_LINE_POSITION_EVENT = 'updateLinkLinePosition';
+const getLinkIdOnFirstPositionSelected = events.getLinkIdOnFirstPositionSelected;
+const hasLinkOnSelection = events.hasLinkOnSelection;
+const browser = require('ep_etherpad-lite/static/js/browser');
+const cssFiles = ['ep_full_hyperlinks/static/css/link.css', 'ep_full_hyperlinks/static/css/linkIcon.css'];
+const UPDATE_LINK_LINE_POSITION_EVENT = 'updateLinkLinePosition';
 
 /** **********************************************************************/
 /*                         ep_links Plugin                           */
@@ -640,7 +633,7 @@ ep_links.prototype.collectLinkReplies = function (callback) {
 
       reply.replyId = replyId;
       reply.text = reply.text || '';
-      reply.date = prettyDate(reply.timestamp);
+      reply.date = timeFormat.prettyDate(reply.timestamp);
       reply.formattedDate = new Date(reply.timestamp).toISOString();
 
       const content = $('#replyTemplate').tmpl(reply);
@@ -802,7 +795,7 @@ ep_links.prototype.localizeExistingLinks = function () {
       // localize link element...
       linkL10n.localize(linkElm);
       // ... and update its date
-      link.data.date = prettyDate(link.data.timestamp);
+      link.data.date = timeFormat.prettyDate(link.data.timestamp);
       link.data.formattedDate = new Date(link.data.timestamp).toISOString();
     }
   });
@@ -818,7 +811,7 @@ ep_links.prototype.setLinks = function (links) {
 // Set link data
 ep_links.prototype.setLink = function (linkId, link) {
   const links = this.links;
-  link.date = prettyDate(link.timestamp);
+  link.date = timeFormat.prettyDate(link.timestamp);
   link.formattedDate = new Date(link.timestamp).toISOString();
 
   if (links[linkId] == null) links[linkId] = {};
@@ -1364,11 +1357,6 @@ var hooks = {
   aceEditorCSS: (hookName, context, cb) => cssFiles,
 };
 
-exports.aceEditorCSS = hooks.aceEditorCSS;
-exports.postAceInit = hooks.postAceInit;
-exports.aceAttribsToClasses = hooks.aceAttribsToClasses;
-exports.aceEditEvent = hooks.aceEditEvent;
-
 function getUrlVars(url) {
   const vars = []; let
     hash;
@@ -1477,3 +1465,9 @@ exports.aceInitialized = function (hook, context) {
   editorInfo.ace_getLinkIdOnFirstPositionSelected = _(getLinkIdOnFirstPositionSelected).bind(context);
   editorInfo.ace_hasLinkOnSelection = _(hasLinkOnSelection).bind(context);
 };
+
+exports.aceEditorCSS = hooks.aceEditorCSS;
+exports.postAceInit = hooks.postAceInit;
+exports.aceAttribsToClasses = hooks.aceAttribsToClasses;
+exports.aceEditEvent = hooks.aceEditEvent;
+exports.collectContentPre = shared.collectContentPre

@@ -1,3 +1,5 @@
+'use strict';
+
 const eejs = require('ep_etherpad-lite/node/eejs/');
 const settings = require('ep_etherpad-lite/node/utils/Settings');
 const formidable = require('formidable');
@@ -22,6 +24,8 @@ exports.padRemove = (hook_name, context, callback) => {
   });
   return [];
 };
+
+console.log(';lkas;ldk;aks;ldka0s9d-09-09-09-9-09-09-09-09-09-');
 exports.padCopy = (hook_name, context, callback) => {
   linkManager.copyLinks(context.originalPad.id, context.destinationID, () => {
     linkManager.copyLinkReplies(context.originalPad.id, context.destinationID, callback);
@@ -42,19 +46,13 @@ exports.handleMessageSecurity = (hook_name, context, callback) => {
     } else {
       return false;
     }
-  } else {
-    return false;
   }
+  return false;
 };
 
 exports.socketio = (hook_name, args, cb) => {
-  const app = args.app;
   const io = args.io;
-  let pushLink;
-  const padLink = io;
-
-  const linkSocket = io
-      .of('/link')
+  io.of('/link')
       .on('connection', (socket) => {
         // Join the rooms
         socket.on('getLinks', (data, callback) => {
@@ -172,12 +170,6 @@ exports.socketio = (hook_name, args, cb) => {
 
         socket.on('addLinkReply', (data, callback) => {
           const padId = data.padId;
-          const content = data.reply;
-          const changeTo = data.changeTo || null;
-          const changeFrom = data.changeFrom || null;
-          const changeAccepted = data.changeAccepted || null;
-          const changeReverted = data.changeReverted || null;
-          const linkId = data.linkId;
           linkManager.addLinkReply(padId, data, (err, replyId, reply, changeTo, changeFrom, changeAccepted, changeReverted) => {
             reply.replyId = replyId;
             socket.broadcast.to(padId).emit('pushAddLinkReply', replyId, reply, changeTo, changeFrom, changeAccepted, changeReverted);
@@ -346,7 +338,7 @@ exports.expressCreateServer = (hook_name, args, callback) => {
   return [];
 };
 
-var broadcastLinksAdded = (padId, linkIds, links) => {
+const broadcastLinksAdded = (padId, linkIds, links) => {
   const socket = clientIO.connect(broadcastUrl);
 
   const data = {
@@ -358,7 +350,7 @@ var broadcastLinksAdded = (padId, linkIds, links) => {
   socket.emit('apiAddLinks', data);
 };
 
-var broadcastLinkRepliesAdded = (padId, replyIds, replies) => {
+const broadcastLinkRepliesAdded = (padId, replyIds, replies) => {
   const socket = clientIO.connect(broadcastUrl);
 
   const data = {
@@ -370,4 +362,4 @@ var broadcastLinkRepliesAdded = (padId, replyIds, replies) => {
   socket.emit('apiAddLinkReplies', data);
 };
 
-var broadcastUrl = apiUtils.broadcastUrlFor('/link');
+const broadcastUrl = apiUtils.broadcastUrlFor('/link');
