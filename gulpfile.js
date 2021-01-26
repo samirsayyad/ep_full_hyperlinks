@@ -61,8 +61,7 @@ gulp.task('bump', () => gulp.src('./package.json')
     .pipe(gulp.dest('./')));
 
 gulp.task('git:publish', () => gulp.src([
-  './static/dist/js/ep.full.hyperlinks.mini.js',
-  './static/dist/js/ep.full.hyperlinks.mini.js.map',
+  './static/dist/',
   './package.json',
 ])
     .pipe(git.add())
