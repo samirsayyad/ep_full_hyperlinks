@@ -93,7 +93,7 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
       linkElm.css({"width":"324px"}) // because of need to determine exact size for putting best area
 
       var loaded= linkElm.attr("data-loaded")
-      if(loaded){
+      if(loaded == "true"){
         linkElm.css({"left":parseInt(editorLink.position().left) +parseInt(linkElm.css("width").split('px')[0]) + "px"   })
         linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) + 35 + "px"  })
         linkElm.addClass('hyperlink-display');
@@ -102,10 +102,14 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
 
       
         
-        
+        var hyperlink =linkElm.attr("data-hyperlink") ;
+
         var ep_hyperlink_title      = linkElm.find('#ep_hyperlink_title');
+        ep_hyperlink_title.text(hyperlink)
         var ep_hyperlink_img      = linkElm.find('#ep_hyperlink_img');
         var ep_hyperlink_description  = linkElm.find("#ep_hyperlink_description")
+        ep_hyperlink_description.text("")
+
         var card_loading_hyperlink  = linkElm.find("#card_loading_hyperlink")
         
         ep_hyperlink_img.hide()
@@ -120,7 +124,6 @@ var highlightLink = function(linkId, e, editorLink,socket,padId){
         linkElm.addClass('hyperlink-display');
         //raise for og:title resolving
 
-        var hyperlink =linkElm.attr("data-hyperlink") ;
         if(!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
           hyperlink = "https://" + hyperlink;
         }
@@ -311,9 +314,16 @@ var notInTheseUrls  = function(url) {
 // Indicates if event was on one of the elements that does not close link
 var shouldNotCloseLink = function(e) {
   // a link box
-  if ($(e.target).closest('.link').length || $(e.target).closest('.link-modal').length
-  || $(e.target).closest('.ep_hyperlink_docs_bubble_button_edit').length ||  $(e.target).closest('.ep_hyperlink_docs_bubble_button_delete').length ||
-  $(e.target).closest('.ep_hyperlink_docs_bubble_button_copy').length
+  if (
+     $(e.target).closest('.link').length || $(e.target).closest('.link-modal').length
+  || $(e.target).closest('.ep_hyperlink_docs_bubble_button_edit').length 
+  || $(e.target).closest('.ep_hyperlink_docs_bubble_button_delete').length 
+  || $(e.target).closest('.ep_hyperlink_docs_bubble_button_copy').length
+  || $(e.target).closest('.full-display-link').length
+  || $(e.target).closest('.link-title-wrapper').length
+  || $(e.target).closest('.link-edit-form').length
+  || $(e.target).closest('.link-text-text').length
+  || $(e.target).closest('.link-text-hyperlink').length
   ) { // the link modal
     return true;
   }
