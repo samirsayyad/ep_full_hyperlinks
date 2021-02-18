@@ -32,18 +32,28 @@ const newLink = (() => {
 		const index = 0;
 		const form = $('#newLink');
 		const link = buildLinkFrom(form);
-		// @todo samir add url validation
-		if (link.text.length > 0 || link.changeTo && link.changeTo.length > 0) {
+		if ((link.text.length > 0 || link.changeTo && link.changeTo.length > 0) && validURL(link.hyperlink)) {
 			form.find('.link-content, .to-value').removeClass('error');
 			hideNewLinkPopup();
 			callback(link, index);
 		} else {
 			if (link.text.length == 0) form.find('.link-content').addClass('error');
+			if (!validURL(link.hyperlink)) form.find('#hyperlink-url').addClass('error');
+
 			if (link.changeTo && link.changeTo.length == 0) form.find('.to-value').addClass('error');
 		}
 		return false;
 	};
 
+	var validURL = function (str) {
+		var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+		  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+		  '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+		  '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+		  '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+		  '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+		return !!pattern.test(str);
+	  };
 	/* ***** Public methods: ***** */
 
 	var localizenewLinkPopup = function () {

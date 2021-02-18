@@ -82,7 +82,7 @@
     display: none;
   }
   input.error, textarea.error {
-    border-color: red;
+    border:1px solid red !important;
   }
   .form-more{
     margin-top: 12px;

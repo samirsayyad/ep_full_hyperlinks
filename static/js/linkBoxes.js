@@ -58,7 +58,15 @@ const linkBoxes = (() => {
       }
     });
   };
-
+  var validURL = function (str) {
+    var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+      '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+    return !!pattern.test(str);
+  };
   var highlightLink = function (linkId, e, editorLink, socket, padId) {
     const container = getLinksContainer();
     const linkElm = container.find(`#${linkId}`);
@@ -116,7 +124,18 @@ const linkBoxes = (() => {
           if (!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
             hyperlink = `https://${hyperlink}`;
           }
-
+          if(!validURL(hyperlink))
+          {
+            ep_hyperlink_img.attr('src', '../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png');
+                ep_hyperlink_img.on('load', () => {
+                  card_loading_hyperlink.fadeOut(500, () => {
+                    ep_hyperlink_img.fadeIn();
+                    ep_hyperlink_description.text(hyperlink.replace(/^(?:https?:\/\/)?(?:www\.)?/i, '').split('/')[0]);
+                    linkElm.attr({'data-loaded': true});
+                  });
+                });
+              return false;
+          }
           // ........
           const metaResolverCallBack = function (result) {
             ep_hyperlink_title.attr('href', hyperlink);

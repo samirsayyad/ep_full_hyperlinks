@@ -25,7 +25,6 @@ exports.padRemove = (hook_name, context, callback) => {
   return [];
 };
 
-console.log(';lkas;ldk;aks;ldka0s9d-09-09-09-9-09-09-09-09-09-');
 exports.padCopy = (hook_name, context, callback) => {
   linkManager.copyLinks(context.originalPad.id, context.destinationID, () => {
     linkManager.copyLinkReplies(context.originalPad.id, context.destinationID, callback);
@@ -161,6 +160,7 @@ exports.socketio = (hook_name, args, cb) => {
               last: data.last,
             });
           } catch (e) {
+            console.log(e.message , e.status  )
             callback({
               metadata: false,
               last: data.last,
