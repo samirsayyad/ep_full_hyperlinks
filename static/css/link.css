@@ -109,6 +109,7 @@
     margin-right: 4px;
     margin-top: 4px;
     display: none;
+    object-fit: cover;
 
   }
   #ep_hyperlink_title{
