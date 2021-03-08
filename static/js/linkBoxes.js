@@ -67,6 +67,7 @@ const linkBoxes = (() => {
       '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
     return !!pattern.test(str);
   };
+
   var highlightLink = function (linkId, e, editorLink, socket, padId) {
     const container = getLinksContainer();
     const linkElm = container.find(`#${linkId}`);
@@ -84,7 +85,7 @@ const linkBoxes = (() => {
             padOuter.find(`#edit-form-${$(this).attr('data-linkid')}`).hide();
             padOuter.find(`#show-form-${$(this).attr('data-linkid')}`).show();
 
-            // $(this).css({top:  parseInt($(this).css("top").split('px')[0]) - 35 + "px"  })
+            $(this).css({top:  parseInt($(this).css("top").split('px')[0]) - 35 + "px"  })
 
             $(this).css({top: `${linkElm.attr('data-basetop')}px`});
           }
@@ -96,13 +97,22 @@ const linkBoxes = (() => {
         linkElm.css({width: '324px'}); // because of need to determine exact size for putting best area
 
         const loaded = linkElm.attr('data-loaded');
-        if (loaded == 'true') {
-          linkElm.css({left: `${parseInt(editorLink.position().left) + parseInt(linkElm.css('width').split('px')[0])}px`});
-          linkElm.css({top: `${parseInt(linkElm.css('top').split('px')[0]) + 35}px`});
-          linkElm.addClass('hyperlink-display');
-        } else {
-          let hyperlink = linkElm.attr('data-hyperlink');
 
+        const padInner = getPadOuter().find('iframe[name="ace_inner"]');
+        let targetLeft = e.clientX;
+        targetLeft += padInner.offset().left;
+        let targetTop = $(e.target).offset().top;
+        targetTop += parseInt(padInner.css('padding-top').split('px')[0]);
+        targetTop += parseInt(padOuter.find('#outerdocbody').css('padding-top').split('px')[0]);
+
+        linkElm.css({left: `${parseInt(targetLeft) }px`});
+        linkElm.css({top: `${parseInt(targetTop) + 35}px`});
+        linkElm.addClass('hyperlink-display');
+          // linkElm.css({left: `${parseInt(editorLink.position().left) + parseInt(linkElm.css('width').split('px')[0])}px`});
+          // linkElm.css({top: `${parseInt(linkElm.css('top').split('px')[0]) + 35}px`});
+
+        if (loaded != 'true') {
+          let hyperlink = linkElm.attr('data-hyperlink');
           const ep_hyperlink_title = linkElm.find('#ep_hyperlink_title');
           ep_hyperlink_title.text(hyperlink);
           const ep_hyperlink_img = linkElm.find('#ep_hyperlink_img');
@@ -116,9 +126,6 @@ const linkBoxes = (() => {
           card_loading_hyperlink.show();
 
 
-          linkElm.css({left: `${parseInt(editorLink.position().left) + parseInt(linkElm.css('width').split('px')[0])}px`});
-          linkElm.css({top: `${parseInt(linkElm.css('top').split('px')[0]) + 35}px`});
-          linkElm.addClass('hyperlink-display');
           // raise for og:title resolving
 
           if (!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
@@ -167,65 +174,7 @@ const linkBoxes = (() => {
               }
             }
 
-
-            // //////////// meta resolver
-            // if(res){
-            //   ep_hyperlink_title.attr('href',hyperlink);
-
-            //   var image = null ;
-
-            //   if(res.image ){
-            //     image = res.image
-            //   }
-            //   else {
-            //     if (res.images){
-            //       $.each(res.images,function(key,value){
-            //         if(isUrlValid(value) && notInTheseUrls(value)){
-            //           image = value;
-            //           return false;
-            //         }
-            //       });
-            //     }
-            //   }
-            //   if(isUrlValid(image)){
-            //     ep_hyperlink_img.attr('src',image);
-            //   }else{
-            //     if(isUrlValid(res.url+image)){
-            //       ep_hyperlink_img.attr('src',res.url+image);
-            //     }else{
-            //       if (isUrlValid(res.uri.scheme+"://"+res.uri.host+image)){
-            //         ep_hyperlink_img.attr('src',res.uri.scheme+"://"+res.uri.host+image);
-            //       }else{
-            //         if (isUrlValid(res["forem:logo"])){
-            //           ep_hyperlink_img.attr('src',res["forem:logo"]);
-            //         }else{
-            //           ep_hyperlink_img.attr('src',"#");
-            //         }
-            //       }
-            //     }
-            //   }
-
-            //   ep_hyperlink_img.on("load",function(){
-
-            //     card_loading_hyperlink.fadeOut(500,function(){
-            //       ep_hyperlink_img.fadeIn()
-            //       ep_hyperlink_title.text(res.title)
-            //       ep_hyperlink_description.text(res.url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0])
-            //       linkElm.attr({"data-loaded":true})
-            //     })
-
-
-            //     // ep_hyperlink_title.fadeIn()
-
-            //       // Animation complete.
-
-            //   })
-            // }else{
-            //   console.log("res rtide")
-            //   var url = new URL(hyperlink);
-            //   hyperlink = "https://" + url.hostname;
-            //   socket.emit('metaResolver', {padId: padId,hyperlink : hyperlink}, metaResolverCallBack);
-            // }
+            
           };
           // ........
 
