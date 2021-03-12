@@ -537,12 +537,12 @@ ep_links.prototype.collectLinks = function (callback) {
   // hover event
 
   this.padInner.contents().on('click', '.link', function (e) {
-    if (container.is(':visible')) { // not on mobile
+    //if (container.is(':visible')) { // not on mobile
       e.preventDefault();
       clearTimeout(hideLinkTimer);
       const linkId = self.linkIdOf(e);
       linkBoxes.highlightLink(linkId, e, $(this), self.socket, self.padId);
-    }
+    //}
   });
 
 

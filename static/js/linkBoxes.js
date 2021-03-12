@@ -73,7 +73,11 @@ const linkBoxes = (() => {
     const linkElm = container.find(`#${linkId}`);
     var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
 
-    if (container.is(':visible')) {
+
+
+   
+
+    //if (container.is(':visible')) {
       // hide all other links
       container.find('.sidebar-link').each(function () {
         inner.contents().find('head .link-style').remove();
@@ -92,25 +96,23 @@ const linkBoxes = (() => {
         }
       });
 
-
       if (!linkElm.hasClass('hyperlink-display')) {
         linkElm.css({width: '324px'}); // because of need to determine exact size for putting best area
-
         const loaded = linkElm.attr('data-loaded');
-
+  
         const padInner = getPadOuter().find('iframe[name="ace_inner"]');
         let targetLeft = e.clientX;
         targetLeft += padInner.offset().left;
         let targetTop = $(e.target).offset().top;
         targetTop += parseInt(padInner.css('padding-top').split('px')[0]);
         targetTop += parseInt(padOuter.find('#outerdocbody').css('padding-top').split('px')[0]);
-
+  
         linkElm.css({left: `${parseInt(targetLeft) }px`});
         linkElm.css({top: `${parseInt(targetTop) + 35}px`});
         linkElm.addClass('hyperlink-display');
           // linkElm.css({left: `${parseInt(editorLink.position().left) + parseInt(linkElm.css('width').split('px')[0])}px`});
           // linkElm.css({top: `${parseInt(linkElm.css('top').split('px')[0]) + 35}px`});
-
+  
         if (loaded != 'true') {
           let hyperlink = linkElm.attr('data-hyperlink');
           const ep_hyperlink_title = linkElm.find('#ep_hyperlink_title');
@@ -118,16 +120,16 @@ const linkBoxes = (() => {
           const ep_hyperlink_img = linkElm.find('#ep_hyperlink_img');
           const ep_hyperlink_description = linkElm.find('#ep_hyperlink_description');
           ep_hyperlink_description.text('');
-
+  
           const card_loading_hyperlink = linkElm.find('#card_loading_hyperlink');
-
+  
           ep_hyperlink_img.hide();
           ep_hyperlink_title.show();
           card_loading_hyperlink.show();
-
-
+  
+  
           // raise for og:title resolving
-
+  
           if (!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
             hyperlink = `https://${hyperlink}`;
           }
@@ -146,7 +148,7 @@ const linkBoxes = (() => {
           // ........
           const metaResolverCallBack = function (result) {
             ep_hyperlink_title.attr('href', hyperlink);
-
+  
             if (result.metadata.image && result.metadata.title) {
               ep_hyperlink_img.attr('src', result.metadata.image);
               ep_hyperlink_img.on('load', () => {
@@ -173,15 +175,17 @@ const linkBoxes = (() => {
                 });
               }
             }
-
+  
             
           };
           // ........
-
-
+  
+  
           socket.emit('metaResolver', {padId, hyperlink, last: false}, metaResolverCallBack);
         }
       }
+
+     
       // else{
       //   linkElm.removeClass('hyperlink-display');
       //   linkElm.css({top:  parseInt(linkElm.css("top").split('px')[0]) - 40 + "px"  })
@@ -194,45 +198,62 @@ const linkBoxes = (() => {
       // It's fucked up but that's how we do it..
       var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
       inner.contents().find('head').append(`<style class='link-style'>.${linkId}{ color: #a7680c !important }</style>`);
-    } else {
-      // make a full copy of the html, including listeners
-      const linkElmCloned = linkElm.clone(true, true);
+    // } else {
+    //   // make a full copy of the html, including listeners
+    //   const linkElmCloned = linkElm.clone(true, true);
 
-      // before of appending clear the css (like top positionning)
-      linkElmCloned.attr('style', '');
-      // fix checkbox, because as we are duplicating the sidebar-link, we lose unique input names
-      linkElmCloned.find('.label-suggestion-checkbox').click(function () {
-        $(this).siblings('input[type="checkbox"]').click();
-      });
+    //   // before of appending clear the css (like top positionning)
+    //   linkElmCloned.attr('style', '');
+    //   // fix checkbox, because as we are duplicating the sidebar-link, we lose unique input names
+    //   linkElmCloned.find('.label-suggestion-checkbox').click(function () {
+    //     $(this).siblings('input[type="checkbox"]').click();
+    //   });
 
-      // hovering link view
-      getPadOuter().find('.link-modal-link').html('').append(linkElmCloned);
-      const padInner = getPadOuter().find('iframe[name="ace_inner"]');
-      // get modal position
-      const containerWidth = getPadOuter().find('#outerdocbody').outerWidth(true);
-      const modalWitdh = getPadOuter().find('.link-modal').outerWidth(true);
-      var targetLeft = e.clientX;
-      let targetTop = $(e.target).offset().top;
-      if (editorLink) {
-        targetLeft += padInner.offset().left;
-        targetTop += parseInt(padInner.css('padding-top').split('px')[0]);
-        targetTop += parseInt(padOuter.find('#outerdocbody').css('padding-top').split('px')[0]);
-      } else {
-        // mean we are clicking from a link Icon
-        var targetLeft = $(e.target).offset().left - 20;
-      }
+    //   // hovering link view
+    //   getPadOuter().find('.link-modal-link').html('').append(linkElmCloned);
+    //   const padInner = getPadOuter().find('iframe[name="ace_inner"]');
+    //   // get modal position
+    //   const containerWidth = getPadOuter().find('#outerdocbody').outerWidth(true);
+    //   const modalWitdh = getPadOuter().find('.link-modal').outerWidth(true);
+    //   var targetLeft = e.clientX;
+    //   let targetTop = $(e.target).offset().top;
+    //   if (editorLink) {
+    //     targetLeft += padInner.offset().left;
+    //     targetTop += parseInt(padInner.css('padding-top').split('px')[0]);
+    //     targetTop += parseInt(padOuter.find('#outerdocbody').css('padding-top').split('px')[0]);
+    //   } else {
+    //     // mean we are clicking from a link Icon
+    //     var targetLeft = $(e.target).offset().left - 20;
+    //   }
 
-      // if positioning modal on target left will make part of the modal to be
-      // out of screen, we place it closer to the middle of the screen
-      if (targetLeft + modalWitdh > containerWidth) {
-        targetLeft = containerWidth - modalWitdh - 25;
-      }
-      const editorLinkHeight = editorLink ? editorLink.outerHeight(true) : 30;
-      getPadOuter().find('.link-modal').addClass('popup-show').css({
-        left: `${targetLeft}px`,
-        top: `${targetTop + editorLinkHeight}px`,
-      });
-    }
+    //   // if positioning modal on target left will make part of the modal to be
+    //   // out of screen, we place it closer to the middle of the screen
+    //   if (targetLeft + modalWitdh > containerWidth) {
+    //     targetLeft = containerWidth - modalWitdh - 25;
+    //   }
+    //   const editorLinkHeight = editorLink ? editorLink.outerHeight(true) : 30;
+    //   getPadOuter().find('.link-modal').addClass('popup-show').css({
+    //     left: `${targetLeft}px`,
+    //     top: `${targetTop + editorLinkHeight}px`,
+    //   });
+    // }
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
   };
 
   // Adjust position of the link detail on the container, to be on the same

@@ -28,12 +28,12 @@
   #links:not(.active) {
     display: none;
   }
-  @media (max-width: 900px) {
+  /* @media (max-width: 900px) {
     #linkIcons, #links {
       display: none !important;
     }
   }
-  
+   */
   .sidebar-link {
     position: absolute;
     /* width: 286px; */
@@ -565,6 +565,12 @@ input:-internal-autofill-selected {
 
 .hyperlink-popup{
   padding: 16px;
+}
+.popup-content{
+  padding: 0 !important;
+}
+.popup:not(.link-modal-link) p{
+  margin: 0!important;
 }
 #link-create-btn{
   width: 111px;
