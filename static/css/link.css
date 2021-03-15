@@ -566,9 +566,9 @@ input:-internal-autofill-selected {
 .hyperlink-popup{
   padding: 16px;
 }
-.popup-content{
+/* .popup-content{
   padding: 0 !important;
-}
+} */
 .popup:not(.link-modal-link) p{
   margin: 0!important;
 }
