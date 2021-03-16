@@ -1200,6 +1200,24 @@ ep_links.prototype.linkListen = function () {
 ep_links.prototype.linkRepliesListen = function () {
   const self = this;
   const socket = this.socket;
+
+
+  socket.on("connect", (reason) => {
+    console.log("[LINK]: socket disconnection, reason:", reason, socket.id, clientVars.userId, pad.getUserId());
+
+  });
+  socket.on("connect_error", (error) => {
+    console.error("[LINK]: socket connect_error:", error, pad.getUserId());
+  });
+  socket.on("disconnect", (reason) => {
+    console.error("[LINK]: socket disconnection, reason:", reason, socket.id, clientVars.userId, pad.getUserId());
+  });
+
+  socket.on("reconnect", (reason) => {
+    console.log("[LINK]: socket disconnection, reason:", reason, socket.id, clientVars.userId , pad.getUserId());
+
+  });
+
   socket.on('pushAddLinkReply', (replyId, reply, changeTo, changeFrom) => {
     // console.warn("pAcR response", replyId, reply, changeTo, changeFrom);
     // callback(replyId, reply);
