@@ -23,6 +23,7 @@
     "ep_full_hyperlinks.links_template.cancel.value" : "Cancel",
     "ep_full_hyperlinks.links_template.reply.value" : "Reply",
     "ep_full_hyperlinks.links_template.reply.placeholder" : "Reply",
+    "ep_full_hyperlinks.links_template.apply.value" :"Apply",
     "ep_full_hyperlinks.time.seconds.past" : "{{count}} seconds ago",
     "ep_full_hyperlinks.time.seconds.future" : "{{count}} seconds from now",
     "ep_full_hyperlinks.time.one_minute.past" : "1 minute ago",
