@@ -214,7 +214,19 @@ exports.eejsBlock_mySettings = (hook_name, args, cb) => {
   args.content += eejs.require('ep_full_hyperlinks/templates/settings.ejs');
   return [];
 };
+exports.padInitToolbar = (hookName, args, cb) => {
+  const toolbar = args.toolbar;
 
+  const button = toolbar.button({
+    command: 'addLink',
+    localizationId: 'ep_full_hyperlinks.add_link.title',
+    class: 'buttonicon buttonicon-link',
+  });
+
+  toolbar.registerButton('addComment', button);
+
+  return cb();
+};
 exports.eejsBlock_editbarMenuLeft = (hook_name, args, cb) => {
   args.content += eejs.require('ep_full_hyperlinks/templates/linkBarButtons.ejs');
   return [];

@@ -13,6 +13,7 @@
           "aceInitialized": "ep_full_hyperlinks/static/js/index"
         },
         "hooks": {
+          "padInitToolbar": "ep_comments_page/index",
           "padRemove": "ep_full_hyperlinks/index",
           "padCopy": "ep_full_hyperlinks/index",
           "socketio": "ep_full_hyperlinks/index",
