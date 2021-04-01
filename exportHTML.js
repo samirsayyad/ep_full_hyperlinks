@@ -1,6 +1,6 @@
 'use strict';
 
-const _ = require('ep_etherpad-lite/static/js/underscore');
+const _ = require('underscore');
 
 
 // Add the props to be supported in export

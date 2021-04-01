@@ -42,13 +42,14 @@
     "formidable": "*",
     "got": "^11.8.1",
     "meta-resolver": "0.0.3",
-    "metascraper": "^5.16.13",
-    "metascraper-description": "^5.16.13",
-    "metascraper-image": "^5.16.13",
-    "metascraper-logo": "^5.16.13",
-    "metascraper-title": "^5.16.13",
-    "metascraper-url": "^5.16.13",
-    "socket.io-client": "*"
+    "metascraper": "^5.21.4",
+    "metascraper-description": "^5.21.4",
+    "metascraper-image": "^5.21.4",
+    "metascraper-logo": "^5.21.4",
+    "metascraper-title": "^5.21.4",
+    "metascraper-url": "^5.21.4",
+    "socket.io-client": "*",
+    "underscore": "^1.12.1"
   },
   "homepage": "https://github.com/samirsayyad/ep_full_hyperlinks#readme",
   "devDependencies": {

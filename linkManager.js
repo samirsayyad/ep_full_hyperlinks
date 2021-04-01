@@ -1,4 +1,4 @@
-const _ = require('ep_etherpad-lite/static/js/underscore');
+const _ = require('underscore');
 const db = require('ep_etherpad-lite/node/db/DB').db;
 const ERR = require('ep_etherpad-lite/node_modules/async-stacktrace');
 const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
@@ -38,12 +38,7 @@ exports.deleteLink = (padId, linkId, callback) => {
   });
 };
 
-exports.deleteLinks = (padId, callback) => {
-  db.remove(`links:${padId}`, (err) => {
-    if (ERR(err, callback)) return;
-    callback(null);
-  });
-};
+exports.deleteLinks = async (padId) => db.remove(`links:${padId}`);
 
 exports.addLink = (padId, data, callback) => {
   exports.bulkAddLinks(padId, [data], (err, linkIds, links) => {
@@ -99,21 +94,14 @@ exports.bulkAddLinks = (padId, data, callback) => {
   });
 };
 
-exports.copyLinks = (originalPadId, newPadID, callback) => {
-  // get the links of original pad
-  db.get(`links:${originalPadId}`, (err, originalLinks) => {
-    if (ERR(err, callback)) return;
+exports.copyLinks = async (originalPadId, newPadID, callback) => {
+	// get the comments of original pad
+	const originalComments = await db.get(`links:${originalPadId}`);
+	// make sure we have different copies of the comment between pads
+	const copiedComments = _.mapObject(originalComments, (thisComment) => _.clone(thisComment));
 
-    const copiedLinks = _.mapObject(originalLinks, (thisLink, thisLinkId) =>
-      // make sure we have different copies of the link between pads
-      _.clone(thisLink)
-    );
-
-    // save the links on new pad
-    db.set(`links:${newPadID}`, copiedLinks);
-
-    callback(null);
-  });
+	// save the comments on new pad
+	await db.set(`links:${newPadID}`, copiedComments);
 };
 
 exports.getLinkReplies = (padId, callback) => {
@@ -134,12 +122,7 @@ exports.getLinkReplies = (padId, callback) => {
   });
 };
 
-exports.deleteLinkReplies = (padId, callback) => {
-  db.remove(`link-replies:${padId}`, (err) => {
-    if (ERR(err, callback)) return;
-    callback(null);
-  });
-};
+exports.deleteLinkReplies = async (padId) => db.remove(`link-replies:${padId}`);
 
 exports.addLinkReply = (padId, data, callback) => {
   exports.bulkAddLinkReplies(padId, [data], (err, replyIds, replies) => {
@@ -198,21 +181,14 @@ exports.bulkAddLinkReplies = (padId, data, callback) => {
   });
 };
 
-exports.copyLinkReplies = (originalPadId, newPadID, callback) => {
-  // get the replies of original pad
-  db.get(`link-replies:${originalPadId}`, (err, originalReplies) => {
-    if (ERR(err, callback)) return;
+exports.copyLinkReplies = async (originalPadId, newPadID) => {
+	// get the replies of original pad
+	const originalReplies = await db.get(`link-replies:${originalPadId}`);
+	// make sure we have different copies of the reply between pads
+	const copiedReplies = _.mapObject(originalReplies, (thisReply) => _.clone(thisReply));
 
-    const copiedReplies = _.mapObject(originalReplies, (thisReply, thisReplyId) =>
-      // make sure we have different copies of the reply between pads
-      _.clone(thisReply)
-    );
-
-    // save the link replies on new pad
-    db.set(`link-replies:${newPadID}`, copiedReplies);
-
-    callback(null);
-  });
+	// save the comment replies on new pad
+	await db.set(`link-replies:${newPadID}`, copiedReplies);
 };
 
 exports.changeAcceptedState = (padId, linkId, state, callback) => {
