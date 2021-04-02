@@ -48,7 +48,7 @@
     "metascraper-logo": "^5.21.4",
     "metascraper-title": "^5.21.4",
     "metascraper-url": "^5.21.4",
-    "socket.io-client": "*",
+    "socket.io-client": "^2",
     "underscore": "^1.12.1"
   },
   "homepage": "https://github.com/samirsayyad/ep_full_hyperlinks#readme",
