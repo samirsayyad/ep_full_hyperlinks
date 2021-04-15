@@ -147,7 +147,7 @@ const linkBoxes = (() => {
           }
           // ........
           const metaResolverCallBack = function (result) {
-            ep_hyperlink_title.attr('href', hyperlink);
+            //ep_hyperlink_title.attr('href', hyperlink);
   
             if (result.metadata.image && result.metadata.title) {
               ep_hyperlink_img.attr('src', result.metadata.image);
