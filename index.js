@@ -7,49 +7,43 @@ const clientIO = require('socket.io-client');
 const linkManager = require('./linkManager');
 const links = require('./links');
 const apiUtils = require('./apiUtils');
-const _ = require('ep_etherpad-lite/static/js/underscore');
-// var meta = require('meta-resolver');
-const metascraper = require('metascraper')([
-  require('metascraper-description')(),
-  require('metascraper-image')(),
-  require('metascraper-logo')(),
-  require('metascraper-title')(),
-  require('metascraper-url')(),
-]);
+const _ = require('underscore');
+var meta = require('meta-resolver');
+
+// const metascraper = require('metascraper')([
+//   require('metascraper-description')(),
+//   require('metascraper-image')(),
+//   require('metascraper-logo')(),
+//   require('metascraper-title')(),
+//   require('metascraper-url')(),
+// ]);
+
 const got = require('got');
 
-exports.padRemove = (hook_name, context, callback) => {
-  linkManager.deleteLinkReplies(context.padID, () => {
-    linkManager.deleteLinks(context.padID, callback);
-  });
-  return [];
+const padRemove = async (hook_name, context, callback) => {
+	return await Promise.all([
+    linkManager.deleteLinkReplies(context.padID),
+    linkManager.deleteLinks(context.padID),
+  ]);
 };
 
-exports.padCopy = (hook_name, context, callback) => {
-  linkManager.copyLinks(context.originalPad.id, context.destinationID, () => {
-    linkManager.copyLinkReplies(context.originalPad.id, context.destinationID, callback);
-  });
-  return [];
+const padCopy = async (hook_name, context, callback) => {
+	await Promise.all([
+    linkManager.copyLinks(context.originalPad.id, context.destinationID),
+    linkManager.copyLinkReplies(context.originalPad.id, context.destinationID),
+  ]);
 };
 
-exports.handleMessageSecurity = (hook_name, context, callback) => {
-  if (context.message && context.message.data && context.message.data.apool) {
-    const apool = context.message.data.apool;
-    if (apool.numToAttrib && apool.numToAttrib[0] && apool.numToAttrib[0][0]) {
-      if (apool.numToAttrib[0][0] === 'link') {
-        // Link change, allow it to override readonly security model!!
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
+const handleMessageSecurity = (hook_name, context, callback) => {
+	const {message: {data: {apool} = {}} = {}} = context;
+  if (apool && apool[0] && apool[0][0] === 'link') {
+    // link change, allow it to override readonly security model!!
+    return callback(true);
   }
-  return false;
+  return callback();
 };
 
-exports.socketio = (hook_name, args, cb) => {
+const socketio = (hook_name, args, cb) => {
   const io = args.io;
   io.of('/link')
       .on('connection', (socket) => {
@@ -202,19 +196,20 @@ exports.socketio = (hook_name, args, cb) => {
           }
         });
       });
-  return [];
+	return cb();
 };
 
-exports.eejsBlock_dd_insert = (hook_name, args, cb) => {
-  args.content += eejs.require('ep_full_hyperlinks/templates/menuButtons.ejs');
-  return [];
+const eejsBlock_dd_insert = (hook_name, args, cb) => {
+	args.content += eejs.require('ep_full_hyperlinks/templates/menuButtons.ejs');
+  return cb();
 };
 
-exports.eejsBlock_mySettings = (hook_name, args, cb) => {
-  args.content += eejs.require('ep_full_hyperlinks/templates/settings.ejs');
-  return [];
+const eejsBlock_mySettings = (hook_name, args, cb) => {
+	args.content += eejs.require('ep_full_hyperlinks/templates/settings.ejs');
+  return cb();
 };
-exports.padInitToolbar = (hookName, args, cb) => {
+
+const padInitToolbar = (hookName, args, cb) => {
   const toolbar = args.toolbar;
 
   const button = toolbar.button({
@@ -223,36 +218,41 @@ exports.padInitToolbar = (hookName, args, cb) => {
     class: 'buttonicon buttonicon-link',
   });
 
-  toolbar.registerButton('addComment', button);
+  toolbar.registerButton('addLink', button);
 
   return cb();
 };
-exports.eejsBlock_editbarMenuLeft = (hook_name, args, cb) => {
-  args.content += eejs.require('ep_full_hyperlinks/templates/linkBarButtons.ejs');
-  return [];
+
+const eejsBlock_editbarMenuLeft = (hook_name, args, cb) => {
+	// check if custom button is used
+	if (JSON.stringify(settings.toolbar).indexOf('addLink') > -1) {
+		return cb();
+	}
+	args.content += eejs.require('ep_full_hyperlinks/templates/linkBarButtons.ejs');
+	return cb();
 };
 
-exports.eejsBlock_scripts = (hook_name, args, cb) => {
-  args.content += eejs.require('ep_full_hyperlinks/templates/links.html', {}, module);
-  args.content += eejs.require('ep_full_hyperlinks/templates/linkIcons.html', {}, module);
-  return [];
+const eejsBlock_scripts = (hook_name, args, cb) => {
+	args.content += eejs.require('ep_full_hyperlinks/templates/links.html');
+  args.content += eejs.require('ep_full_hyperlinks/templates/linkIcons.html');
+  return cb();
 };
 
-exports.eejsBlock_styles = (hook_name, args, cb) => {
-  args.content += eejs.require('ep_full_hyperlinks/templates/styles.html', {}, module);
-  return [];
+const eejsBlock_styles = (hook_name, args, cb) => {
+	args.content += eejs.require('ep_full_hyperlinks/templates/styles.html');
+  return cb();
 };
 
-exports.clientVars = (hook, context, cb) => {
+const clientVars = (hook, context, cb) => {
   const displayLinkAsIcon = settings.ep_full_hyperlinks ? settings.ep_full_hyperlinks.displayLinkAsIcon : false;
   const highlightSelectedText = settings.ep_full_hyperlinks ? settings.ep_full_hyperlinks.highlightSelectedText : false;
-  return {
-    displayLinkAsIcon,
-    highlightSelectedText,
-  };
+	return cb({
+		displayLinkAsIcon,
+		highlightSelectedText,
+	});
 };
 
-exports.expressCreateServer = (hook_name, args, callback) => {
+const expressCreateServer = (hook_name, args, callback) => {
   args.app.get('/p/:pad/:rev?/links', (req, res) => {
     const fields = req.query;
     // check the api key
@@ -347,7 +347,7 @@ exports.expressCreateServer = (hook_name, args, callback) => {
     });
   });
 
-  return [];
+	return callback();
 };
 
 const broadcastLinksAdded = (padId, linkIds, links) => {
@@ -375,3 +375,18 @@ const broadcastLinkRepliesAdded = (padId, replyIds, replies) => {
 };
 
 const broadcastUrl = apiUtils.broadcastUrlFor('/link');
+
+module.exports = {
+	padRemove,
+	padCopy,
+	handleMessageSecurity,
+	socketio,
+	eejsBlock_dd_insert,
+	eejsBlock_mySettings,
+	padInitToolbar,
+	eejsBlock_editbarMenuLeft,
+	eejsBlock_scripts,
+	eejsBlock_styles,
+	clientVars,
+	expressCreateServer,
+}

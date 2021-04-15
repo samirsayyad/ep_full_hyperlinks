@@ -1,5 +1,5 @@
 
-const _ = require('ep_etherpad-lite/static/js/underscore');
+const _ = require('underscore');
 const padcookie = require('ep_etherpad-lite/static/js/pad_cookie').padcookie;
 
 const {

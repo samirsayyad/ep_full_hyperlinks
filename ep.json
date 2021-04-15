@@ -13,11 +13,11 @@
           "aceInitialized": "ep_full_hyperlinks/static/js/index"
         },
         "hooks": {
-          "padInitToolbar": "ep_comments_page/index",
+          "padInitToolbar": "ep_full_hyperlinks/index",
           "padRemove": "ep_full_hyperlinks/index",
           "padCopy": "ep_full_hyperlinks/index",
-          "socketio": "ep_full_hyperlinks/index",
-          "expressCreateServer": "ep_full_hyperlinks/index",
+					"socketio": "ep_full_hyperlinks/index",
+					"expressCreateServer": "ep_full_hyperlinks/index",
           "collectContentPre": "ep_full_hyperlinks/static/js/index",
           "eejsBlock_editbarMenuLeft": "ep_full_hyperlinks/index",
           "eejsBlock_dd_insert": "ep_full_hyperlinks/index",
