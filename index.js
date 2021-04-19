@@ -159,14 +159,13 @@ const socketio = (hook_name, args, cb) => {
 
             urlMetadata(data.hyperlink).then(
             function (metadata) { // success handler
-              console.log("mmetadatane",metadata)
               callback({
                 metadata,
                 last: data.last,
               });
             },
             function (e) { // failure handler
-              console.log("mmetadatane error",e.message , e.status )
+              console.log(e.message , e.status )
 
               callback({
                 metadata: false,
