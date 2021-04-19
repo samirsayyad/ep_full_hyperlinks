@@ -1,6 +1,6 @@
 {
   "name": "ep_full_hyperlinks",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "etherpad plugin ep_full_hyperlink hyperlink",
   "main": "index.js",
   "scripts": {
@@ -49,7 +49,8 @@
     "metascraper-title": "^5.21.4",
     "metascraper-url": "^5.21.4",
     "socket.io-client": "^2",
-    "underscore": "^1.12.1"
+    "underscore": "^1.12.1",
+    "url-metadata": "^2.5.0"
   },
   "homepage": "https://github.com/samirsayyad/ep_full_hyperlinks#readme",
   "devDependencies": {

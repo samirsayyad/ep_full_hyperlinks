@@ -8,7 +8,7 @@ const linkManager = require('./linkManager');
 const links = require('./links');
 const apiUtils = require('./apiUtils');
 const _ = require('underscore');
-var meta = require('meta-resolver');
+//var meta = require('meta-resolver');
 
 // const metascraper = require('metascraper')([
 //   require('metascraper-description')(),
@@ -18,7 +18,10 @@ var meta = require('meta-resolver');
 //   require('metascraper-url')(),
 // ]);
 
-const got = require('got');
+const urlMetadata = require('url-metadata')
+
+
+//const got = require('got');
 
 const padRemove = async (hook_name, context, callback) => {
 	return await Promise.all([
@@ -147,12 +150,29 @@ const socketio = (hook_name, args, cb) => {
           // })
           // let result = await promise
           try {
-            const {body: html, url} = await got(data.hyperlink);
-            const metadata = await metascraper({html, url});
-            callback({
-              metadata,
-              last: data.last,
-            });
+            // const {body: html, url} = await got(data.hyperlink);
+            // const metadata = await metascraper({html, url});
+            // callback({
+            //   metadata,
+            //   last: data.last,
+            // });
+
+            urlMetadata(data.hyperlink).then(
+            function (metadata) { // success handler
+              console.log("mmetadatane",metadata)
+              callback({
+                metadata,
+                last: data.last,
+              });
+            },
+            function (e) { // failure handler
+              console.log("mmetadatane error",e.message , e.status )
+
+              callback({
+                metadata: false,
+                last: data.last,
+              });
+            })
           } catch (e) {
             console.log(e.message , e.status  )
             callback({

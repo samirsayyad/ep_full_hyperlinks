@@ -114,7 +114,9 @@ const linkBoxes = (() => {
           // linkElm.css({top: `${parseInt(linkElm.css('top').split('px')[0]) + 35}px`});
   
         if (loaded != 'true') {
-          let hyperlink = linkElm.attr('data-hyperlink');
+          var hyperlink = linkElm.attr('data-hyperlink');
+          const dividedUrl = new URL(hyperlink);
+
           const ep_hyperlink_title = linkElm.find('#ep_hyperlink_title');
           ep_hyperlink_title.text(hyperlink);
           const ep_hyperlink_img = linkElm.find('#ep_hyperlink_img');
@@ -130,58 +132,59 @@ const linkBoxes = (() => {
   
           // raise for og:title resolving
   
+          
           if (!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
             hyperlink = `https://${hyperlink}`;
           }
+
+          const changeMetaView = function(hyperlink,title,image){
+            ep_hyperlink_img.attr('src', image);
+            ep_hyperlink_img.on('load', () => {
+              card_loading_hyperlink.fadeOut(500, () => {
+                ep_hyperlink_img.fadeIn();
+                ep_hyperlink_title.text(title.replace(/^(?:https?:\/\/)?(?:www\.)?/i, ''));
+                ep_hyperlink_description.text(hyperlink.replace(/^(?:https?:\/\/)?(?:www\.)?/i, ''));
+                linkElm.attr({'data-loaded': true});
+              });
+            });
+          }
+
+
           if(!validURL(hyperlink))
           {
-            ep_hyperlink_img.attr('src', '../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png');
-                ep_hyperlink_img.on('load', () => {
-                  card_loading_hyperlink.fadeOut(500, () => {
-                    ep_hyperlink_img.fadeIn();
-                    ep_hyperlink_description.text(hyperlink.replace(/^(?:https?:\/\/)?(?:www\.)?/i, '').split('/')[0]);
-                    linkElm.attr({'data-loaded': true});
-                  });
-                });
-              return false;
+            changeMetaView(hyperlink,hyperlink,'../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png')
+            return false;
           }
+
+
           // ........
           const metaResolverCallBack = function (result) {
             //ep_hyperlink_title.attr('href', hyperlink);
   
             if (result.metadata.image && result.metadata.title) {
-              ep_hyperlink_img.attr('src', result.metadata.image);
-              ep_hyperlink_img.on('load', () => {
-                card_loading_hyperlink.fadeOut(500, () => {
-                  ep_hyperlink_img.fadeIn();
-                  ep_hyperlink_title.text(result.metadata.title);
-                  ep_hyperlink_description.text(result.metadata.url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, '').split('/')[0]);
-                  linkElm.attr({'data-loaded': true});
-                });
-              });
+              changeMetaView(hyperlink,result.metadata.title,result.metadata.image)
             } else {
-              const url = new URL(hyperlink);
-              hyperlink = `https://${url.hostname}`;
+              var editedHyperlink = `https://${dividedUrl.hostname}`;
               if (result.last !== true) {
-                socket.emit('metaResolver', {padId, hyperlink, last: true}, metaResolverCallBack);
+                socket.emit('metaResolver', {padId, editedHyperlink, last: true}, metaResolverCallBack);
               } else {
-                ep_hyperlink_img.attr('src', '../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png');
-                ep_hyperlink_img.on('load', () => {
-                  card_loading_hyperlink.fadeOut(500, () => {
-                    ep_hyperlink_img.fadeIn();
-                    ep_hyperlink_description.text(hyperlink.replace(/^(?:https?:\/\/)?(?:www\.)?/i, '').split('/')[0]);
-                    linkElm.attr({'data-loaded': true});
-                  });
-                });
+                changeMetaView(hyperlink,hyperlink,'../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png')
               }
             }
   
             
           };
           // ........
-  
-  
-          socket.emit('metaResolver', {padId, hyperlink, last: false}, metaResolverCallBack);
+
+
+          switch(dividedUrl.hostname) {
+            case "twitter.com":
+              changeMetaView(hyperlink,hyperlink,'../static/plugins/ep_full_hyperlinks/static/dist/img/twitter.png')
+              break;
+            default:
+              socket.emit('metaResolver', {padId, hyperlink, last: false}, metaResolverCallBack);
+
+          }
         }
       }
 
