@@ -12,6 +12,7 @@ const shared = (() => {
 		// with existing links, a fake linkId is used, so then we generate a new one
 		// when the link is saved
 		if (fakeLink) {
+			console.log(fakeLink,"fakeLink");
 			const mapFakeLinks = pad.plugins.ep_full_hyperlinks.getMapfakeLinks();
 			const fakeLinkId = fakeLink[1];
 			const linkId = mapFakeLinks[fakeLinkId];

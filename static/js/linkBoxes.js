@@ -73,10 +73,6 @@ const linkBoxes = (() => {
     const linkElm = container.find(`#${linkId}`);
     var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
 
-
-
-   
-
     //if (container.is(':visible')) {
       // hide all other links
       container.find('.sidebar-link').each(function () {
@@ -168,7 +164,7 @@ const linkBoxes = (() => {
               if (result.last !== true) {
                 socket.emit('metaResolver', {padId, editedHyperlink, last: true}, metaResolverCallBack);
               } else {
-                changeMetaView(hyperlink,hyperlink,'../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png')
+                changeMetaView(hyperlink,result.metadata.title || hyperlink,'../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png')
               }
             }
   

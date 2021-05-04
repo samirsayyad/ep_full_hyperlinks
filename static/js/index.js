@@ -406,7 +406,7 @@ ep_links.prototype.init = function () {
     });
 
     self.padInner.contents().on('paste', (e) => {
-      events.saveLinksAndReplies(e);
+      events.saveLinksAndReplies(e,self.padInner);
     });
   }
 };

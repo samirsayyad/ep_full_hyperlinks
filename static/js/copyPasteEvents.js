@@ -94,7 +94,7 @@ const events = (() => {
 		const linkId = `fakelink-${randomString(16)}`;
 		return linkId;
 	};
-	
+
 	var getLinkIds = function (html) {
 		const allSpans = $(html).find('span');
 		const linkIds = [];
@@ -194,18 +194,103 @@ const events = (() => {
 		return tags;
 	};
 	
-	const saveLinksAndReplies = function (e) {
+	const saveLinksAndReplies = function (e,padInner) {
+	
+
+		
 		let links = e.originalEvent.clipboardData.getData('text/objectLink');
 		let replies = e.originalEvent.clipboardData.getData('text/objectReply');
 		if (links && replies) {
 			links = JSON.parse(links);
+			console.log(links,"links")
 			replies = JSON.parse(replies);
 			saveLinks(links);
 			saveReplies(replies);
+		}else{
+
+	
+			var clipboardData, pastedData;
+			var text = '';
+
+			clipboardData = e.originalEvent.clipboardData || window.clipboardData;
+			pastedData = clipboardData.getData('text');
+			const range = padInner.contents()[0].getSelection().getRangeAt(0);
+
+			if (!range) return false;
+
+
+			// Do whatever with pasteddata
+			console.log(pastedData);
+
+			if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(pastedData)) {
+				var expression = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/gi;
+				var matches = pastedData.match(expression);
+				var allLinks ={};
+
+				if(matches){
+					for(match in matches.reverse()){ // because of characters position need to be fixed and going to add tags from end
+						var result = {};
+						var newLinkId = shared.generateLinkId();
+						result['link'] = matches[match];
+	
+						// allLinks.push(fakeLinkId)
+						allLinks[newLinkId] ={
+							data : {
+								author : "empty",
+								linkId : newLinkId,
+								reply : false ,
+								timestamp : new Date().getTime(),
+								text :  result['link'] ,
+								originalLinkId : newLinkId ,
+								hyperlink : result['link'] ,
+								headerId : null,
+								date : new Date(),
+								formattedDate : new Date(),
+							}
+						};
+						result['startsAt'] = pastedData.indexOf(matches[match]);
+						//allMatchedLinks.push(result)
+						var openTag = '<span id="'+newLinkId+'" class="'+newLinkId+'">' ;
+						var closeTag = '</span>'
+						pastedData = [pastedData.slice(0, result['startsAt']), openTag, pastedData.slice(result['startsAt'])].join('');
+						result['endsAt'] = 	pastedData.indexOf(matches[match]) + matches[match].length;
+	
+						pastedData = [pastedData.slice(0, result['endsAt']), closeTag, pastedData.slice(result['endsAt'])].join('');
+	
+					}
+	
+					
+					//console.log(allMatchedLinks)
+					pastedData = pastedData.replace(/(?:\r\n|\r|\n)/g, '<br>');
+
+					console.log("before",pastedData)
+					text = $('<div></div>').html(pastedData);
+					const linkIds = getLinkIds(text);
+					console.log(linkIds,"linkIds")
+		
+					//range.insertNode(document.createTextNode(pastedData));
+		
+					padInner.contents()[0].execCommand('insertHTML',false,$('<div>').append($(text).clone()).html());
+		
+					console.log("external",allLinks)
+
+					pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(clientVars.padId, allLinks);
+
+					e.preventDefault();
+					
+
+				}
+		
+			}
+
+		
+
 		}
 	};
 	
 	var saveLinks = function (links) {
+		console.log("saveLinks1",links)
+
 		const linksToSave = {};
 		const padId = clientVars.padId;
 	
@@ -220,6 +305,8 @@ const events = (() => {
 			mapOriginalLinksId[originalLinkId] = newLinkId;
 			linksToSave[newLinkId] = link;
 		});
+		console.log("saveLinks2",padId, linksToSave)
+
 		pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(padId, linksToSave);
 	};
 	

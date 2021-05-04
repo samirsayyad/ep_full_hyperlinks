@@ -9,6 +9,8 @@ const links = require('./links');
 const apiUtils = require('./apiUtils');
 const _ = require('underscore');
 //var meta = require('meta-resolver');
+const gmeta = require('gmeta');
+var Meta = require('html-metadata-parser');
 
 // const metascraper = require('metascraper')([
 //   require('metascraper-description')(),
@@ -17,9 +19,13 @@ const _ = require('underscore');
 //   require('metascraper-title')(),
 //   require('metascraper-url')(),
 // ]);
+const metagetall = require('metagetall');
 
+//const urlMetadata = require('meta-fetcher')
 const urlMetadata = require('url-metadata')
+const metaget = require('metaget');
 
+var getMetadata = require('extract-meta');
 
 //const got = require('got');
 
@@ -142,38 +148,17 @@ const socketio = (hook_name, args, cb) => {
         });
         // resolve meta of url
         socket.on('metaResolver', async (data, callback) => {
-          // var hyperlink = data.hyperlink;
-          // let promise =new Promise((resolve,reject)=>{
-          //   meta.fetch(hyperlink,[],(err,meta) =>{
-          //     resolve(meta)
-          //   })
-          // })
-          // let result = await promise
           try {
-            // const {body: html, url} = await got(data.hyperlink);
-            // const metadata = await metascraper({html, url});
-            // callback({
-            //   metadata,
-            //   last: data.last,
-            // });
-
-            urlMetadata(data.hyperlink).then(
-            function (metadata) { // success handler
-              callback({
-                metadata,
-                last: data.last,
-              });
-            },
-            function (e) { // failure handler
-              console.log(e.message , e.status )
-
-              callback({
-                metadata: false,
-                last: data.last,
-              });
-            })
+            var result = await Meta.parser(data.hyperlink || data.editedHyperlink);
+            callback({metadata : 
+              {
+                "image" : result["og"].images[0].url ||  result["og"].image || result["images"][0].url || null ,
+                "title" : result["meta"].title || null ,
+              },
+              last: data.last,
+            });
           } catch (e) {
-            console.log(e.message , e.status  )
+            console.log(e.message , e.status , "error" )
             callback({
               metadata: false,
               last: data.last,
