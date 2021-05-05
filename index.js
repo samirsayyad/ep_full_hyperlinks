@@ -8,26 +8,8 @@ const linkManager = require('./linkManager');
 const links = require('./links');
 const apiUtils = require('./apiUtils');
 const _ = require('underscore');
-//var meta = require('meta-resolver');
-const gmeta = require('gmeta');
+
 var Meta = require('html-metadata-parser');
-
-// const metascraper = require('metascraper')([
-//   require('metascraper-description')(),
-//   require('metascraper-image')(),
-//   require('metascraper-logo')(),
-//   require('metascraper-title')(),
-//   require('metascraper-url')(),
-// ]);
-const metagetall = require('metagetall');
-
-//const urlMetadata = require('meta-fetcher')
-const urlMetadata = require('url-metadata')
-const metaget = require('metaget');
-
-var getMetadata = require('extract-meta');
-
-//const got = require('got');
 
 const padRemove = async (hook_name, context, callback) => {
 	return await Promise.all([
@@ -150,9 +132,18 @@ const socketio = (hook_name, args, cb) => {
         socket.on('metaResolver', async (data, callback) => {
           try {
             var result = await Meta.parser(data.hyperlink || data.editedHyperlink);
+            var image = null ;
+            if(result["og"].images.length)
+              image = result["og"].images[0].url
+            else if (result["images"].length)
+              image = result["images"][0].url  ;
+            else if (result["og"].image )
+              image = result["og"].image;
+            
+
             callback({metadata : 
               {
-                "image" : result["og"].images[0].url ||  result["og"].image || result["images"][0].url || null ,
+                "image" : image ,
                 "title" : result["meta"].title || null ,
               },
               last: data.last,

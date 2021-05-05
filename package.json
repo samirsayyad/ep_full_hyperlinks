@@ -1,6 +1,6 @@
 {
   "name": "ep_full_hyperlinks",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "description": "etherpad plugin ep_full_hyperlink hyperlink",
   "main": "index.js",
   "scripts": {
@@ -39,25 +39,10 @@
     }
   },
   "dependencies": {
-    "extract-meta": "^1.0.1",
     "formidable": "*",
-    "gmeta": "^1.1.5",
-    "got": "^11.8.1",
     "html-metadata-parser": "^1.0.3",
-    "meta-fetcher": "^3.1.0",
-    "meta-resolver": "0.0.3",
-    "metafetch": "^2.0.0",
-    "metaget": "^1.0.7",
-    "metagetall": "^1.1.41",
-    "metascraper": "^5.21.4",
-    "metascraper-description": "^5.21.4",
-    "metascraper-image": "^5.21.4",
-    "metascraper-logo": "^5.21.4",
-    "metascraper-title": "^5.21.4",
-    "metascraper-url": "^5.21.4",
     "socket.io-client": "^2",
-    "underscore": "^1.12.1",
-    "url-metadata": "^2.5.0"
+    "underscore": "^1.12.1"
   },
   "homepage": "https://github.com/samirsayyad/ep_full_hyperlinks#readme",
   "devDependencies": {
