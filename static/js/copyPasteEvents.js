@@ -109,6 +109,20 @@ const events = (() => {
 		const uniqueLinkIds = _.uniq(linkIds);
 		return uniqueLinkIds;
 	};
+	var getLinkIdsFromA = function (html) {
+		const allElem = $(html).find('a');
+		const linkIds = [];
+		_.each(allElem, (a) => {
+			const cls = $(a).attr('class');
+			const classLinkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
+			const linkId = (classLinkId) ? classLinkId[1] : false;
+			if (linkId) {
+				linkIds.push(linkId);
+			}
+		});
+		const uniqueLinkIds = _.uniq(linkIds);
+		return uniqueLinkIds;
+	};
 	
 	var createHiddenDiv = function (range) {
 		const content = range.cloneContents();
@@ -200,6 +214,7 @@ const events = (() => {
 		
 		let links = e.originalEvent.clipboardData.getData('text/objectLink');
 		let replies = e.originalEvent.clipboardData.getData('text/objectReply');
+		
 		if (links && replies) {
 			links = JSON.parse(links);
 			console.log(links,"links")
@@ -214,77 +229,82 @@ const events = (() => {
 
 			clipboardData = e.originalEvent.clipboardData || window.clipboardData;
 			pastedData = clipboardData.getData('text');
+			var pastedDataHtml = clipboardData.getData('text/html');
 			const range = padInner.contents()[0].getSelection().getRangeAt(0);
 
 			if (!range) return false;
 
-
-			// Do whatever with pasteddata
-			console.log(pastedData);
-
-			if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(pastedData)) {
-				var expression = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/gi;
-				var matches = pastedData.match(expression);
-				var allLinks ={};
-
-				if(matches){
-					for(match in matches.reverse()){ // because of characters position need to be fixed and going to add tags from end
-						var result = {};
-						var newLinkId = shared.generateLinkId();
-						result['link'] = matches[match];
-	
-						// allLinks.push(fakeLinkId)
-						allLinks[newLinkId] ={
-							data : {
-								author : "empty",
-								linkId : newLinkId,
-								reply : false ,
-								timestamp : new Date().getTime(),
-								text :  result['link'] ,
-								originalLinkId : newLinkId ,
-								hyperlink : result['link'] ,
-								headerId : null,
-								date : new Date(),
-								formattedDate : new Date(),
-							}
-						};
-						result['startsAt'] = pastedData.indexOf(matches[match]);
-						//allMatchedLinks.push(result)
-						var openTag = '<span id="'+newLinkId+'" class="'+newLinkId+'">' ;
-						var closeTag = '</span>'
-						pastedData = [pastedData.slice(0, result['startsAt']), openTag, pastedData.slice(result['startsAt'])].join('');
-						result['endsAt'] = 	pastedData.indexOf(matches[match]) + matches[match].length;
-	
-						pastedData = [pastedData.slice(0, result['endsAt']), closeTag, pastedData.slice(result['endsAt'])].join('');
-	
+			if (!pastedDataHtml){
+				if(new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(pastedData)) {
+					var expression = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/gi;
+					var matches = pastedData.match(expression);
+					var allLinks ={};
+					if(matches){
+						for(match in matches.reverse()){ // because of characters position need to be fixed and going to add tags from end
+							var result = {};
+							var newLinkId = shared.generateLinkId();
+							result['link'] = matches[match];
+		
+							// allLinks.push(fakeLinkId)
+							allLinks[newLinkId] ={
+								data : {
+									author : "empty",
+									linkId : newLinkId,
+									reply : false ,
+									timestamp : new Date().getTime(),
+									text :  result['link'] ,
+									originalLinkId : newLinkId ,
+									hyperlink : result['link'] ,
+									headerId : null,
+									date : new Date(),
+									formattedDate : new Date(),
+								}
+							};
+							result['startsAt'] = pastedData.indexOf(matches[match]);
+							var openTag = '<span id="'+newLinkId+'" class="'+newLinkId+'">' ;
+							var closeTag = '</span>'
+							pastedData = [pastedData.slice(0, result['startsAt']), openTag, pastedData.slice(result['startsAt'])].join('');
+							result['endsAt'] = 	pastedData.indexOf(matches[match]) + matches[match].length;
+							pastedData = [pastedData.slice(0, result['endsAt']), closeTag, pastedData.slice(result['endsAt'])].join('');
+						}
+						pastedData = pastedData.replace(/(?:\r\n|\r|\n)/g, '<br>');
+						text = $('<div></div>').html(pastedData);
+						padInner.contents()[0].execCommand('insertHTML',false,$('<div>').append($(text).clone()).html());
+						pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(clientVars.padId, allLinks);
+						e.preventDefault();
 					}
-	
-					
-					//console.log(allMatchedLinks)
-					pastedData = pastedData.replace(/(?:\r\n|\r|\n)/g, '<br>');
-
-					console.log("before",pastedData)
-					text = $('<div></div>').html(pastedData);
-					const linkIds = getLinkIds(text);
-					console.log(linkIds,"linkIds")
-		
-					//range.insertNode(document.createTextNode(pastedData));
-		
-					padInner.contents()[0].execCommand('insertHTML',false,$('<div>').append($(text).clone()).html());
-		
-					console.log("external",allLinks)
-
-					pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(clientVars.padId, allLinks);
-
-					e.preventDefault();
-					
-
+			
 				}
-		
+			}else{ // it means pasted in html 
+				e.preventDefault();
+				var pastedHtmlHolderElemenet = document.createElement( 'div' );
+				pastedHtmlHolderElemenet.innerHTML = pastedDataHtml;
+				var allLinksElement=pastedHtmlHolderElemenet.getElementsByTagName( 'a' );
+				var allLinksData ={};
+				_.each(allLinksElement , (eachElemenet)=>{
+					var tempHyperLink =  eachElemenet.href ;
+					var tempHyperLinkText =  eachElemenet.innerHTML ;
+					var newLinkId = shared.generateLinkId();
+					eachElemenet.className = newLinkId
+					eachElemenet.id = newLinkId ;
+					allLinksData[newLinkId] ={
+						data : {
+							author : "empty",
+							linkId : newLinkId,
+							reply : false ,
+							timestamp : new Date().getTime(),
+							text :  tempHyperLinkText ,
+							originalLinkId : newLinkId ,
+							hyperlink : tempHyperLink ,
+							headerId : null,
+							date : new Date(),
+							formattedDate : new Date(),
+						}
+					};
+				})  
+				pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(clientVars.padId, allLinksData);
+				padInner.contents()[0].execCommand('insertHTML',false,$('<div>').append($(pastedHtmlHolderElemenet).clone()).html());
 			}
-
-		
-
 		}
 	};
 	

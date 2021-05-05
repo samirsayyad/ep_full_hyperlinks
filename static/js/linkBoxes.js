@@ -72,7 +72,7 @@ const linkBoxes = (() => {
     const container = getLinksContainer();
     const linkElm = container.find(`#${linkId}`);
     var inner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
-
+    if (!linkElm.length) return ;
     //if (container.is(':visible')) {
       // hide all other links
       container.find('.sidebar-link').each(function () {
