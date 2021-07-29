@@ -631,4 +631,8 @@ input:-internal-autofill-selected {
 }
 
 
- 
+.ep_hyperlink_icon{
+  background-image: url("../img/icon.png");
+  width: 28px;
+  height: 28px;
+}
