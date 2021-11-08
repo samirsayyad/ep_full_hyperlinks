@@ -12,30 +12,27 @@ const imagemin = require('gulp-imagemin');
 const jsfiles = {
   events: './static/js/copyPasteEvents.js',
   linkBoxes: './static/js/linkBoxes.js',
-  linkIcons: './static/js/linkIcons.js',
-  linkL10n: './static/js/linkL10n.js',
   newLink: './static/js/newLink.js',
   preLinkMark: './static/js/preLinkMark.js',
-  timeFormat: './static/js/timeFormat.js',
   shared: './static/js/shared.js',
 };
 
-const jsPlugins = []
+const jsPlugins = [];
 
 const etherpadModule = [`
 	const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 	const _ = require('ep_etherpad-lite/static/js/underscore');
-`]
+`];
 
-const cssFiles = ['./static/css/**/*.css']
-const imageFiles = ['./static/img/*']
+const cssFiles = ['./static/css/**/*.css'];
+const imageFiles = ['./static/img/*'];
 
 const gulpifyJs = () => gulp.src([
-		...jsPlugins,
-		...Object.entries(jsfiles).map((x) => x[1])
-	]).pipe(mode.production(sourcemaps.init()))
-		.pipe(concat('ep.full.hyperlinks.mini.js'))
-		.pipe(inject.prepend(`${etherpadModule} \n`))
+  ...jsPlugins,
+  ...Object.entries(jsfiles).map((x) => x[1]),
+]).pipe(mode.production(sourcemaps.init()))
+    .pipe(concat('ep.full.hyperlinks.mini.js'))
+    .pipe(inject.prepend(`${etherpadModule} \n`))
     .pipe(inject.append(`return {\n${Object.entries(jsfiles).map((x) => `${x[0]}\n`)}}\n`))
     .pipe(inject.wrap('exports.moduleList = (()=>{\n', '})();'))
     .pipe(mode.production(uglify(/* options */)))
@@ -44,17 +41,13 @@ const gulpifyJs = () => gulp.src([
 
 gulp.task('js', gulpifyJs);
 
-gulp.task('minify-css', () => {
-  return gulp.src('static/css/**/*.css')
+gulp.task('minify-css', () => gulp.src('static/css/**/*.css')
     .pipe(cleanCSS({compatibility: 'ie8'}))
-    .pipe(gulp.dest('static/dist/css'));
-});
+    .pipe(gulp.dest('static/dist/css')));
 
-gulp.task('minify-image', () => {
-	return gulp.src(imageFiles)
-        .pipe(imagemin())
-        .pipe(gulp.dest('static/dist/img'))
-})
+gulp.task('minify-image', () => gulp.src(imageFiles)
+    .pipe(imagemin())
+    .pipe(gulp.dest('static/dist/img')));
 
 gulp.task('bump', () => gulp.src('./package.json')
     .pipe(bump())
@@ -75,11 +68,11 @@ gulp.task('git:push', (cb) => {
 });
 
 gulp.task('watch', () => {
-	const watchFiles = [
-		...Object.entries(jsfiles).map((x) => x[1]),
-		...cssFiles
-	]
+  const watchFiles = [
+    ...Object.entries(jsfiles).map((x) => x[1]),
+    ...cssFiles,
+  ];
   gulp.watch(watchFiles, gulp.series(['js', 'minify-css']));
 });
 
-gulp.task('build', gulp.series(['js','minify-css', 'minify-image', 'bump', 'git:publish', 'git:push']));
+gulp.task('build', gulp.series(['js', 'minify-css', 'minify-image', 'bump', 'git:publish', 'git:push']));

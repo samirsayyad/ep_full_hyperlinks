@@ -4,6 +4,17 @@ const ERR = require('ep_etherpad-lite/node_modules/async-stacktrace');
 const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 const readOnlyManager = require('ep_etherpad-lite/node/db/ReadOnlyManager.js');
 const {shared} = require('./static/dist/js/ep.full.hyperlinks.mini').moduleList;
+
+exports.getLink = (padId, linkId, callback) => {
+  db.get(`links:${padId}`, (err, links) => {
+    if (ERR(err, callback)) return;
+    let link = {};
+    if (!links) links = {};
+    if (links[linkId]) link = {id: linkId, ...links[linkId]};
+    callback(null, link);
+  });
+};
+
 exports.getLinks = (padId, callback) => {
   // We need to change readOnly PadIds to Normal PadIds
   const isReadOnly = padId.indexOf('r.') === 0;
@@ -95,100 +106,13 @@ exports.bulkAddLinks = (padId, data, callback) => {
 };
 
 exports.copyLinks = async (originalPadId, newPadID, callback) => {
-	// get the comments of original pad
-	const originalComments = await db.get(`links:${originalPadId}`);
-	// make sure we have different copies of the comment between pads
-	const copiedComments = _.mapObject(originalComments, (thisComment) => _.clone(thisComment));
+  // get the comments of original pad
+  const originalComments = await db.get(`links:${originalPadId}`);
+  // make sure we have different copies of the comment between pads
+  const copiedComments = _.mapObject(originalComments, (thisComment) => _.clone(thisComment));
 
-	// save the comments on new pad
-	await db.set(`links:${newPadID}`, copiedComments);
-};
-
-exports.getLinkReplies = (padId, callback) => {
-  // We need to change readOnly PadIds to Normal PadIds
-  const isReadOnly = padId.indexOf('r.') === 0;
-  if (isReadOnly) {
-    readOnlyManager.getPadId(padId, (err, rwPadId) => {
-      padId = rwPadId;
-    });
-  }
-
-  // get the globalLinks replies
-  db.get(`link-replies:${padId}`, (err, replies) => {
-    if (ERR(err, callback)) return;
-    // link does not exists
-    if (replies == null) replies = {};
-    callback(null, {replies});
-  });
-};
-
-exports.deleteLinkReplies = async (padId) => db.remove(`link-replies:${padId}`);
-
-exports.addLinkReply = (padId, data, callback) => {
-  exports.bulkAddLinkReplies(padId, [data], (err, replyIds, replies) => {
-    if (ERR(err, callback)) return;
-
-    if (replyIds && replyIds.length > 0 && replies && replies.length > 0) {
-      callback(null, replyIds[0], replies[0]);
-    }
-  });
-};
-
-exports.bulkAddLinkReplies = (padId, data, callback) => {
-  // We need to change readOnly PadIds to Normal PadIds
-  const isReadOnly = padId.indexOf('r.') === 0;
-  if (isReadOnly) {
-    readOnlyManager.getPadId(padId, (err, rwPadId) => {
-      padId = rwPadId;
-    });
-  }
-
-  // get the entry
-  db.get(`link-replies:${padId}`, (err, replies) => {
-    if (ERR(err, callback)) return;
-
-    // the entry doesn't exist so far, let's create it
-    if (replies == null) replies = {};
-
-    const newReplies = [];
-    const replyIds = _.map(data, (replyData) => {
-      // create the new reply id
-      const replyId = `c-reply-${randomString(16)}`;
-
-      const metadata = replyData.link || {};
-
-      const reply = {
-        linkId: replyData.linkId,
-        text: replyData.reply || replyData.text,
-        changeTo: replyData.changeTo || null,
-        changeFrom: replyData.changeFrom || null,
-        author: metadata.author || 'empty',
-        name: metadata.name || replyData.name,
-        timestamp: parseInt(replyData.timestamp) || new Date().getTime(),
-      };
-
-      // add the entry for this pad
-      replies[replyId] = reply;
-
-      newReplies.push(reply);
-      return replyId;
-    });
-
-    // save the new element back
-    db.set(`link-replies:${padId}`, replies);
-
-    callback(null, replyIds, newReplies);
-  });
-};
-
-exports.copyLinkReplies = async (originalPadId, newPadID) => {
-	// get the replies of original pad
-	const originalReplies = await db.get(`link-replies:${originalPadId}`);
-	// make sure we have different copies of the reply between pads
-	const copiedReplies = _.mapObject(originalReplies, (thisReply) => _.clone(thisReply));
-
-	// save the comment replies on new pad
-	await db.set(`link-replies:${newPadID}`, copiedReplies);
+  // save the comments on new pad
+  await db.set(`links:${newPadID}`, copiedComments);
 };
 
 exports.changeAcceptedState = (padId, linkId, state, callback) => {
@@ -202,11 +126,7 @@ exports.changeAcceptedState = (padId, linkId, state, callback) => {
     });
   }
 
-  // If we're dealing with link replies we need to a different query
-  let prefix = 'links:';
-  if (linkId.substring(0, 7) === 'c-reply') {
-    prefix = 'link-replies:';
-  }
+  const prefix = 'links:';
 
   // get the entry
   db.get(prefix + padId, (err, links) => {
@@ -244,12 +164,7 @@ exports.changeLinkText = (padId, linkId, linkText, callback) => {
       });
     }
 
-    // If we're dealing with link replies we need to a different query
-    let prefix = 'links:';
-    if (linkId.substring(0, 7) === 'c-reply') {
-      prefix = 'link-replies:';
-    }
-
+    const prefix = 'links:';
 
     // get the entry
     db.get(prefix + padId, (err, links) => {
@@ -268,7 +183,6 @@ exports.changeLinkText = (padId, linkId, linkText, callback) => {
   }
 };
 
-
 exports.changeLinkData = (data, callback) => {
   // var linkTextIsNotEmpty = data.linkText.length > 0;
   if (data.linkText) {
@@ -281,11 +195,7 @@ exports.changeLinkData = (data, callback) => {
       });
     }
 
-    // If we're dealing with link replies we need to a different query
-    let prefix = 'links:';
-    if (data.linkId.substring(0, 7) === 'c-reply') {
-      prefix = 'link-replies:';
-    }
+    const prefix = 'links:';
 
     // get the entry
     db.get(prefix + data.padId, (err, links) => {

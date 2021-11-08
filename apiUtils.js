@@ -25,9 +25,7 @@ const validateApiKey = (fields, res) => {
   return valid;
 };
 
-const validateRequiredField = (originalFields, fieldName) => {
-  return (typeof originalFields[fieldName] !== 'undefined');
-};
+const validateRequiredField = (originalFields, fieldName) => (typeof originalFields[fieldName] !== 'undefined');
 
 // Checks if required fields are present, and prepare response if any of them
 // is not. Returns true if valid, false otherwise.

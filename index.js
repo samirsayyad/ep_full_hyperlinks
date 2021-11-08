@@ -9,24 +9,20 @@ const links = require('./links');
 const apiUtils = require('./apiUtils');
 const _ = require('underscore');
 
-var Meta = require('html-metadata-parser');
+const Meta = require('html-metadata-parser');
 
-const padRemove = async (hook_name, context, callback) => {
-	return await Promise.all([
-    linkManager.deleteLinkReplies(context.padID),
-    linkManager.deleteLinks(context.padID),
-  ]);
-};
+const padRemove = async (hook_name, context, callback) => await Promise.all([
+  linkManager.deleteLinks(context.padID),
+]);
 
 const padCopy = async (hook_name, context, callback) => {
-	await Promise.all([
+  await Promise.all([
     linkManager.copyLinks(context.originalPad.id, context.destinationID),
-    linkManager.copyLinkReplies(context.originalPad.id, context.destinationID),
   ]);
 };
 
 const handleMessageSecurity = (hook_name, context, callback) => {
-	const {message: {data: {apool} = {}} = {}} = context;
+  const {message: {data: {apool} = {}} = {}} = context;
   if (apool && apool[0] && apool[0][0] === 'link') {
     // link change, allow it to override readonly security model!!
     return callback(true);
@@ -44,13 +40,6 @@ const socketio = (hook_name, args, cb) => {
           socket.join(padId);
           linkManager.getLinks(padId, (err, links) => {
             callback(links);
-          });
-        });
-
-        socket.on('getLinkReplies', (data, callback) => {
-          const padId = data.padId;
-          linkManager.getLinkReplies(padId, (err, replies) => {
-            callback(replies);
           });
         });
 
@@ -74,7 +63,7 @@ const socketio = (hook_name, args, cb) => {
 
         socket.on('revertChange', (data, callback) => {
           // Broadcast to all other users that this change was accepted.
-          // Note that linkId here can either be the linkId or replyId..
+          // Note that linkId here can either be the linkId.
           const padId = data.padId;
           linkManager.changeAcceptedState(padId, data.linkId, false, () => {
             socket.broadcast.to(padId).emit('changeReverted', data.linkId);
@@ -83,7 +72,7 @@ const socketio = (hook_name, args, cb) => {
 
         socket.on('acceptChange', (data, callback) => {
           // Broadcast to all other users that this change was accepted.
-          // Note that linkId here can either be the linkId or replyId..
+          // Note that linkId here can either be the linkId.
           const padId = data.padId;
           linkManager.changeAcceptedState(padId, data.linkId, true, () => {
             socket.broadcast.to(padId).emit('changeAccepted', data.linkId);
@@ -98,29 +87,14 @@ const socketio = (hook_name, args, cb) => {
           });
         });
 
-        socket.on('bulkAddLinkReplies', (padId, data, callback) => {
-          linkManager.bulkAddLinkReplies(padId, data, (err, repliesId, replies) => {
-            socket.broadcast.to(padId).emit('pushAddLinkReply', repliesId, replies);
-            const repliesWithReplyId = _.zip(repliesId, replies);
-            callback(repliesWithReplyId);
-          });
-        });
-
         socket.on('updateLinkText', (data, callback) => {
           // Broadcast to all other users that the link text was changed.
-          // Note that linkId here can either be the linkId or replyId..
+          // Note that linkId here can either be the linkId ..
           const padId = data.padId;
           const linkId = data.linkId;
           const linkText = data.linkText;
           const hyperlink = data.hyperlink;
 
-
-          // linkManager.changeLinkText(padId, linkId, linkText, function(err) {
-          //   if(!err){
-          //     socket.broadcast.to(padId).emit('textLinkUpdated', linkId, linkText);
-          //   }
-          //   callback(err);
-          // });
           linkManager.changeLinkData(data, (err) => {
             if (!err) {
               socket.broadcast.to(padId).emit('textLinkUpdated', linkId, linkText, hyperlink);
@@ -128,42 +102,28 @@ const socketio = (hook_name, args, cb) => {
             callback(err);
           });
         });
+
         // resolve meta of url
         socket.on('metaResolver', async (data, callback) => {
           try {
-            var result = await Meta.parser(data.hyperlink || data.editedHyperlink);
-            var image = null ;
-            if(result["og"].images.length)
-              image = result["og"].images[0].url
-            else if (result["images"].length)
-              image = result["images"][0].url  ;
-            else if (result["og"].image )
-              image = result["og"].image;
-            
+            const result = await Meta.parser(data.hyperlink || data.editedHyperlink);
+            let image = null;
+            if (result.og.images.length) { image = result.og.images[0].url; } else if (result.images.length) { image = result.images[0].url; } else if (result.og.image) { image = result.og.image; }
 
-            callback({metadata : 
+
+            callback({metadata:
               {
-                "image" : image ,
-                "title" : result["meta"].title || null ,
+                image,
+                title: result.meta.title || null,
               },
-              last: data.last,
-            });
+            last: data.last});
           } catch (e) {
-            console.log(e.message , e.status , "error" )
+            console.log(e.message, e.status, 'error');
             callback({
               metadata: false,
               last: data.last,
             });
           }
-        });
-
-        socket.on('addLinkReply', (data, callback) => {
-          const padId = data.padId;
-          linkManager.addLinkReply(padId, data, (err, replyId, reply, changeTo, changeFrom, changeAccepted, changeReverted) => {
-            reply.replyId = replyId;
-            socket.broadcast.to(padId).emit('pushAddLinkReply', replyId, reply, changeTo, changeFrom, changeAccepted, changeReverted);
-            callback(replyId, reply);
-          });
         });
 
         // link added via API
@@ -176,31 +136,17 @@ const socketio = (hook_name, args, cb) => {
             socket.broadcast.to(padId).emit('pushAddLink', linkIds[i], links[i]);
           }
         });
-
-        // link reply added via API
-        socket.on('apiAddLinkReplies', (data) => {
-          const padId = data.padId;
-          const replyIds = data.replyIds;
-          const replies = data.replies;
-
-          for (let i = 0, len = replyIds.length; i < len; i++) {
-            const reply = replies[i];
-            const replyId = replyIds[i];
-            reply.replyId = replyId;
-            socket.broadcast.to(padId).emit('pushAddLinkReply', replyId, reply);
-          }
-        });
       });
-	return cb();
+  return cb();
 };
 
 const eejsBlock_dd_insert = (hook_name, args, cb) => {
-	args.content += eejs.require('ep_full_hyperlinks/templates/menuButtons.ejs');
+  args.content += eejs.require('ep_full_hyperlinks/templates/menuButtons.ejs');
   return cb();
 };
 
 const eejsBlock_mySettings = (hook_name, args, cb) => {
-	args.content += eejs.require('ep_full_hyperlinks/templates/settings.ejs');
+  args.content += eejs.require('ep_full_hyperlinks/templates/settings.ejs');
   return cb();
 };
 
@@ -219,40 +165,47 @@ const padInitToolbar = (hookName, args, cb) => {
 };
 
 const eejsBlock_editbarMenuLeft = (hook_name, args, cb) => {
-	// check if custom button is used
-	if (JSON.stringify(settings.toolbar).indexOf('addLink') > -1) {
-		return cb();
-	}
-	args.content += eejs.require('ep_full_hyperlinks/templates/linkBarButtons.ejs');
-	return cb();
+  // check if custom button is used
+  if (JSON.stringify(settings.toolbar).indexOf('addLink') > -1) {
+    return cb();
+  }
+  args.content += eejs.require('ep_full_hyperlinks/templates/linkBarButtons.ejs');
+  return cb();
 };
 
 const eejsBlock_scripts = (hook_name, args, cb) => {
-	args.content += eejs.require('ep_full_hyperlinks/templates/links.html');
-  args.content += eejs.require('ep_full_hyperlinks/templates/linkIcons.html');
+  args.content += eejs.require('ep_full_hyperlinks/templates/links.html');
   return cb();
 };
 
 const eejsBlock_styles = (hook_name, args, cb) => {
-	args.content += eejs.require('ep_full_hyperlinks/templates/styles.html');
+  args.content += eejs.require('ep_full_hyperlinks/templates/styles.html');
   return cb();
 };
 
 const clientVars = (hook, context, cb) => {
   const displayLinkAsIcon = settings.ep_full_hyperlinks ? settings.ep_full_hyperlinks.displayLinkAsIcon : false;
   const highlightSelectedText = settings.ep_full_hyperlinks ? settings.ep_full_hyperlinks.highlightSelectedText : false;
-	return cb({
-		displayLinkAsIcon,
-		highlightSelectedText,
-	});
+  return cb({
+    displayLinkAsIcon,
+    highlightSelectedText,
+  });
 };
 
 const expressCreateServer = (hook_name, args, callback) => {
-  args.app.get('/p/:pad/:rev?/links', (req, res) => {
-    const fields = req.query;
-    // check the api key
-    if (!apiUtils.validateApiKey(fields, res)) return;
+  args.app.get('/hyperlink/:pad/links/:linkId', (req, res) => {
+    // sanitize pad id before continuing
+    const padId = apiUtils.sanitizePadId(req);
+    const {linkId} = req.params;
 
+    links.getPadLink(padId, linkId, (err, data) => {
+      if (err) { return res.json({status: false, message: 'internal error', link: null}); }
+
+      res.json({status: true, link: data});
+    });
+  });
+
+  args.app.get('/hyperlink/:pad/links', (req, res) => {
     // sanitize pad id before continuing
     const padIdReceived = apiUtils.sanitizePadId(req);
 
@@ -294,55 +247,7 @@ const expressCreateServer = (hook_name, args, callback) => {
     });
   });
 
-  args.app.get('/p/:pad/:rev?/linkReplies', (req, res) => {
-    // it's the same thing as the formidable's fields
-    const fields = req.query;
-    // check the api key
-    if (!apiUtils.validateApiKey(fields, res)) return;
-
-    // sanitize pad id before continuing
-    const padIdReceived = apiUtils.sanitizePadId(req);
-
-    // call the route with the pad id sanitized
-    links.getPadLinkReplies(padIdReceived, (err, data) => {
-      if (err) {
-        res.json({code: 2, message: 'internal error', data: null});
-      } else {
-        res.json({code: 0, data});
-      }
-    });
-  });
-
-  args.app.post('/p/:pad/:rev?/linkReplies', (req, res) => {
-    new formidable.IncomingForm().parse(req, (err, fields, files) => {
-      // check the api key
-      if (!apiUtils.validateApiKey(fields, res)) return;
-
-      // check required fields from link data
-      if (!apiUtils.validateRequiredFields(fields, ['data'], res)) return;
-
-      // sanitize pad id before continuing
-      const padIdReceived = apiUtils.sanitizePadId(req);
-
-      // create data to hold link reply information:
-      try {
-        const data = JSON.parse(fields.data);
-
-        links.bulkAddPadLinkReplies(padIdReceived, data, (err, replyIds, replies) => {
-          if (err) {
-            res.json({code: 2, message: 'internal error', data: null});
-          } else {
-            broadcastLinkRepliesAdded(padIdReceived, replyIds, replies);
-            res.json({code: 0, replyIds});
-          }
-        });
-      } catch (e) {
-        res.json({code: 1, message: 'data must be a JSON', data: null});
-      }
-    });
-  });
-
-	return callback();
+  return callback();
 };
 
 const broadcastLinksAdded = (padId, linkIds, links) => {
@@ -357,31 +262,19 @@ const broadcastLinksAdded = (padId, linkIds, links) => {
   socket.emit('apiAddLinks', data);
 };
 
-const broadcastLinkRepliesAdded = (padId, replyIds, replies) => {
-  const socket = clientIO.connect(broadcastUrl);
-
-  const data = {
-    padId,
-    replyIds,
-    replies,
-  };
-
-  socket.emit('apiAddLinkReplies', data);
-};
-
 const broadcastUrl = apiUtils.broadcastUrlFor('/link');
 
 module.exports = {
-	padRemove,
-	padCopy,
-	handleMessageSecurity,
-	socketio,
-	eejsBlock_dd_insert,
-	eejsBlock_mySettings,
-	padInitToolbar,
-	eejsBlock_editbarMenuLeft,
-	eejsBlock_scripts,
-	eejsBlock_styles,
-	clientVars,
-	expressCreateServer,
-}
+  padRemove,
+  padCopy,
+  handleMessageSecurity,
+  socketio,
+  eejsBlock_dd_insert,
+  eejsBlock_mySettings,
+  padInitToolbar,
+  eejsBlock_editbarMenuLeft,
+  eejsBlock_scripts,
+  eejsBlock_styles,
+  clientVars,
+  expressCreateServer,
+};

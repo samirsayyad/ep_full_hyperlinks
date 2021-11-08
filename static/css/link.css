@@ -25,12 +25,6 @@
   #links:not(.active) {
     display: none;
   }
-  /* @media (max-width: 900px) {
-    #linkIcons, #links {
-      display: none !important;
-    }
-  }
-   */
   .sidebar-link {
     position: absolute;
     /* width: 286px; */
@@ -75,11 +69,8 @@
     display: inline-flex;
   }
   
-  .link-reply .new-link:not(.editing) .form-more {
-    display: none;
-  }
   input.error, textarea.error {
-    border:1px solid red !important;
+    border:2px solid red !important;
   }
   .form-more{
     margin-top: 12px;
@@ -252,12 +243,7 @@
     padding: 6px 0px;
     height: 63px;
   }
-  .full-display-link .link-title-wrapper,
-  .full-display-link .link-reply {
-    /* padding: 10px;
-    width: 78%; */
-    /* float: left; */
-  }
+
   .full-display-link .link-title-wrapper .link-text {
     /* display: block; */
     /* margin-top: 10px; */
@@ -285,15 +271,8 @@
   padding: 10px 7px 9px 7px !important;
 }
 .link-title-wrapper{
-  margin-bottom: 15px;
-  margin-top: 15px;
+  width: 400px;
   display: none;
-  background-color: #fff;
-  width: 477px;
-  border-radius: 5px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px #ddd;
-  padding: 16px;
 }
 .link-title-wrapper-meta{
   /* margin-bottom: 33px */
@@ -333,10 +312,6 @@
 input:-internal-autofill-selected {
   background-color: white;
 }
-  
-.link-close{
-  cursor: pointer;
-}
 .submit_LCM{
   float: right;
   margin-top: -38px;
@@ -344,35 +319,32 @@ input:-internal-autofill-selected {
   height: 38px;
   padding: 5px 15px;
 }
+
+.hyperlink-form-btn-section{
+	text-align: right;
+	margin-top: 18px;
+}
+
 .hyperlink-form-lable-section{
-  width:445px;
-  height: 67px;
+	font-size: 0.92rem;
+	font-weight: 600;
+	margin-top: 14px;
 }
-.hyperlink-form-lable-section .hyperlink-form-lable{
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 16px;
-  color: #696969;
-  float: left;
-  width: 100%;
-}
-.hyperlink-form-lable-section .hyperlink-form-lable-disabled{
-  
-  font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 16px;
-    color: #696969;
-    float: left;
-    width: 100%;
+
+.hyperlink-form-lable-section label{
+	font-style: normal;
+	font-weight: 600;
+	font-size: 14px;
+	color: #555;
+	width: 100%;
+  display: block;
 }
   .full-display-link .link-title-wrapper .link-text.default-text {
     display: none;
   }
   
   /* SUGGESTION */
-  .suggestion, .reply-suggestion {
+  .suggestion {
     display: none;
   }
   .suggestion-display {
@@ -410,45 +382,12 @@ input:-internal-autofill-selected {
   .link-container.change-accepted .revert-suggestion-btn { display: block; }
   .link-container.change-accepted .approve-suggestion-btn { display: none; }
   
-  .link-container.change-accepted .link-replies-container .revert-suggestion-btn { display: none; }
-  .link-container.change-accepted .link-replies-container .approve-suggestion-btn { display: block; }
-  .link-container.change-accepted .link-replies-container .link-container.change-accepted .revert-suggestion-btn { display: block; }
-  .link-container.change-accepted .link-replies-container .link-container.change-accepted .approve-suggestion-btn { display: none; }
-  /* REPLIES */
-  .link-reply {
-    background-color: #f9f9f9;
-    border-top: 1px solid #eee;
-  }
-  /* One previous reply */
-  .sidebar-link-reply {
-    margin-bottom: 10px;
-  }
-  .sidebar-link-reply .link-text {
-    display: inline;
-    margin-top: 5px;
-    white-space: normal;
-  }
-  .sidebar-link-reply .link-edit {
-    display: none;
-    margin-left: 5px;
-    font-size: 1em;
-    opacity: .7;
-    transition: opacity .2s;
-  }
-  .sidebar-link-reply:hover:not(.editing) .link-edit {
-    display: inline;
-  }
-  .sidebar-link-reply:hover:not(.editing) .link-edit:hover {
-    opacity: 1;
-  }
-  .reply-link-suggest, .link-suggest {
-    margin-top: 10px;
-  }
+
   
   /* EDITING LINK */
   .link-edit-form{
     width: 100%;
-    height: 140px;
+    /* height: 140px; */
   }
   .link-edit-text {
     width: 100%;
@@ -514,82 +453,60 @@ input:-internal-autofill-selected {
     margin-right: 11px;
     height: 33px;
   }
-  #link-close{
-    background-color: gray;
-    color: #fff;
-    padding-left: 8px;
-    padding-right: 10px;
-    margin-right: 11px;
-    height: 33px;
- 
-  }
+
 
 #newLink{
   width: 477px;
 }
-#hyperlink-text{
-  margin: 8px 0 0 0!important;
-  height: 35px;
-  width: 320px;
-  float: left;
-  background: #efefef;
-  box-shadow: 0 2px 0 rgba(0,0,0,.25);
-  border-radius: 4px;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 16px;
-  color: #474747;
-  border: 0;
-  padding: 10px 7px 9px 7px!important;
-}
-#hyperlink-url{
-  margin: 8px 0 0 0!important;
-  height: 35px;
-  width: 320px;
-  float: left;
-  background: #efefef;
-  box-shadow: 0 2px 0 rgba(0,0,0,.25);
-  border-radius: 4px;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 16px;
-  color: #474747;
-  border: 0;
-  padding: 10px 7px 9px 7px !important;
-}
+
 
 .hyperlink-popup{
-  padding: 16px;
+	font-family: Quicksand, Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+	padding: 2px 15px 11px!important;
 }
-/* .popup-content{
-  padding: 0 !important;
-} */
+
+.hyperlink-popup .title {
+	font-weight: 500;
+	font-size: 1.4rem;
+}
+
+.hyperlink-popup input {
+	border: 2px solid transparent;
+	padding: 4px 6px!important;
+	margin: 0!important;
+	width: 100%!important;
+}
+
+.hyperlink-popup input:focus{
+	border-color: #2678ff;
+}
+
 .popup:not(.link-modal-link) p{
   margin: 0!important;
 }
-#link-create-btn{
-  width: 111px;
-  height: 35px;
-  font-weight: 700;
-  border: 0 none;
-  cursor: pointer;
-  float: left;
-  background: #3873e0;
-  box-shadow: 0 2px 0 #2255b5;
-  border-radius: 4px;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: 500;
+
+#link-create-btn, #link-cancel-btn{
+  background: #2678ff;
   font-size: 18px;
-  line-height: 21px;
-  align-items: center;
-  text-align: center;
   color: #fff;
-  margin: 8px 0px 0px 12px;
+	border: 2px solid #2678ff;
+	padding: 4px 38px;
+	font-size: 1.06rem;
+	transition: all .2s;
+}
+#link-create-btn:hover{
+	border-color: #0849b3;
+}
+#link-cancel-btn{
+	background-color: transparent;
+	color: #aaa;
+	border-color: transparent;
 }
 
+#link-cancel-btn:hover{
+	border-color: #aaa;
+	color: #555;
+}
 
 .ep_hyperlink_docs_bubble_button_edit, .ep_hyperlink_docs_bubble_button_copy, .ep_hyperlink_docs_bubble_button_delete{
   background-color: transparent;

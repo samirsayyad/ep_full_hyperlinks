@@ -4,7 +4,6 @@
 <script id="newLinkTemplate" type="text/html">
     <div id="newLink" class="popup toolbar-popup new-link-popup">
         <div class="popup-content hyperlink-popup">
-
             {{tmpl "#new-link-form"}}
         </div>
     </div>
@@ -12,95 +11,66 @@
 
 <!-- Subtemplate to create a link -->
 <script id="new-link-form" type="text/html">
-    <form class="new-link">
-
         <div class="link-edit-form">
             <div class="hyperlink-form-lable-section">
-                <span  class="hyperlink-form-lable-disabled">Text</span>
-                <input type="text"  id="hyperlink-text"  class="link-content-disabled">
-                <input type="hidden" id="hyperlink-text-hidden">
-
-                 <br> 
-
+                <label  class="hyperlink-form-lable-disabled">Text</label>
+                <input type="text" id="hyperlink-text" value="${text}">
+                <input type="hidden" id="hyperlink-text-hidden" value="${text}">
             </div>
-            <div class="hyperlink-form-lable-section" style="margin-top:10px">
-                <span class="hyperlink-form-lable" >Link</span>
-                <input type="text" id="hyperlink-url" placeholder="http://..." class="link-content">
-                <input type="submit" id="link-create-btn" class="btn btn-primary" value="Apply" data-l10n-id="ep_full_hyperlinks.links_template.{{if link}}apply{{else}}apply{{/if}}.value" />
-
+            <div class="hyperlink-form-lable-section">
+                <label class="hyperlink-form-lable" >Link</label>
+                <input type="text" id="hyperlink-url" value="${hyperlink}" placeholder="http://example.com">
             </div>
-       
-
+						<div class="hyperlink-form-btn-section">
+							<button id="link-cancel-btn" class="btn">
+								Cancel 
+							</button>
+							<button id="link-create-btn" class="btn btn-primary {{if linkId}} link-edit-submit {{/if}}">
+								Apply
+							</button>
+						</div>
         </div>
-<!-- 
-        <div class="form-more">
-            <div class="link-buttons">
-                <input type="submit" id="link-create-btn" class="btn btn-primary" value="Link" data-l10n-id="ep_full_hyperlinks.links_template.{{if link}}link{{else}}link{{/if}}.value" />
-                <input type="reset" id="link-reset" class="btn btn-default btn-cancel-reply" value="Cancel" data-l10n-id="ep_full_hyperlinks.links_template.cancel.value" />
-            </div>
-        </div> -->
-    </form>
 </script>
 
 <!-- Display the link on the right side of the page -->
-<script id="linksTemplate" type="text/html">
-    <div id="${linkId}" data-linkid="${linkId}" data-hyperlink="${hyperlink}"
-         class="sidebar-link link-container {{if changeAccepted}}change-accepted{{/if}}" >
+<script id="linkBoxTemplate" type="text/html">
+	<div id="${linkId}" data-linkid="${linkId}" data-hyperlink="${hyperlink}" class="sidebar-link link-container" >
 
+ <div class="full-display-link" id="show-form-${linkId}">
+		 <div class="link-title-wrapper-meta">
+				 <div id="card_loading_hyperlink" class="card"> 
+						 <div class="card__image loading"></div> 
+				 </div> 
+				 <img id="ep_hyperlink_img"/>
+				 <a href="${hyperlink}" data-id="${headerId}" title="${hyperlink}" id="ep_hyperlink_title">${hyperlink}</a>
 
-       
+				 <div class="ep_hyperlink_docs_bubble_button_container">
+						 <div  data-hyperlink="${hyperlink}" role="button" class="ep_hyperlink_docs_bubble_button_copy" tabindex="0" data-tooltip="Copy link" aria-label="Copy link">
+								 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="18px" height="18px" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g transform="translate(0 24) scale(1 -1)"><path d="M19 21H8V7h11m0-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2m-3-4H4a2 2 0 0 0-2 2v14h2V3h12V1z" fill="#5f6368"/></g><rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" /></svg>
+						 </div>
+						 <div role="button" class="ep_hyperlink_docs_bubble_button_edit" tabindex="0" data-tooltip="Edit link" aria-label="Edit link">
+								 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="18px" height="18px" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83a.996.996 0 0 0 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="#5f6368"/></svg>
+						 </div>
+						 <div role="button"  class="ep_hyperlink_docs_bubble_button_delete" tabindex="0" data-tooltip="Remove link" aria-label="Remove link">
+								 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="18px" height="18px" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M17 7h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1c0 1.43-.98 2.63-2.31 2.98l1.46 1.46C20.88 15.61 22 13.95 22 12c0-2.76-2.24-5-5-5zm-1 4h-2.19l2 2H16zM2 4.27l3.11 3.11A4.991 4.991 0 0 0 2 12c0 2.76 2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1c0-1.59 1.21-2.9 2.76-3.07L8.73 11H8v2h2.73L13 15.27V17h1.73l4.01 4L20 19.74L3.27 3L2 4.27z" fill="#5f6368"/><rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" /></svg>
+						 </div>
+						 
+				 </div>
+		 </div>
+		 <p class="ep_hyperlink_description" id="ep_hyperlink_description"></p>
+ </div>
 
-        <div class="full-display-link" id="show-form-${linkId}">
-            <div class="link-title-wrapper-meta">
-                <div id="card_loading_hyperlink" class="card"> 
-                    <div class="card__image loading"></div> 
-                </div> 
-                <img id="ep_hyperlink_img"/>
-                <a href="${hyperlink}" data-id="${headerId}" title="${hyperlink}" data-join="{{if internal==true}}VIDEO{{/if}}" data-action="{{if internal==true}}JOINBYQUERY{{/if}}"   class="{{if internal==true}}btn_roomHandler{{/if}}" target="{{if internal==false}}_blank{{/if}}" id="ep_hyperlink_title">${hyperlink}</a>
-                <!-- <a data-id="${headerId}" title="${hyperlink}" class="{{if ignore==true}}disable-link{{/if}}" target="{{if internal==false}}_blank{{/if}}" id="ep_hyperlink_title">${hyperlink}</a> -->
-
-
-                <div class="ep_hyperlink_docs_bubble_button_container">
-                    <div  data-hyperlink="${hyperlink}" role="button" class="ep_hyperlink_docs_bubble_button_copy" tabindex="0" data-tooltip="Copy link" aria-label="Copy link">
-                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="18px" height="18px" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g transform="translate(0 24) scale(1 -1)"><path d="M19 21H8V7h11m0-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2m-3-4H4a2 2 0 0 0-2 2v14h2V3h12V1z" fill="#5f6368"/></g><rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" /></svg>
-                    </div>
-                    <div role="button" class="ep_hyperlink_docs_bubble_button_edit" tabindex="0" data-tooltip="Edit link" aria-label="Edit link">
-                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="18px" height="18px" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83a.996.996 0 0 0 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" fill="#5f6368"/></svg>
-                    </div>
-                    <div role="button"  class="ep_hyperlink_docs_bubble_button_delete" tabindex="0" data-tooltip="Remove link" aria-label="Remove link">
-                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" focusable="false" width="18px" height="18px" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M17 7h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1c0 1.43-.98 2.63-2.31 2.98l1.46 1.46C20.88 15.61 22 13.95 22 12c0-2.76-2.24-5-5-5zm-1 4h-2.19l2 2H16zM2 4.27l3.11 3.11A4.991 4.991 0 0 0 2 12c0 2.76 2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1c0-1.59 1.21-2.9 2.76-3.07L8.73 11H8v2h2.73L13 15.27V17h1.73l4.01 4L20 19.74L3.27 3L2 4.27z" fill="#5f6368"/><rect x="0" y="0" width="24" height="24" fill="rgba(0, 0, 0, 0)" /></svg>
-                    </div>
-                    
-                </div>
-            </div>
-            <p class="ep_hyperlink_description" id="ep_hyperlink_description"></p>
-        </div>
-
-        <div class="link-title-wrapper" id="edit-form-${linkId}">
-            <div class="link-edit-form">
-
-
-
-
-
-                <div class="hyperlink-form-lable-section">
-                    <span  class="hyperlink-form-lable-disabled">Text</span>
-                    <input type="text"  class="link-text-text" id="hyperlink-text"  value="${text}"  />
-                    <input type="hidden" value="${text}" class="link-text-text-old" id="hyperlink-text-hidden-${linkId}">
-
-                     <br> 
-    
-                </div>
-                <div class="hyperlink-form-lable-section" style="margin-top:10px">
-                    <span class="hyperlink-form-lable" >Link</span>
-                    <input type="text"  value="${hyperlink}" placeholder="http://..." class="link-text-hyperlink" />
-                    <input type="submit" id="link-edit-btn" class="btn btn-primary link-edit-submit" value="Apply" data-l10n-id="ep_full_hyperlinks.links_template.{{if link}}apply{{else}}apply{{/if}}.value" />
-    
-                </div>
-            </div>
-        </div>
-    </div>
+ <div class="link-title-wrapper" id="edit-form-${linkId}">
+		 <div class="link-edit-form">
+				<div class="popup-content hyperlink-popup">
+					{{tmpl() "#new-link-form"}}
+				</div>
+		 </div>
+ </div>
+</div>
 </script>
+
+
 
 <!-- SubTemplate to display the link text -->
 <script id="link-text" type="text/html">
@@ -111,32 +81,3 @@
     {{/if}}
 </script>
 
-<!-- SubTemplate to dislay a suggestion -->
-<!-- <script id="display-suggestion" type="text/html"> -->
-    <!-- When link contains a suggestion, we display it with an approval button -->
-    <!-- {{if changeTo}}
-    <form class="link-changeTo-form suggestion-display">
-        <span class="from-label" data-l10n-id="ep_full_hyperlinks.links_template.suggested_change_from">Suggested Change From</span>
-        <span class="from-value">${changeFrom}</span>
-        <span class="to-label" data-l10n-id="ep_full_hyperlinks.links_template.to">To</span>
-        <span class="to-value">${changeTo}</span> -->
-        <!-- Approve/revert button -->
-        <!-- <input type="Submit" class="btn btn-primary approve-suggestion-btn acl-write" value="Accept Change" data-l10n-id="ep_full_hyperlinks.links_template.accept_change.value">
-        <input type="Submit" class="btn btn-default revert-suggestion-btn acl-write" value="Revert Change" data-l10n-id="ep_full_hyperlinks.links_template.revert_change.value"> -->
-<!-- 
-    </form>
-    {{/if}}
-</script> -->
-
-
-
-<!-- When click Edit on a link, we insert this template just next to the link so we can edit it -->
-<!-- <script id="editLinkTemplate" type="text/html">
-  <div class="link-edit-form">
-    <textarea class="link-edit-text">${hyperlink}</textarea>
-    <p>
-      <button class="btn btn-primary link-edit-submit" data-l10n-id="ep_full_hyperlinks.links_template.edit_link.save">Save</button>
-      <button class="btn btn-default link-edit-cancel" data-l10n-id="ep_full_hyperlinks.links_template.edit_link.cancel">Cancel</button>
-    </p>
-  </div>
-</script> -->
