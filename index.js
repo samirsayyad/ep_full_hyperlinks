@@ -193,7 +193,7 @@ const clientVars = (hook, context, cb) => {
 };
 
 const expressCreateServer = (hook_name, args, callback) => {
-  args.app.get('/hyperlink/:pad/links/:linkId', (req, res) => {
+  args.app.get('/pluginfw/hyperlink/:pad/links/:linkId', (req, res) => {
     // sanitize pad id before continuing
     const padId = apiUtils.sanitizePadId(req);
     const {linkId} = req.params;
@@ -205,7 +205,7 @@ const expressCreateServer = (hook_name, args, callback) => {
     });
   });
 
-  args.app.get('/hyperlink/:pad/links', (req, res) => {
+  args.app.get('/pluginfw/hyperlink/:pad/links', (req, res) => {
     // sanitize pad id before continuing
     const padIdReceived = apiUtils.sanitizePadId(req);
 
@@ -218,7 +218,7 @@ const expressCreateServer = (hook_name, args, callback) => {
     });
   });
 
-  args.app.post('/p/:pad/:rev?/links', (req, res) => {
+  args.app.post('/pluginfw/hyperlink/:pad', (req, res) => {
     new formidable.IncomingForm().parse(req, (err, fields, files) => {
       // check the api key
       if (!apiUtils.validateApiKey(fields, res)) return;
