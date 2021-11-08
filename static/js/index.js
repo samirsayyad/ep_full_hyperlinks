@@ -314,7 +314,7 @@ ep_links.prototype.collectLinks = function (callback) {
 		clearTimeout(hideLinkTimer);
 		// getPadOuter().find("#linkBoxWrapper .link-container").remove()
       const linkId = self.linkIdOf(event);
-			fetch(`/hyperlink/${clientVars.padId}/links/${linkId}`)
+			fetch(`/pluginfw/hyperlink/${clientVars.padId}/links/${linkId}`)
 			.then(res => res.json())
 			.then(res => {
 				const linkObj = {...res.link, linkId}
