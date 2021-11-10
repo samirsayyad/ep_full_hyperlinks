@@ -1,7 +1,6 @@
 const _ = require('underscore');
 const db = require('ep_etherpad-lite/node/db/DB').db;
 const ERR = require('ep_etherpad-lite/node_modules/async-stacktrace');
-const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 const readOnlyManager = require('ep_etherpad-lite/node/db/ReadOnlyManager.js');
 const {shared} = require('./static/dist/js/ep.full.hyperlinks.mini').moduleList;
 

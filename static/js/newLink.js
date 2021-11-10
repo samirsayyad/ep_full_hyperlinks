@@ -26,29 +26,17 @@ const newLink = (() => {
     const index = 0;
     const form = $(document).find('#newLink');
     const link = buildLinkFrom(form);
-    if (link.text.length > 0 && validURL(link.hyperlink)) {
+    if (link.text.length > 0 && validUrl.isUri(link.hyperlink)) {
       form.find('#hyperlink-text, #hyperlink-url').removeClass('error');
       hideNewLinkPopup();
       callback(link, index);
     } else {
       if (link.text.length === 0) form.find('#hyperlink-text').addClass('error');
-      if (!validURL(link.hyperlink)) form.find('#hyperlink-url').addClass('error');
+      if (!validUrl.isUri(link.hyperlink)) form.find('#hyperlink-url').addClass('error');
     }
     return false;
   };
 
-  var validURL = function (str) {
-    const pattern = new RegExp(
-        '^(https?:\\/\\/)?' + // protocol
-				'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-				'((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-				'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-				'(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-				'(\\#[-a-z\\d_]*)?$',
-        'i'
-    ); // fragment locator
-    return !!pattern.test(str);
-  };
   /* ***** Public methods: ***** */
 
   // Insert new Link Form

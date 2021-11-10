@@ -10,6 +10,7 @@ const cleanCSS = require('gulp-clean-css');
 const imagemin = require('gulp-imagemin');
 
 const jsfiles = {
+  validUrl: './static/js/validUrl.js',
   events: './static/js/copyPasteEvents.js',
   linkBoxes: './static/js/linkBoxes.js',
   newLink: './static/js/newLink.js',

@@ -1,3 +1,5 @@
+'use strict'
+
 const linkBoxes = (() => {
 	let padOuter;
 	const getPadOuter = () =>
@@ -16,19 +18,6 @@ const linkBoxes = (() => {
 	};
 
 	const hideAllLinks = () => getLinksContainer().find(`.link-container`).hide();
-
-	const validURL = (str) => {
-		var pattern = new RegExp(
-			"^(https?:\\/\\/)?" + // protocol
-				"((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-				"((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-				"(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-				"(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-				"(\\#[-a-z\\d_]*)?$",
-			"i"
-		); // fragment locator
-		return !!pattern.test(str);
-	};
 
 	const showLinkModal = (e, linkObj, socket) => {
 		const padOuter = $('iframe[name="ace_outer"]').contents();
@@ -124,7 +113,7 @@ const linkBoxes = (() => {
 					});
 				});
 			};
-			if (!validURL(hyperlink)) {
+			if (!validUrl.isUri(hyperlink)) {
 				const img =
 					"../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png";
 				changeMetaView(hyperlink, hyperlink, img);
