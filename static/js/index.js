@@ -56,14 +56,12 @@ ep_links.prototype.init = function () {
   this.getLinks((links) => {
     if (!$.isEmptyObject(links)) {
       self.setLinks(links);
-      self.collectLinks();
     }
   });
 
   // Init add push event
   this.pushLink('add', (linkId, link) => {
     self.setLink(linkId, link);
-    // self.collectLinksAfterSomeIntervalsOfTime();
   });
 
   // On click link icon toolbar
@@ -71,9 +69,6 @@ ep_links.prototype.init = function () {
     e.preventDefault(); // stops focus from being lost
     self.displayNewLinkForm();
   });
-
-  // Import for below listener : we are using this.container.parent() so we include
-  // events on both link-modal and sidebar
 
   // submit the edition on the text and update the link text
   this.container.parent().on('click', '.link-edit-submit', function (e) {
@@ -139,7 +134,6 @@ ep_links.prototype.init = function () {
 
   });
 
-
 	this.container.on('click', '#link-cancel-btn', function(){
 		const linkId = $(this).closest('.link-container')[0].id;
 		self.padOuter.find(`#show-form-${linkId}`).show();
@@ -167,7 +161,6 @@ ep_links.prototype.init = function () {
     linkBoxes.hideLink(linkId);
   });
 
-  // it was link-delete
   this.container.parent().on('click', '.ep_hyperlink_docs_bubble_button_delete', function () {
     const linkId = $(this).closest('.link-container')[0].id;
     self.deleteLink(linkId);
@@ -191,6 +184,33 @@ ep_links.prototype.init = function () {
     // dispatch event
     self.socket.emit('deleteLink', {padId: self.padId, linkId}, () => {});
   });
+
+
+	let hideLinkTimer;
+  this.container.on('mouseover', '.sidebar-link', (e) => {
+    // highlight link
+    clearTimeout(hideLinkTimer);
+  }).on('mouseout', '.sidebar-link', (e) => {
+    // do not hide directly the link, because sometime the mouse get out accidently
+    hideLinkTimer = setTimeout(() => {
+			const linkId = e.currentTarget.id;
+      linkBoxes.hideLink(linkId);
+    }, 3000);
+  });
+
+  this.padInner.contents().on('click', '.link', function (event) {
+		event.preventDefault();
+		clearTimeout(hideLinkTimer);
+      const linkId = self.linkIdOf(event);
+			fetch(`/pluginfw/hyperlink/${clientVars.padId}/links/${linkId}`)
+			.then(res => res.json())
+			.then(res => {
+				const linkObj = {...res.link, linkId}
+				linkBoxes.showLinkModal(event, linkObj, self.socket)
+			});
+  });
+
+  this.addListenersToCloseOpenedLink();
 
   // Enable and handle cookies
   if (padcookie.getPref('links') === false) {
@@ -257,76 +277,6 @@ ep_links.prototype.findContainers = function () {
   this.outerBody = padOuter.find('#outerdocbody');
 };
 
-ep_links.prototype.collectLinks = function (callback) {
-  const self = this;
-  const container = this.container;
-  const links = this.links;
-  const padLink = this.padInner.contents().find('.link');
-  padLink.each(function (it) {
-    const $this = $(this);
-    const cls = $this.attr('class');
-    const classLinkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
-    var linkId = (classLinkId) ? classLinkId[1] : null;
-    if (!linkId) {
-      return;
-    }
-
-    self.padInner.contents().find('#innerdocbody').addClass('links');
-
-    if (linkId === null) {
-      const isAuthorClassName = /(?:^| )(a.[A-Za-z0-9]*)/.exec(cls);
-      if (isAuthorClassName) self.removeLink(isAuthorClassName[1], it);
-      return;
-    }
-
-    // showing after inserrting link
-    var linkId = classLinkId[1];
-    const linkElm = container.find(`#${linkId}`);
-
-    const link = links[linkId];
-
-
-    // if (link) {
-    //   if (link !== null) {
-    //     // If link is not in sidebar insert it
-    //     if (linkElm.length == 0) {
-    //       self.insertLink(linkId, link.data, it);
-    //     }
-    //   }
-    // }
-  });
-
-
-  // @@@@@@@@@@@@@@@@ get back just for dev
-  let hideLinkTimer;
-  this.container.on('mouseover', '.sidebar-link', (e) => {
-    // highlight link
-    clearTimeout(hideLinkTimer);
-  }).on('mouseout', '.sidebar-link', (e) => {
-    // do not hide directly the link, because sometime the mouse get out accidently
-    hideLinkTimer = setTimeout(() => {
-      linkBoxes.hideLink(e.currentTarget.id);
-    }, 3000);
-  });
-
-  this.padInner.contents().on('click', '.link', function (event) {
-		event.preventDefault();
-		clearTimeout(hideLinkTimer);
-		// getPadOuter().find("#linkBoxWrapper .link-container").remove()
-      const linkId = self.linkIdOf(event);
-			fetch(`/pluginfw/hyperlink/${clientVars.padId}/links/${linkId}`)
-			.then(res => res.json())
-			.then(res => {
-				const linkObj = {...res.link, linkId}
-				linkBoxes.showLinkModal(event, linkObj, self.socket)
-			});
-  });
-
-  self.addListenersToCloseOpenedLink();
-
-  if (callback) callback();
-};
-
 // set the text of the link
 ep_links.prototype.setLinkNewText = function (linkId, text, hyperlink) {
   if (this.links[linkId]) {
@@ -386,36 +336,6 @@ ep_links.prototype.insertContainers = function () {
 		.prepend('<div id="linkBoxWrapper"></div>');
 
   this.container = linkBoxWrapper;
-};
-
-// Insert a link node
-ep_links.prototype.insertLink = function (linkId, link, index) {
-  // let content = null;
-  // const container = this.container;
-  // const padId = this.padId;
-  // const linkAfterIndex = container.find('.sidebar-link').eq(index);
-  // link.headerId = null;
-  // link.linkId = linkId;
-  // link.internal = false;
-  // link.ignore = false;
-
-  // if (link.hyperlink.indexOf(`/${padId}`) >= 0) {
-  //   link.headerId = getUrlVars(link.hyperlink).id;
-  //   if (link.headerId) { link.internal = true; } else { link.ignore = true; }
-  // }
-  // content = $('#linksTemplate').tmpl(link);
-
-  // // position doesn't seem to be relative to rep
-
-  // // console.log('position', index, linkAfterIndex);
-  // if (index === 0) {
-  //   content.prependTo(container);
-  // } else if (linkAfterIndex.length === 0) {
-  //   content.appendTo(container);
-  // } else {
-  //   linkAfterIndex.before(content);
-  // }
-
 };
 
 // Set links content data
@@ -682,7 +602,6 @@ ep_links.prototype.saveLink = function (data, rep) {
     }, 'insertLink', true);
 
     self.setLink(linkId, link);
-    self.collectLinks();
   });
 };
 
@@ -719,28 +638,6 @@ ep_links.prototype.buildLink = function (linkId, linkData) {
 
 ep_links.prototype.getMapfakeLinks = function () {
   return this.mapFakeLinks;
-};
-
-// Listen for link
-ep_links.prototype.linkListen = function () {
-  const self = this;
-  const socket = this.socket;
-  socket.on('pushAddLinkInBulk', () => {
-    self.getLinks((allLinks) => {
-      if (!$.isEmptyObject(allLinks)) {
-        // we get the links in this format {c-123:{author:...}, c-124:{author:...}}
-        // but it's expected to be {c-123: {data: {author:...}}, c-124:{data:{author:...}}}
-        // in this.links
-        const linksProcessed = {};
-        _.map(allLinks, (link, linkId) => {
-          linksProcessed[linkId] = {};
-          linksProcessed[linkId].data = link;
-        });
-        self.links = linksProcessed;
-        // self.collectLinksAfterSomeIntervalsOfTime(); // here we collect on the collaborators
-      }
-    });
-  });
 };
 
 ep_links.prototype.findLinkText = function ($linkBox) {

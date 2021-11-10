@@ -11,9 +11,7 @@ const _ = require('underscore');
 
 const Meta = require('html-metadata-parser');
 
-const padRemove = async (hook_name, context, callback) => await Promise.all([
-  linkManager.deleteLinks(context.padID),
-]);
+const padRemove = async (hook_name, context, callback) => await Promise.all([linkManager.deleteLinks(context.padID)]);
 
 const padCopy = async (hook_name, context, callback) => {
   await Promise.all([
@@ -32,111 +30,119 @@ const handleMessageSecurity = (hook_name, context, callback) => {
 
 const socketio = (hook_name, args, cb) => {
   const io = args.io;
-  io.of('/link')
-      .on('connection', (socket) => {
-        // Join the rooms
-        socket.on('getLinks', (data, callback) => {
-          const padId = data.padId;
-          socket.join(padId);
-          linkManager.getLinks(padId, (err, links) => {
-            callback(links);
-          });
-        });
-
-        // On add events
-        socket.on('addLink', (data, callback) => {
-          const padId = data.padId;
-          const content = data.link;
-          linkManager.addLink(padId, content, (err, linkId, link) => {
-            socket.broadcast.to(padId).emit('pushAddLink', linkId, link);
-            callback(linkId, link);
-          });
-        });
-
-        socket.on('deleteLink', (data, callback) => {
-          // delete the link on the database
-          linkManager.deleteLink(data.padId, data.linkId, () => {
-            // Broadcast to all other users that this link was deleted
-            socket.broadcast.to(data.padId).emit('linkDeleted', data.linkId);
-          });
-        });
-
-        socket.on('revertChange', (data, callback) => {
-          // Broadcast to all other users that this change was accepted.
-          // Note that linkId here can either be the linkId.
-          const padId = data.padId;
-          linkManager.changeAcceptedState(padId, data.linkId, false, () => {
-            socket.broadcast.to(padId).emit('changeReverted', data.linkId);
-          });
-        });
-
-        socket.on('acceptChange', (data, callback) => {
-          // Broadcast to all other users that this change was accepted.
-          // Note that linkId here can either be the linkId.
-          const padId = data.padId;
-          linkManager.changeAcceptedState(padId, data.linkId, true, () => {
-            socket.broadcast.to(padId).emit('changeAccepted', data.linkId);
-          });
-        });
-
-        socket.on('bulkAddLink', (padId, data, callback) => {
-          linkManager.bulkAddLinks(padId, data, (error, linksId, links) => {
-            socket.broadcast.to(padId).emit('pushAddLinkInBulk');
-            const linkWithLinkId = _.object(linksId, links); // {c-123:data, c-124:data}
-            callback(linkWithLinkId);
-          });
-        });
-
-        socket.on('updateLinkText', (data, callback) => {
-          // Broadcast to all other users that the link text was changed.
-          // Note that linkId here can either be the linkId ..
-          const padId = data.padId;
-          const linkId = data.linkId;
-          const linkText = data.linkText;
-          const hyperlink = data.hyperlink;
-
-          linkManager.changeLinkData(data, (err) => {
-            if (!err) {
-              socket.broadcast.to(padId).emit('textLinkUpdated', linkId, linkText, hyperlink);
-            }
-            callback(err);
-          });
-        });
-
-        // resolve meta of url
-        socket.on('metaResolver', async (data, callback) => {
-          try {
-            const result = await Meta.parser(data.hyperlink || data.editedHyperlink);
-            let image = null;
-            if (result.og.images.length) { image = result.og.images[0].url; } else if (result.images.length) { image = result.images[0].url; } else if (result.og.image) { image = result.og.image; }
-
-
-            callback({metadata:
-              {
-                image,
-                title: result.meta.title || null,
-              },
-            last: data.last});
-          } catch (e) {
-            console.log(e.message, e.status, 'error');
-            callback({
-              metadata: false,
-              last: data.last,
-            });
-          }
-        });
-
-        // link added via API
-        socket.on('apiAddLinks', (data) => {
-          const padId = data.padId;
-          const linkIds = data.linkIds;
-          const links = data.links;
-
-          for (let i = 0, len = linkIds.length; i < len; i++) {
-            socket.broadcast.to(padId).emit('pushAddLink', linkIds[i], links[i]);
-          }
-        });
+  io.of('/link').on('connection', (socket) => {
+    // Join the rooms
+    socket.on('getLinks', (data, callback) => {
+      const padId = data.padId;
+      socket.join(padId);
+      linkManager.getLinks(padId, (err, links) => {
+        callback(links);
       });
+    });
+
+    // On add events
+    socket.on('addLink', (data, callback) => {
+      const padId = data.padId;
+      const content = data.link;
+      linkManager.addLink(padId, content, (err, linkId, link) => {
+        socket.broadcast.to(padId).emit('pushAddLink', linkId, link);
+        callback(linkId, link);
+      });
+    });
+
+    socket.on('deleteLink', (data, callback) => {
+      // delete the link on the database
+      linkManager.deleteLink(data.padId, data.linkId, () => {
+        // Broadcast to all other users that this link was deleted
+        socket.broadcast.to(data.padId).emit('linkDeleted', data.linkId);
+      });
+    });
+
+    socket.on('revertChange', (data, callback) => {
+      // Broadcast to all other users that this change was accepted.
+      // Note that linkId here can either be the linkId.
+      const padId = data.padId;
+      linkManager.changeAcceptedState(padId, data.linkId, false, () => {
+        socket.broadcast.to(padId).emit('changeReverted', data.linkId);
+      });
+    });
+
+    socket.on('acceptChange', (data, callback) => {
+      // Broadcast to all other users that this change was accepted.
+      // Note that linkId here can either be the linkId.
+      const padId = data.padId;
+      linkManager.changeAcceptedState(padId, data.linkId, true, () => {
+        socket.broadcast.to(padId).emit('changeAccepted', data.linkId);
+      });
+    });
+
+    socket.on('bulkAddLink', (padId, data, callback) => {
+      linkManager.bulkAddLinks(padId, data, (error, linksId, links) => {
+        const linkWithLinkId = _.object(linksId, links); // {c-123:data, c-124:data}
+        callback(linkWithLinkId);
+      });
+    });
+
+    socket.on('updateLinkText', (data, callback) => {
+      // Broadcast to all other users that the link text was changed.
+      // Note that linkId here can either be the linkId ..
+      const padId = data.padId;
+      const linkId = data.linkId;
+      const linkText = data.linkText;
+      const hyperlink = data.hyperlink;
+
+      linkManager.changeLinkData(data, (err) => {
+        if (!err) {
+          socket.broadcast
+              .to(padId)
+              .emit('textLinkUpdated', linkId, linkText, hyperlink);
+        }
+        callback(err);
+      });
+    });
+
+    // resolve meta of url
+    socket.on('metaResolver', async (data, callback) => {
+      try {
+        const result = await Meta.parser(
+            data.hyperlink || data.editedHyperlink
+        );
+        let image = null;
+        if (result.og.images.length) {
+          image = result.og.images[0].url;
+        } else if (result.images.length) {
+          image = result.images[0].url;
+        } else if (result.og.image) {
+          image = result.og.image;
+        }
+
+        callback({
+          metadata: {
+            image,
+            title: result.meta.title || null,
+          },
+          last: data.last,
+        });
+      } catch (e) {
+        console.log(e.message, e.status, 'error');
+        callback({
+          metadata: false,
+          last: data.last,
+        });
+      }
+    });
+
+    // link added via API
+    socket.on('apiAddLinks', (data) => {
+      const padId = data.padId;
+      const linkIds = data.linkIds;
+      const links = data.links;
+
+      for (let i = 0, len = linkIds.length; i < len; i++) {
+        socket.broadcast.to(padId).emit('pushAddLink', linkIds[i], links[i]);
+      }
+    });
+  });
   return cb();
 };
 
@@ -169,7 +175,9 @@ const eejsBlock_editbarMenuLeft = (hook_name, args, cb) => {
   if (JSON.stringify(settings.toolbar).indexOf('addLink') > -1) {
     return cb();
   }
-  args.content += eejs.require('ep_full_hyperlinks/templates/linkBarButtons.ejs');
+  args.content += eejs.require(
+      'ep_full_hyperlinks/templates/linkBarButtons.ejs'
+  );
   return cb();
 };
 
@@ -184,8 +192,12 @@ const eejsBlock_styles = (hook_name, args, cb) => {
 };
 
 const clientVars = (hook, context, cb) => {
-  const displayLinkAsIcon = settings.ep_full_hyperlinks ? settings.ep_full_hyperlinks.displayLinkAsIcon : false;
-  const highlightSelectedText = settings.ep_full_hyperlinks ? settings.ep_full_hyperlinks.highlightSelectedText : false;
+  const displayLinkAsIcon = settings.ep_full_hyperlinks
+    ? settings.ep_full_hyperlinks.displayLinkAsIcon
+    : false;
+  const highlightSelectedText = settings.ep_full_hyperlinks
+    ? settings.ep_full_hyperlinks.highlightSelectedText
+    : false;
   return cb({
     displayLinkAsIcon,
     highlightSelectedText,
@@ -199,7 +211,13 @@ const expressCreateServer = (hook_name, args, callback) => {
     const {linkId} = req.params;
 
     links.getPadLink(padId, linkId, (err, data) => {
-      if (err) { return res.json({status: false, message: 'internal error', link: null}); }
+      if (err) {
+        return res.json({
+          status: false,
+          message: 'internal error',
+          link: null,
+        });
+      }
 
       res.json({status: true, link: data});
     });

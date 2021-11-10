@@ -1,9 +1,12 @@
+'use strict';
+
 const events = (() => {
   const addTextOnClipboard = (e, ace, padInner, removeSelection, links) => {
     let linkIdOnFirstPositionSelected;
     let hasLinkOnSelection;
     ace.callWithAce((ace) => {
-      linkIdOnFirstPositionSelected = ace.ace_getLinkIdOnFirstPositionSelected();
+      linkIdOnFirstPositionSelected =
+				ace.ace_getLinkIdOnFirstPositionSelected();
       hasLinkOnSelection = ace.ace_hasLinkOnSelection();
     });
 
@@ -20,7 +23,11 @@ const events = (() => {
       // linkIdOnFirstPositionSelected is the linkId in this partial selection
       if (onlyTextIsSelected) {
         const textSelected = rawHtml[0].textContent;
-        html = buildHtmlToCopyWhenSelectionHasOnlyText(textSelected, range, linkIdOnFirstPositionSelected);
+        html = buildHtmlToCopyWhenSelectionHasOnlyText(
+            textSelected,
+            range,
+            linkIdOnFirstPositionSelected
+        );
       }
       const linkIds = getLinkIds(html);
       linksData = buildLinksData(html, links);
@@ -37,7 +44,6 @@ const events = (() => {
       }
     }
   };
-
 
   const buildLinkIdToFakeIdMap = (linksData) => {
     const linkIdToFakeId = {};
@@ -69,7 +75,7 @@ const events = (() => {
     return linksData;
   };
 
-  const generateFakeLinkId = ()  => `fakelink-${randomString(16)}`;
+  const generateFakeLinkId = () => `fakelink-${randomString(16)}`;
 
   const getLinkIds = (html) => {
     const allSpans = $(html).find('span');
@@ -77,7 +83,7 @@ const events = (() => {
     _.each(allSpans, (span) => {
       const cls = $(span).attr('class');
       const classLinkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
-      const linkId = (classLinkId) ? classLinkId[1] : false;
+      const linkId = classLinkId ? classLinkId[1] : false;
       if (linkId) {
         linkIds.push(linkId);
       }
@@ -130,7 +136,10 @@ const events = (() => {
   // has the text until the last but one character and second one with the last character <span class='link c-124'>g</span>.
   // Etherpad does a good job joining the two spans into one after the paste is triggered.
   const buildHtmlWithTwoSpanTags = (text, linkId) => {
-    const firstSpan = `<span class="link ${linkId}">${text.slice(0, -1)}</span>`; // text until before last char
+    const firstSpan = `<span class="link ${linkId}">${text.slice(
+        0,
+        -1
+    )}</span>`; // text until before last char
     const secondSpan = `<span class="link ${linkId}">${text.slice(-1)}</span>`; // last char
 
     return firstSpan + secondSpan;
@@ -186,12 +195,18 @@ const events = (() => {
       if (!range) return false;
 
       if (!pastedDataHtml) {
-        if (new RegExp('([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?').test(pastedData)) {
-          const expression = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/gi;
+        if (
+          new RegExp(
+              '([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?'
+          ).test(pastedData)
+        ) {
+          const expression =
+						/(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/gi;
           const matches = pastedData.match(expression);
           const allLinks = {};
           if (matches) {
-            for (match in matches.reverse()) { // because of characters position need to be fixed and going to add tags from end
+            for (match in matches.reverse()) {
+              // because of characters position need to be fixed and going to add tags from end
               const result = {};
               const newLinkId = shared.generateLinkId();
               result.link = matches[match];
@@ -213,22 +228,42 @@ const events = (() => {
               result.startsAt = pastedData.indexOf(matches[match]);
               const openTag = `<span id="${newLinkId}" class="${newLinkId}">`;
               const closeTag = '</span>';
-              pastedData = [pastedData.slice(0, result.startsAt), openTag, pastedData.slice(result.startsAt)].join('');
-              result.endsAt = 	pastedData.indexOf(matches[match]) + matches[match].length;
-              pastedData = [pastedData.slice(0, result.endsAt), closeTag, pastedData.slice(result.endsAt)].join('');
+              pastedData = [
+                pastedData.slice(0, result.startsAt),
+                openTag,
+                pastedData.slice(result.startsAt),
+              ].join('');
+              result.endsAt =
+								pastedData.indexOf(matches[match]) + matches[match].length;
+              pastedData = [
+                pastedData.slice(0, result.endsAt),
+                closeTag,
+                pastedData.slice(result.endsAt),
+              ].join('');
             }
             pastedData = pastedData.replace(/(?:\r\n|\r|\n)/g, '<br>');
             text = $('<div></div>').html(pastedData);
-            padInner.contents()[0].execCommand('insertHTML', false, $('<div>').append($(text).clone()).html());
-            pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(clientVars.padId, allLinks);
+            padInner
+                .contents()[0]
+                .execCommand(
+                    'insertHTML',
+                    false,
+                    $('<div>').append($(text).clone()).html()
+                );
+            pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(
+                clientVars.padId,
+                allLinks
+            );
             e.preventDefault();
           }
         }
-      } else { // it means pasted in html
+      } else {
+        // it means pasted in html
         e.preventDefault();
         const pastedHtmlHolderElemenet = document.createElement('div');
         pastedHtmlHolderElemenet.innerHTML = pastedDataHtml;
-        const allLinksElement = pastedHtmlHolderElemenet.getElementsByTagName('a');
+        const allLinksElement =
+					pastedHtmlHolderElemenet.getElementsByTagName('a');
         const allLinksData = {};
         _.each(allLinksElement, (eachElemenet) => {
           const tempHyperLink = eachElemenet.href;
@@ -250,8 +285,17 @@ const events = (() => {
             },
           };
         });
-        pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(clientVars.padId, allLinksData);
-        padInner.contents()[0].execCommand('insertHTML', false, $('<div>').append($(pastedHtmlHolderElemenet).clone()).html());
+        pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(
+            clientVars.padId,
+            allLinksData
+        );
+        padInner
+            .contents()[0]
+            .execCommand(
+                'insertHTML',
+                false,
+                $('<div>').append($(pastedHtmlHolderElemenet).clone()).html()
+            );
       }
     }
   };
@@ -260,7 +304,8 @@ const events = (() => {
     const linksToSave = {};
     const padId = clientVars.padId;
 
-    const mapOriginalLinksId = pad.plugins.ep_full_hyperlinks.mapOriginalLinksId;
+    const mapOriginalLinksId =
+			pad.plugins.ep_full_hyperlinks.mapOriginalLinksId;
     const mapFakeLinks = pad.plugins.ep_full_hyperlinks.mapFakeLinks;
 
     _.each(links, (link, fakeLinkId) => {
@@ -274,7 +319,6 @@ const events = (() => {
 
     pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(padId, linksToSave);
   };
-
 
   const buildLinkData = (link, fakeLinkId) => {
     const linkData = {};
@@ -300,7 +344,9 @@ const events = (() => {
   const getLinkIdOnFirstPositionSelected = function () {
     const attributeManager = this.documentAttributeManager;
     const rep = this.rep;
-    const linkId = _.object(attributeManager.getAttributesOnPosition(rep.selStart[0], rep.selStart[1])).link;
+    const linkId = _.object(
+        attributeManager.getAttributesOnPosition(rep.selStart[0], rep.selStart[1])
+    ).link;
     return linkId;
   };
 
@@ -312,22 +358,57 @@ const events = (() => {
     const firstColumn = rep.selStart[1];
     const lastColumn = rep.selEnd[1];
     const lastLineOfSelection = rep.selEnd[0];
-    const selectionOfMultipleLine = hasMultipleLineSelected(firstLineOfSelection, lastLineOfSelection);
+    const selectionOfMultipleLine = hasMultipleLineSelected(
+        firstLineOfSelection,
+        lastLineOfSelection
+    );
 
     if (selectionOfMultipleLine) {
-      hasLink = hasLinkOnMultipleLineSelection(firstLineOfSelection, lastLineOfSelection, rep, attributeManager);
+      hasLink = hasLinkOnMultipleLineSelection(
+          firstLineOfSelection,
+          lastLineOfSelection,
+          rep,
+          attributeManager
+      );
     } else {
-      hasLink = hasLinkOnLine(firstLineOfSelection, firstColumn, lastColumn, attributeManager);
+      hasLink = hasLinkOnLine(
+          firstLineOfSelection,
+          firstColumn,
+          lastColumn,
+          attributeManager
+      );
     }
     return hasLink;
   };
 
-  const hasLinkOnMultipleLineSelection = (firstLineOfSelection, lastLineOfSelection, rep, attributeManager) => {
+  const hasLinkOnMultipleLineSelection = (
+      firstLineOfSelection,
+      lastLineOfSelection,
+      rep,
+      attributeManager
+  ) => {
     let foundLineWithLink = false;
-    for (let line = firstLineOfSelection; line <= lastLineOfSelection && !foundLineWithLink; line++) {
-      const firstColumn = getFirstColumnOfSelection(line, rep, firstLineOfSelection);
-      const lastColumn = getLastColumnOfSelection(line, rep, lastLineOfSelection);
-      const hasLink = hasLinkOnLine(line, firstColumn, lastColumn, attributeManager);
+    for (
+      let line = firstLineOfSelection;
+      line <= lastLineOfSelection && !foundLineWithLink;
+      line++
+    ) {
+      const firstColumn = getFirstColumnOfSelection(
+          line,
+          rep,
+          firstLineOfSelection
+      );
+      const lastColumn = getLastColumnOfSelection(
+          line,
+          rep,
+          lastLineOfSelection
+      );
+      const hasLink = hasLinkOnLine(
+          line,
+          firstColumn,
+          lastColumn,
+          attributeManager
+      );
       if (hasLink) {
         foundLineWithLink = true;
       }
@@ -335,9 +416,7 @@ const events = (() => {
     return foundLineWithLink;
   };
 
-  const getFirstColumnOfSelection = (line, rep, firstLineOfSelection) => {
-    return line !== firstLineOfSelection ? 0 : rep.selStart[1];
-  };
+  const getFirstColumnOfSelection = (line, rep, firstLineOfSelection) => line !== firstLineOfSelection ? 0 : rep.selStart[1];
 
   const getLastColumnOfSelection = (line, rep, lastLineOfSelection) => {
     let lastColumnOfSelection;
@@ -349,10 +428,21 @@ const events = (() => {
     return lastColumnOfSelection;
   };
 
-  const hasLinkOnLine = (lineNumber, firstColumn, lastColumn, attributeManager) => {
+  const hasLinkOnLine = (
+      lineNumber,
+      firstColumn,
+      lastColumn,
+      attributeManager
+  ) => {
     let foundLinkOnLine = false;
-    for (let column = firstColumn; column <= lastColumn && !foundLinkOnLine; column++) {
-      const linkId = _.object(attributeManager.getAttributesOnPosition(lineNumber, column)).link;
+    for (
+      let column = firstColumn;
+      column <= lastColumn && !foundLinkOnLine;
+      column++
+    ) {
+      const linkId = _.object(
+          attributeManager.getAttributesOnPosition(lineNumber, column)
+      ).link;
       if (linkId !== undefined) {
         foundLinkOnLine = true;
       }
@@ -360,9 +450,7 @@ const events = (() => {
     return foundLinkOnLine;
   };
 
-  const hasMultipleLineSelected = (firstLineOfSelection, lastLineOfSelection) => {
-    return firstLineOfSelection !== lastLineOfSelection;
-  };
+  const hasMultipleLineSelected = (firstLineOfSelection, lastLineOfSelection) => firstLineOfSelection !== lastLineOfSelection;
 
   const getLength = (line, rep) => {
     const nextLine = line + 1;
@@ -380,6 +468,5 @@ const events = (() => {
     getLinkIdOnFirstPositionSelected,
     hasLinkOnSelection,
     saveLinks,
-
   };
 })();

@@ -3,12 +3,15 @@ exports.moduleList = (()=>{
 	const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
 	const _ = require('ep_etherpad-lite/static/js/underscore');
  
+'use strict';
+
 const events = (() => {
   const addTextOnClipboard = (e, ace, padInner, removeSelection, links) => {
     let linkIdOnFirstPositionSelected;
     let hasLinkOnSelection;
     ace.callWithAce((ace) => {
-      linkIdOnFirstPositionSelected = ace.ace_getLinkIdOnFirstPositionSelected();
+      linkIdOnFirstPositionSelected =
+				ace.ace_getLinkIdOnFirstPositionSelected();
       hasLinkOnSelection = ace.ace_hasLinkOnSelection();
     });
 
@@ -25,7 +28,11 @@ const events = (() => {
       // linkIdOnFirstPositionSelected is the linkId in this partial selection
       if (onlyTextIsSelected) {
         const textSelected = rawHtml[0].textContent;
-        html = buildHtmlToCopyWhenSelectionHasOnlyText(textSelected, range, linkIdOnFirstPositionSelected);
+        html = buildHtmlToCopyWhenSelectionHasOnlyText(
+            textSelected,
+            range,
+            linkIdOnFirstPositionSelected
+        );
       }
       const linkIds = getLinkIds(html);
       linksData = buildLinksData(html, links);
@@ -42,7 +49,6 @@ const events = (() => {
       }
     }
   };
-
 
   const buildLinkIdToFakeIdMap = (linksData) => {
     const linkIdToFakeId = {};
@@ -74,7 +80,7 @@ const events = (() => {
     return linksData;
   };
 
-  const generateFakeLinkId = ()  => `fakelink-${randomString(16)}`;
+  const generateFakeLinkId = () => `fakelink-${randomString(16)}`;
 
   const getLinkIds = (html) => {
     const allSpans = $(html).find('span');
@@ -82,7 +88,7 @@ const events = (() => {
     _.each(allSpans, (span) => {
       const cls = $(span).attr('class');
       const classLinkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
-      const linkId = (classLinkId) ? classLinkId[1] : false;
+      const linkId = classLinkId ? classLinkId[1] : false;
       if (linkId) {
         linkIds.push(linkId);
       }
@@ -135,7 +141,10 @@ const events = (() => {
   // has the text until the last but one character and second one with the last character <span class='link c-124'>g</span>.
   // Etherpad does a good job joining the two spans into one after the paste is triggered.
   const buildHtmlWithTwoSpanTags = (text, linkId) => {
-    const firstSpan = `<span class="link ${linkId}">${text.slice(0, -1)}</span>`; // text until before last char
+    const firstSpan = `<span class="link ${linkId}">${text.slice(
+        0,
+        -1
+    )}</span>`; // text until before last char
     const secondSpan = `<span class="link ${linkId}">${text.slice(-1)}</span>`; // last char
 
     return firstSpan + secondSpan;
@@ -191,12 +200,18 @@ const events = (() => {
       if (!range) return false;
 
       if (!pastedDataHtml) {
-        if (new RegExp('([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?').test(pastedData)) {
-          const expression = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/gi;
+        if (
+          new RegExp(
+              '([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?'
+          ).test(pastedData)
+        ) {
+          const expression =
+						/(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/gi;
           const matches = pastedData.match(expression);
           const allLinks = {};
           if (matches) {
-            for (match in matches.reverse()) { // because of characters position need to be fixed and going to add tags from end
+            for (match in matches.reverse()) {
+              // because of characters position need to be fixed and going to add tags from end
               const result = {};
               const newLinkId = shared.generateLinkId();
               result.link = matches[match];
@@ -218,22 +233,42 @@ const events = (() => {
               result.startsAt = pastedData.indexOf(matches[match]);
               const openTag = `<span id="${newLinkId}" class="${newLinkId}">`;
               const closeTag = '</span>';
-              pastedData = [pastedData.slice(0, result.startsAt), openTag, pastedData.slice(result.startsAt)].join('');
-              result.endsAt = 	pastedData.indexOf(matches[match]) + matches[match].length;
-              pastedData = [pastedData.slice(0, result.endsAt), closeTag, pastedData.slice(result.endsAt)].join('');
+              pastedData = [
+                pastedData.slice(0, result.startsAt),
+                openTag,
+                pastedData.slice(result.startsAt),
+              ].join('');
+              result.endsAt =
+								pastedData.indexOf(matches[match]) + matches[match].length;
+              pastedData = [
+                pastedData.slice(0, result.endsAt),
+                closeTag,
+                pastedData.slice(result.endsAt),
+              ].join('');
             }
             pastedData = pastedData.replace(/(?:\r\n|\r|\n)/g, '<br>');
             text = $('<div></div>').html(pastedData);
-            padInner.contents()[0].execCommand('insertHTML', false, $('<div>').append($(text).clone()).html());
-            pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(clientVars.padId, allLinks);
+            padInner
+                .contents()[0]
+                .execCommand(
+                    'insertHTML',
+                    false,
+                    $('<div>').append($(text).clone()).html()
+                );
+            pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(
+                clientVars.padId,
+                allLinks
+            );
             e.preventDefault();
           }
         }
-      } else { // it means pasted in html
+      } else {
+        // it means pasted in html
         e.preventDefault();
         const pastedHtmlHolderElemenet = document.createElement('div');
         pastedHtmlHolderElemenet.innerHTML = pastedDataHtml;
-        const allLinksElement = pastedHtmlHolderElemenet.getElementsByTagName('a');
+        const allLinksElement =
+					pastedHtmlHolderElemenet.getElementsByTagName('a');
         const allLinksData = {};
         _.each(allLinksElement, (eachElemenet) => {
           const tempHyperLink = eachElemenet.href;
@@ -255,8 +290,17 @@ const events = (() => {
             },
           };
         });
-        pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(clientVars.padId, allLinksData);
-        padInner.contents()[0].execCommand('insertHTML', false, $('<div>').append($(pastedHtmlHolderElemenet).clone()).html());
+        pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(
+            clientVars.padId,
+            allLinksData
+        );
+        padInner
+            .contents()[0]
+            .execCommand(
+                'insertHTML',
+                false,
+                $('<div>').append($(pastedHtmlHolderElemenet).clone()).html()
+            );
       }
     }
   };
@@ -265,7 +309,8 @@ const events = (() => {
     const linksToSave = {};
     const padId = clientVars.padId;
 
-    const mapOriginalLinksId = pad.plugins.ep_full_hyperlinks.mapOriginalLinksId;
+    const mapOriginalLinksId =
+			pad.plugins.ep_full_hyperlinks.mapOriginalLinksId;
     const mapFakeLinks = pad.plugins.ep_full_hyperlinks.mapFakeLinks;
 
     _.each(links, (link, fakeLinkId) => {
@@ -279,7 +324,6 @@ const events = (() => {
 
     pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(padId, linksToSave);
   };
-
 
   const buildLinkData = (link, fakeLinkId) => {
     const linkData = {};
@@ -305,7 +349,9 @@ const events = (() => {
   const getLinkIdOnFirstPositionSelected = function () {
     const attributeManager = this.documentAttributeManager;
     const rep = this.rep;
-    const linkId = _.object(attributeManager.getAttributesOnPosition(rep.selStart[0], rep.selStart[1])).link;
+    const linkId = _.object(
+        attributeManager.getAttributesOnPosition(rep.selStart[0], rep.selStart[1])
+    ).link;
     return linkId;
   };
 
@@ -317,22 +363,57 @@ const events = (() => {
     const firstColumn = rep.selStart[1];
     const lastColumn = rep.selEnd[1];
     const lastLineOfSelection = rep.selEnd[0];
-    const selectionOfMultipleLine = hasMultipleLineSelected(firstLineOfSelection, lastLineOfSelection);
+    const selectionOfMultipleLine = hasMultipleLineSelected(
+        firstLineOfSelection,
+        lastLineOfSelection
+    );
 
     if (selectionOfMultipleLine) {
-      hasLink = hasLinkOnMultipleLineSelection(firstLineOfSelection, lastLineOfSelection, rep, attributeManager);
+      hasLink = hasLinkOnMultipleLineSelection(
+          firstLineOfSelection,
+          lastLineOfSelection,
+          rep,
+          attributeManager
+      );
     } else {
-      hasLink = hasLinkOnLine(firstLineOfSelection, firstColumn, lastColumn, attributeManager);
+      hasLink = hasLinkOnLine(
+          firstLineOfSelection,
+          firstColumn,
+          lastColumn,
+          attributeManager
+      );
     }
     return hasLink;
   };
 
-  const hasLinkOnMultipleLineSelection = (firstLineOfSelection, lastLineOfSelection, rep, attributeManager) => {
+  const hasLinkOnMultipleLineSelection = (
+      firstLineOfSelection,
+      lastLineOfSelection,
+      rep,
+      attributeManager
+  ) => {
     let foundLineWithLink = false;
-    for (let line = firstLineOfSelection; line <= lastLineOfSelection && !foundLineWithLink; line++) {
-      const firstColumn = getFirstColumnOfSelection(line, rep, firstLineOfSelection);
-      const lastColumn = getLastColumnOfSelection(line, rep, lastLineOfSelection);
-      const hasLink = hasLinkOnLine(line, firstColumn, lastColumn, attributeManager);
+    for (
+      let line = firstLineOfSelection;
+      line <= lastLineOfSelection && !foundLineWithLink;
+      line++
+    ) {
+      const firstColumn = getFirstColumnOfSelection(
+          line,
+          rep,
+          firstLineOfSelection
+      );
+      const lastColumn = getLastColumnOfSelection(
+          line,
+          rep,
+          lastLineOfSelection
+      );
+      const hasLink = hasLinkOnLine(
+          line,
+          firstColumn,
+          lastColumn,
+          attributeManager
+      );
       if (hasLink) {
         foundLineWithLink = true;
       }
@@ -340,9 +421,7 @@ const events = (() => {
     return foundLineWithLink;
   };
 
-  const getFirstColumnOfSelection = (line, rep, firstLineOfSelection) => {
-    return line !== firstLineOfSelection ? 0 : rep.selStart[1];
-  };
+  const getFirstColumnOfSelection = (line, rep, firstLineOfSelection) => line !== firstLineOfSelection ? 0 : rep.selStart[1];
 
   const getLastColumnOfSelection = (line, rep, lastLineOfSelection) => {
     let lastColumnOfSelection;
@@ -354,10 +433,21 @@ const events = (() => {
     return lastColumnOfSelection;
   };
 
-  const hasLinkOnLine = (lineNumber, firstColumn, lastColumn, attributeManager) => {
+  const hasLinkOnLine = (
+      lineNumber,
+      firstColumn,
+      lastColumn,
+      attributeManager
+  ) => {
     let foundLinkOnLine = false;
-    for (let column = firstColumn; column <= lastColumn && !foundLinkOnLine; column++) {
-      const linkId = _.object(attributeManager.getAttributesOnPosition(lineNumber, column)).link;
+    for (
+      let column = firstColumn;
+      column <= lastColumn && !foundLinkOnLine;
+      column++
+    ) {
+      const linkId = _.object(
+          attributeManager.getAttributesOnPosition(lineNumber, column)
+      ).link;
       if (linkId !== undefined) {
         foundLinkOnLine = true;
       }
@@ -365,9 +455,7 @@ const events = (() => {
     return foundLinkOnLine;
   };
 
-  const hasMultipleLineSelected = (firstLineOfSelection, lastLineOfSelection) => {
-    return firstLineOfSelection !== lastLineOfSelection;
-  };
+  const hasMultipleLineSelected = (firstLineOfSelection, lastLineOfSelection) => firstLineOfSelection !== lastLineOfSelection;
 
   const getLength = (line, rep) => {
     const nextLine = line + 1;
@@ -385,198 +473,228 @@ const events = (() => {
     getLinkIdOnFirstPositionSelected,
     hasLinkOnSelection,
     saveLinks,
-
   };
 })();
 
 const linkBoxes = (() => {
-
 	let padOuter;
-	const getPadOuter = () => padOuter = padOuter || $('iframe[name="ace_outer"]').contents();
+	const getPadOuter = () =>
+		(padOuter = padOuter || $('iframe[name="ace_outer"]').contents());
 
-  const getLinksContainer = () => getPadOuter().find('#linkBoxWrapper');
+	const getLinksContainer = () => getPadOuter().find("#linkBoxWrapper");
 
-  /* ***** Public methods: ***** */
+	/* ***** Public methods: ***** */
 
-  const showLink = (linkId) => getLinksContainer().find(`#${linkId}`).show();
+	const showLink = (linkId) => getLinksContainer().find(`#${linkId}`).show();
 
-  const hideLink = (linkId) => getLinksContainer().find(`#${linkId}`).hide();
+	const hideLink = (linkId) => {
+		getLinksContainer().find(`#${linkId}`).hide();
+		padOuter.find(`#show-form-${linkId}`).show();
+		padOuter.find(`#edit-form-${linkId}`).hide();
+	};
 
-  const hideAllLinks = () => getLinksContainer().find(`.link-container`).hide();
+	const hideAllLinks = () => getLinksContainer().find(`.link-container`).hide();
 
-  const validURL = (str) => {
-    var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
-      '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-      '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-      '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
-    return !!pattern.test(str);
-  };
+	const validURL = (str) => {
+		var pattern = new RegExp(
+			"^(https?:\\/\\/)?" + // protocol
+				"((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+				"((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+				"(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+				"(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+				"(\\#[-a-z\\d_]*)?$",
+			"i"
+		); // fragment locator
+		return !!pattern.test(str);
+	};
 
 	const showLinkModal = (e, linkObj, socket) => {
-		
 		const padOuter = $('iframe[name="ace_outer"]').contents();
 		const padInner = getPadOuter().find('iframe[name="ace_inner"]');
 		const linkId = linkObj.linkId;
-		const linkModalAppended = getLinksContainer().find(`#${linkId}`).length === 0? false : true;
+		const linkModalAppended =
+			getLinksContainer().find(`#${linkId}`).length === 0 ? false : true;
+
+		hideAllLinks();
 
 		// find link modal, if does not exist create a link modal
 		let linkModal = getLinksContainer().find(`#${linkId}`);
-		if(!linkModalAppended) 
-			linkModal = $('#linkBoxTemplate').tmpl({...linkObj});
+		if (!linkModalAppended)
+			linkModal = $("#linkBoxTemplate").tmpl({ ...linkObj });
 
 		// apppend modal position! where it want appear
 		let targetLeft = e.clientX;
 		targetLeft += padInner.offset().left;
 		let targetTop = $(e.target).offset().top;
-		targetTop += parseInt(padInner.css('padding-top').split('px')[0]);
-		targetTop += parseInt(padOuter.find('#outerdocbody').css('padding-top').split('px')[0]);
+		targetTop += parseInt(padInner.css("padding-top").split("px")[0]);
+		targetTop += parseInt(
+			padOuter.find("#outerdocbody").css("padding-top").split("px")[0]
+		);
 
-		linkModal.css({width: '324px'}); // because of need to determine exact size for putting best area
-		linkModal.css({left: `${parseInt(targetLeft) }px`});
-		linkModal.css({top: `${parseInt(targetTop) + 35}px`});
-		linkModal.addClass('hyperlink-display');
+		linkModal.css({ width: "324px" }); // because of need to determine exact size for putting best area
+		linkModal.css({ left: `${parseInt(targetLeft)}px` });
+		linkModal.css({ top: `${parseInt(targetTop) + 35}px` });
+		linkModal.addClass("hyperlink-display");
 
-		const loaded = linkModal.attr('data-loaded');
+		const loaded = linkModal.attr("data-loaded");
 
 		// if the linkModal was not appended, create a modal and append it to #linkBoxWrapper
-		if(!linkModalAppended){
+		if (!linkModalAppended) {
 			padOuter.find("#linkBoxWrapper").append(linkModal);
 		} else {
 			// if the modal was exist update text and hypertext
 			linkModal.show();
 			// if the old hyperlink was not same as new hyperlink
-			if(linkObj.hyperlink !== linkModal.find("#ep_hyperlink_title").attr("href")){
-				linkModal.attr('data-loaded', 'false')
+			if (
+				linkObj.hyperlink !== linkModal.find("#ep_hyperlink_title").attr("href")
+			) {
+				linkModal.attr("data-loaded", "false");
 			}
 			linkModal.attr("data-hyperlink", linkObj.hyperlink);
-			linkModal.find('input#hyperlink-url').val(linkObj.hyperlink);
-			linkModal.find('input#hyperlink-text, input#hyperlink-text-hidden').val(linkObj.text);
+			linkModal.find("input#hyperlink-url").val(linkObj.hyperlink);
+			linkModal
+				.find("input#hyperlink-text, input#hyperlink-text-hidden")
+				.val(linkObj.text);
 			linkModal.find("a#ep_hyperlink_title").attr({
-				"title": linkObj.hyperlink,
-				"href": linkObj.hyperlink
+				title: linkObj.hyperlink,
+				href: linkObj.hyperlink,
 			});
 		}
 
-
-
 		// TODO: 1/ hyperlink for social and
 		// TODO: 2/ inside link
-		if (loaded != 'true') {
-			var hyperlink = linkObj.hyperlink || linkModal.attr('data-hyperlink');
+		if (loaded != "true") {
+			var hyperlink = linkObj.hyperlink || linkModal.attr("data-hyperlink");
 			const dividedUrl = new URL(hyperlink);
 
-			const ep_hyperlink_img = linkModal.find('#ep_hyperlink_img');
-			const ep_hyperlink_title = linkModal.find('#ep_hyperlink_title');
-			const card_loading_hyperlink = linkModal.find('#card_loading_hyperlink');
-			const ep_hyperlink_description = linkModal.find('#ep_hyperlink_description');
+			const ep_hyperlink_img = linkModal.find("#ep_hyperlink_img");
+			const ep_hyperlink_title = linkModal.find("#ep_hyperlink_title");
+			const card_loading_hyperlink = linkModal.find("#card_loading_hyperlink");
+			const ep_hyperlink_description = linkModal.find(
+				"#ep_hyperlink_description"
+			);
 
-			ep_hyperlink_description.text('');
+			ep_hyperlink_description.text("");
 			ep_hyperlink_title.text(hyperlink);
 
 			ep_hyperlink_img.hide();
 			ep_hyperlink_title.show();
 			card_loading_hyperlink.show();
 
-
 			// raise for og:title resolving
-		
-			if (!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
+
+			if (!/^http:\/\//.test(hyperlink) && !/^https:\/\//.test(hyperlink)) {
 				hyperlink = `https://${hyperlink}`;
 			}
 
-			const changeMetaView = function(hyperlink, title, image){
-				ep_hyperlink_img.attr('src', image);
-				ep_hyperlink_img.on('load', () => {
+			const changeMetaView = function (hyperlink, title, image) {
+				ep_hyperlink_img.attr("src", image);
+				ep_hyperlink_img.on("load", () => {
 					card_loading_hyperlink.fadeOut(500, () => {
 						ep_hyperlink_img.fadeIn();
-						ep_hyperlink_title.text(title.replace(/^(?:https?:\/\/)?(?:www\.)?/i, ''));
-						ep_hyperlink_description.text(hyperlink.replace(/^(?:https?:\/\/)?(?:www\.)?/i, ''));
-						linkModal.attr({'data-loaded': true});
+						ep_hyperlink_title.text(
+							title.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
+						);
+						ep_hyperlink_description.text(
+							hyperlink.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
+						);
+						linkModal.attr({ "data-loaded": true });
 					});
 				});
-			}
-
-
-			if(!validURL(hyperlink)){
-				const img = '../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png'
-				changeMetaView(hyperlink, hyperlink, img)
+			};
+			if (!validURL(hyperlink)) {
+				const img =
+					"../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png";
+				changeMetaView(hyperlink, hyperlink, img);
 				return false;
 			}
-
-
 			// ........
 			const metaResolverCallBack = function (result) {
 				//ep_hyperlink_title.attr('href', hyperlink);
 
 				if (result.metadata.image && result.metadata.title) {
-					changeMetaView(hyperlink,result.metadata.title,result.metadata.image)
+					changeMetaView(
+						hyperlink,
+						result.metadata.title,
+						result.metadata.image
+					);
 				} else {
 					var editedHyperlink = `https://${dividedUrl.hostname}`;
 					if (result.last !== true) {
-						socket.emit('metaResolver', {padId: clientVars.padId, editedHyperlink, last: true}, metaResolverCallBack);
+						socket.emit(
+							"metaResolver",
+							{ padId: clientVars.padId, editedHyperlink, last: true },
+							metaResolverCallBack
+						);
 					} else {
-						changeMetaView(hyperlink,result.metadata.title || hyperlink,'../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png')
+						changeMetaView(
+							hyperlink,
+							result.metadata.title || hyperlink,
+							"../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png"
+						);
 					}
 				}
-
-				
 			};
 			// ........
-
-
-			switch(dividedUrl.hostname) {
+			switch (dividedUrl.hostname) {
 				case "twitter.com":
-					changeMetaView(hyperlink, hyperlink,'../static/plugins/ep_full_hyperlinks/static/dist/img/twitter.png')
+					changeMetaView(
+						hyperlink,
+						hyperlink,
+						"../static/plugins/ep_full_hyperlinks/static/dist/img/twitter.png"
+					);
 					break;
 				default:
-					socket.emit('metaResolver', {padId: clientVars.padId, hyperlink, last: false}, metaResolverCallBack);
+					socket.emit(
+						"metaResolver",
+						{ padId: clientVars.padId, hyperlink, last: false },
+						metaResolverCallBack
+					);
 			}
 		}
+	};
 
+	// Indicates if event was on one of the elements that does not close link
+	const shouldNotCloseLink = function (e) {
+		// a link box
+		if (
+			$(e.target).closest(".link").length ||
+			$(e.target).closest(".link-modal").length ||
+			$(e.target).closest(".ep_hyperlink_docs_bubble_button_edit").length ||
+			$(e.target).closest(".ep_hyperlink_docs_bubble_button_delete").length ||
+			$(e.target).closest(".ep_hyperlink_docs_bubble_button_copy").length ||
+			$(e.target).closest(".full-display-link").length ||
+			$(e.target).closest(".link-title-wrapper").length ||
+			$(e.target).closest(".link-edit-form").length ||
+			$(e.target).closest(".link-text-text").length ||
+			$(e.target).closest(".link-text-hyperlink").length
+		) {
+			// the link modal
+			return true;
+		}
+		return false;
+	};
 
-	}
-
-	  // Indicates if event was on one of the elements that does not close link
-		const shouldNotCloseLink = function (e) {
-			// a link box
-			if (
-				$(e.target).closest('.link').length || $(e.target).closest('.link-modal').length ||
-				$(e.target).closest('.ep_hyperlink_docs_bubble_button_edit').length ||
-				$(e.target).closest('.ep_hyperlink_docs_bubble_button_delete').length ||
-				$(e.target).closest('.ep_hyperlink_docs_bubble_button_copy').length ||
-				$(e.target).closest('.full-display-link').length ||
-				$(e.target).closest('.link-title-wrapper').length ||
-				$(e.target).closest('.link-edit-form').length ||
-				$(e.target).closest('.link-text-text').length ||
-				$(e.target).closest('.link-text-hyperlink').length
-			) { // the link modal
-				return true;
-			}
-			return false;
-		};
-	
-
-  return {
-    showLink,
-    hideLink,
-    hideAllLinks,
+	return {
+		showLink,
+		hideLink,
+		hideAllLinks,
 		showLinkModal,
 		getLinksContainer,
 		shouldNotCloseLink,
-
-  };
+	};
 })();
+
+'use strict'
 
 const newLink = (() => {
   // Create a link object with data filled on the given form
-  const buildLinkFrom = function (form) {
+  const buildLinkFrom = (form) => {
     const text = form.find('#hyperlink-text').val();
     const oldText = form.find('#hyperlink-text-hidden').val();
     let hyperlink = form.find('#hyperlink-url').val();
 
-    if (!(/^http:\/\//.test(hyperlink)) && !(/^https:\/\//.test(hyperlink))) {
+    if (!/^http:\/\//.test(hyperlink) && !/^https:\/\//.test(hyperlink)) {
       hyperlink = `https://${hyperlink}`;
     }
 
@@ -588,9 +706,7 @@ const newLink = (() => {
   };
 
   // Callback for new link Cancel
-  const cancelNewLink = function () {
-    hideNewLinkPopup();
-  };
+  const cancelNewLink = () => hideNewLinkPopup();
 
   // Callback for new link Submit
   const submitNewLink = function (callback) {
@@ -602,35 +718,31 @@ const newLink = (() => {
       hideNewLinkPopup();
       callback(link, index);
     } else {
-      if (link.text.length == 0) form.find('#hyperlink-text').addClass('error');
+      if (link.text.length === 0) form.find('#hyperlink-text').addClass('error');
       if (!validURL(link.hyperlink)) form.find('#hyperlink-url').addClass('error');
     }
     return false;
   };
 
   var validURL = function (str) {
-    const pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
-		  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-		  '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-		  '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-		  '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-		  '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+    const pattern = new RegExp(
+        '^(https?:\\/\\/)?' + // protocol
+				'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+				'((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+				'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+				'(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+				'(\\#[-a-z\\d_]*)?$',
+        'i'
+    ); // fragment locator
     return !!pattern.test(str);
-	  };
+  };
   /* ***** Public methods: ***** */
 
-  // var localizenewLinkPopup = function () {
-  // 	const newLinkPopup = $('#newLink');
-  // 	if (newLinkPopup.length !== 0) linkL10n.localize(newLinkPopup);
-  // };
-
   // Insert new Link Form
-  const insertNewLinkPopupIfDontExist = function (link, callback) {
+  const insertNewLinkPopupIfDontExist = (link, callback) => {
     $('#newLink').remove();
-    var newLinkPopup = $('#newLink');
-
     link.linkId = '';
-    var newLinkPopup = $('#newLinkTemplate').tmpl(link);
+    const newLinkPopup = $('#newLinkTemplate').tmpl(link);
     newLinkPopup.appendTo($('#editorcontainerbox'));
 
     // Cancel btn
@@ -642,7 +754,7 @@ const newLink = (() => {
     return newLinkPopup;
   };
 
-  const showNewLinkPopup = function () {
+  const showNewLinkPopup = () => {
     // position below link icon
     $('#newLink').css('left', $('.toolbar .addLink').offset().left);
 
@@ -653,17 +765,17 @@ const newLink = (() => {
     // Show popup
     $('#newLink').addClass('popup-show');
 
-
     // mark selected text, so it is clear to user which text range the link is being applied to
     pad.plugins.ep_full_hyperlinks.preLinkMarker.markSelectedText();
 
     // focus on hyperlink input
 
-
-    setTimeout(() => { $('#newLink').find('.link-content').focus().select(); }, 500);
+    setTimeout(() => {
+      $('#newLink').find('.link-content').focus().select();
+    }, 500);
   };
 
-  var hideNewLinkPopup = function () {
+  const hideNewLinkPopup = () => {
     $('#newLink').removeClass('popup-show');
 
     // force focus to be lost, so virtual keyboard is hidden on mobile devices
@@ -678,9 +790,10 @@ const newLink = (() => {
     insertNewLinkPopupIfDontExist,
     showNewLinkPopup,
     hideNewLinkPopup,
-
   };
 })();
+
+'use strict';
 
 const preLinkMark = (() => {
   const MARK_CLASS = 'pre-selected-link';
@@ -776,11 +889,9 @@ const preLinkMark = (() => {
   };
 
   // we do nothing on callWithAce; actions will be handled on aceEditEvent
-  var doNothing = function () {};
+  const doNothing = () => {};
 
-  const init = function (ace) {
-    return new preLinkMarker(ace);
-  };
+  const init = (ace) => new preLinkMarker(ace);
 
   return {
     MARK_CLASS,

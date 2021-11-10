@@ -1,3 +1,5 @@
+'use strict';
+
 const preLinkMark = (() => {
   const MARK_CLASS = 'pre-selected-link';
 
@@ -92,11 +94,9 @@ const preLinkMark = (() => {
   };
 
   // we do nothing on callWithAce; actions will be handled on aceEditEvent
-  var doNothing = function () {};
+  const doNothing = () => {};
 
-  const init = function (ace) {
-    return new preLinkMarker(ace);
-  };
+  const init = (ace) => new preLinkMarker(ace);
 
   return {
     MARK_CLASS,
