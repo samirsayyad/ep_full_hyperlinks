@@ -56,27 +56,41 @@ const linkBoxes = (() => {
 			// if the modal was exist update text and hypertext
 			linkModal.show();
 			// if the old hyperlink was not same as new hyperlink
-			if (
-				linkObj.hyperlink !== linkModal.find("#ep_hyperlink_title").attr("href")
-			) {
+			if (linkObj.hyperlink !== linkModal.find("#ep_hyperlink_title").attr("href")) {
 				linkModal.attr("data-loaded", "false");
 			}
+
+
+
 			linkModal.attr("data-hyperlink", linkObj.hyperlink);
 			linkModal.find("input#hyperlink-url").val(linkObj.hyperlink);
-			linkModal
-				.find("input#hyperlink-text, input#hyperlink-text-hidden")
-				.val(linkObj.text);
+
+
 			linkModal.find("a#ep_hyperlink_title").attr({
 				title: linkObj.hyperlink,
 				href: linkObj.hyperlink,
 			});
 		}
 
+		// If the text we saved has changed and is different from the contents of the pad
+		const text = padInner.contents().find(`.${linkId}`).text()
+		linkModal.find("input#hyperlink-text-hidden").val(text);
+		linkModal.find("input#hyperlink-text").val(text);
+
 		// TODO: 1/ hyperlink for social and
 		// TODO: 2/ inside link
 		if (loaded != "true") {
-			var hyperlink = linkObj.hyperlink || linkModal.attr("data-hyperlink");
-			const dividedUrl = new URL(hyperlink);
+			let hyperlink = linkObj.hyperlink || linkModal.attr("data-hyperlink");
+			console.log(hyperlink)
+			let dividedUrl;
+			try {
+				dividedUrl = new URL(hyperlink);
+			} catch (error) {
+				console.error(`[hyperlink]: ${error}`);
+				linkBoxes.hideLink(linkId);
+				return
+			}
+
 
 			const ep_hyperlink_img = linkModal.find("#ep_hyperlink_img");
 			const ep_hyperlink_title = linkModal.find("#ep_hyperlink_title");
@@ -113,6 +127,7 @@ const linkBoxes = (() => {
 					});
 				});
 			};
+			
 			if (!validUrl.isUri(hyperlink)) {
 				const img =
 					"../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png";
