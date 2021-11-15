@@ -56,17 +56,14 @@ const linkBoxes = (() => {
 			// if the modal was exist update text and hypertext
 			linkModal.show();
 			// if the old hyperlink was not same as new hyperlink
-			if (linkObj.hyperlink !== linkModal.find("#ep_hyperlink_title").attr("href")) {
+			if (linkObj.hyperlink !== linkModal.find("a.ep_hyperlink_title").attr("href")) {
 				linkModal.attr("data-loaded", "false");
 			}
-
-
 
 			linkModal.attr("data-hyperlink", linkObj.hyperlink);
 			linkModal.find("input#hyperlink-url").val(linkObj.hyperlink);
 
-
-			linkModal.find("a#ep_hyperlink_title").attr({
+			linkModal.find("a.ep_hyperlink_title").attr({
 				title: linkObj.hyperlink,
 				href: linkObj.hyperlink,
 			});
@@ -91,9 +88,8 @@ const linkBoxes = (() => {
 				return
 			}
 
-
 			const ep_hyperlink_img = linkModal.find("#ep_hyperlink_img");
-			const ep_hyperlink_title = linkModal.find("#ep_hyperlink_title");
+			const ep_hyperlink_title = linkModal.find("a.ep_hyperlink_title");
 			const card_loading_hyperlink = linkModal.find("#card_loading_hyperlink");
 			const ep_hyperlink_description = linkModal.find(
 				"#ep_hyperlink_description"
@@ -136,7 +132,6 @@ const linkBoxes = (() => {
 			}
 			// ........
 			const metaResolverCallBack = function (result) {
-				//ep_hyperlink_title.attr('href', hyperlink);
 
 				if (result.metadata.image && result.metadata.title) {
 					changeMetaView(
@@ -201,6 +196,39 @@ const linkBoxes = (() => {
 		return false;
 	};
 
+	const isLinkInternal = (url) => {
+		const internalPathIs = `${location.origin}${location.pathname}`;
+		const incomeURL = new URL(url);
+		const incomPath = `${incomeURL.origin}${incomeURL.pathname}`;
+
+		let result = internalPathIs === incomPath ? true : false;
+
+		// check if the income url related to filter url
+
+		// does have p
+		const doesPInURL = location.pathname.split('/').indexOf('p') > 0;
+		const padName = clientVars.padId;
+		const padMainPathname = doesPInURL ? `/p/${padName}`: `/${padName}`;
+		if(location.pathname.substring(0, padMainPathname.length) === padMainPathname) result = true
+
+		// does single pad active
+		if(clientVars.ep_singlePad.active) result = true
+
+		return result
+	}
+
+	// internal link
+	// other plugin must listen for pushstate to get new data and excute they part.
+	const internalLinkClick = function (event) {
+		event.preventDefault();
+		const href = $(this).attr('href');
+		if(isLinkInternal(href)){
+			window.history.pushState({type: "hyperLink", href}, document.title, href);
+		}else {
+			// window.open(href, '_blank');
+		}
+	}
+
 	return {
 		showLink,
 		hideLink,
@@ -208,5 +236,6 @@ const linkBoxes = (() => {
 		showLinkModal,
 		getLinksContainer,
 		shouldNotCloseLink,
+		internalLinkClick,
 	};
 })();

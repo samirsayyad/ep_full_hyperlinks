@@ -100,7 +100,7 @@
     object-fit: cover;
 
   }
-  #ep_hyperlink_title{
+  a.ep_hyperlink_title{
     display: none;
     margin-top: 4px;
     color: #15c!important;

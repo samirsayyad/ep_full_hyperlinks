@@ -185,7 +185,6 @@ ep_links.prototype.init = function () {
     self.socket.emit('deleteLink', {padId: self.padId, linkId}, () => {});
   });
 
-
 	let hideLinkTimer;
   this.container.on('mouseover', '.sidebar-link', (e) => {
     // highlight link
@@ -209,6 +208,10 @@ ep_links.prototype.init = function () {
 				linkBoxes.showLinkModal(event, linkObj, self.socket)
 			});
   });
+
+	this.container.parent()
+		.on('click', 'a.ep_hyperlink_title', linkBoxes.internalLinkClick)
+
 
   this.addListenersToCloseOpenedLink();
 
