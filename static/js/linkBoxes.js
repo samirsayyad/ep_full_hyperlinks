@@ -225,7 +225,7 @@ const linkBoxes = (() => {
 		if(isLinkInternal(href)){
 			window.history.pushState({type: "hyperLink", href}, document.title, href);
 		}else {
-			// window.open(href, '_blank');
+			window.open(href, '_blank');
 		}
 	}
 

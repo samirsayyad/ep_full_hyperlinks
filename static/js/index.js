@@ -880,6 +880,15 @@ exports.aceInitialized = function (hook, context) {
   editorInfo.ace_hasLinkOnSelection = _(hasLinkOnSelection).bind(context);
 };
 
+exports.acePostWriteDomLineHTML = function (name, context) {
+	const hasHyperlink = $(context.node).find('a');
+  if (hasHyperlink.length > 0) {
+    hasHyperlink.each(function () {
+			$(this).on('click', linkBoxes.internalLinkClick);
+    });
+  }
+}
+
 exports.aceEditorCSS = hooks.aceEditorCSS;
 exports.postAceInit = hooks.postAceInit;
 exports.aceAttribsToClasses = hooks.aceAttribsToClasses;
