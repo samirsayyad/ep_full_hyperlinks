@@ -254,7 +254,8 @@ const linkBoxes = (() => {
 			if(filters.length>0){
 				const doesPInURL = location.pathname.split('/').indexOf('p') > 0;
 				targetPath = doesPInURL ? '/p': '';
-				targetPath += `/${clientVars.padId}/${filters.join('/')}${incomeURL.search}`;
+				if(!clientVars.ep_singlePad.active) targetPath += `/${clientVars.padId}`;
+				targetPath += `/${filters.join('/')}${incomeURL.search}`;
 			}
 
 			if(incomeURL.search.length===0) targetPath = href;
