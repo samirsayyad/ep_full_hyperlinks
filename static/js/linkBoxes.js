@@ -1,5 +1,7 @@
 'use strict'
 
+const { filter } = require("ep_etherpad-lite/static/js/underscore");
+
 const linkBoxes = (() => {
 	let padOuter;
 	const getPadOuter = () =>
@@ -209,7 +211,7 @@ const linkBoxes = (() => {
 			// does have p
 			const doesPInURL = location.pathname.split('/').indexOf('p') > 0;
 			const padName = clientVars.padId;
-			const padMainPathname = doesPInURL ? `/p/${padName}`: `/${padName}`;
+			const padMainPathname = doesPInURL ? `/p/${padName}` : `/${padName}`;
 			// check if the income url pad name is the same current pad name
 			if(location.pathname.substring(0, padMainPathname.length) === padMainPathname) result = true
 		}
@@ -220,16 +222,44 @@ const linkBoxes = (() => {
 		return result
 	}
 
+	const doesLinkHaveFilter = (url) => {
+		const result = [];
+		const padName = clientVars.padId;
+
+		const currentPathname = url.pathname.split("/");
+
+		let padNameIndex = currentPathname.indexOf(padName) + 1;
+
+		if(clientVars.ep_singlePad.active) padNameIndex = 0;
+
+		const filters = [...currentPathname].splice(padNameIndex, currentPathname.length - 1);
+
+		result.push(...filters);
+
+		return result;
+	}
+
 	// internal link
 	// other plugin must listen for pushstate to get new data and excute they part.
 	const internalLinkClick = function (event) {
 		event.preventDefault();
+		event.stopPropagation();
 		const href = $(this).attr('href');
+
 		if(isLinkInternal(href)){
-			window.history.pushState({type: "hyperLink", href}, document.title, href);
+			const incomeURL = new URL(href);
+			let targetPath = `${incomeURL.search}`
+			const filters = doesLinkHaveFilter(incomeURL);
+
+			if(filters.length>0){
+				targetPath = `/${filters.join('/')}${incomeURL.search}`
+			}
+		
+			window.history.pushState({type: "hyperLink", href}, document.title, targetPath);
 		}else {
 			window.open(href, '_blank');
 		}
+		return false;
 	}
 
 	return {
