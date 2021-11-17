@@ -205,11 +205,14 @@ const linkBoxes = (() => {
 
 		// check if the income url related to filter url
 
-		// does have p
-		const doesPInURL = location.pathname.split('/').indexOf('p') > 0;
-		const padName = clientVars.padId;
-		const padMainPathname = doesPInURL ? `/p/${padName}`: `/${padName}`;
-		if(location.pathname.substring(0, padMainPathname.length) === padMainPathname) result = true
+		if(incomeURL.origin === location.origin){
+			// does have p
+			const doesPInURL = location.pathname.split('/').indexOf('p') > 0;
+			const padName = clientVars.padId;
+			const padMainPathname = doesPInURL ? `/p/${padName}`: `/${padName}`;
+			// check if the income url pad name is the same current pad name
+			if(location.pathname.substring(0, padMainPathname.length) === padMainPathname) result = true
+		}
 
 		// does single pad active
 		if(clientVars.ep_singlePad.active) result = true
