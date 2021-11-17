@@ -252,8 +252,12 @@ const linkBoxes = (() => {
 			const filters = doesLinkHaveFilter(incomeURL);
 
 			if(filters.length>0){
-				targetPath = `/${filters.join('/')}${incomeURL.search}`
+				const doesPInURL = location.pathname.split('/').indexOf('p') > 0;
+				targetPath = doesPInURL ? '/p': '';
+				targetPath += `/${clientVars.padId}/${filters.join('/')}${incomeURL.search}`;
 			}
+
+			if(incomeURL.search.length===0) targetPath = href;
 		
 			window.history.pushState({type: "hyperLink", href}, document.title, targetPath);
 		}else {
