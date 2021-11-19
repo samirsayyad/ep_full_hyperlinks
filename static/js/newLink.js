@@ -7,10 +7,6 @@ const newLink = (() => {
     const oldText = form.find('#hyperlink-text-hidden').val();
     let hyperlink = form.find('#hyperlink-url').val();
 
-    if (!/^http:\/\//.test(hyperlink) && !/^https:\/\//.test(hyperlink)) {
-      hyperlink = `https://${hyperlink}`;
-    }
-
     return {
       text,
       oldText,
