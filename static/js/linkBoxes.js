@@ -259,8 +259,15 @@ const linkBoxes = (() => {
 			}
 
 			if(incomeURL.search.length===0) targetPath = href;
+
+			// The Target is which plugin should listen more for more functionality
+			// In this example, if we find a slug filter in your URL,
+			// the target should be the filter plugin
+			const tartge = filters.length>0 ? "filter" : "other";
 		
-			window.history.pushState({type: "hyperLink", href}, document.title, targetPath);
+			window.history.pushState({type: "hyperLink", href, target: tartge}, document.title, targetPath);
+			// close all link
+			hideAllLinks();
 		}else {
 			window.open(href, '_blank');
 		}
