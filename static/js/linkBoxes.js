@@ -1,6 +1,5 @@
 'use strict'
 
-const { filter } = require("ep_etherpad-lite/static/js/underscore");
 
 const linkBoxes = (() => {
 	let padOuter;
@@ -199,14 +198,15 @@ const linkBoxes = (() => {
 	};
 
 	const isLinkInternal = (url) => {
-		const internalPathIs = `${location.origin}${location.pathname}`;
 		const incomeURL = new URL(url);
-		const incomPath = `${incomeURL.origin}${incomeURL.pathname}`;
+		let result = false;
 
-		let result = internalPathIs === incomPath ? true : false;
+		// 1/ check the origin
+		if(incomeURL.origin !== location.origin) return false;
 
+
+		// 2/ origin the same but diff pad name
 		// check if the income url related to filter url
-
 		if(incomeURL.origin === location.origin){
 			// does have p
 			const doesPInURL = location.pathname.split('/').indexOf('p') > 0;
@@ -214,12 +214,13 @@ const linkBoxes = (() => {
 			const padMainPathname = doesPInURL ? `/p/${padName}` : `/${padName}`;
 			// check if the income url pad name is the same current pad name
 			if(location.pathname.substring(0, padMainPathname.length) === padMainPathname) result = true
+
+			// does single pad active
+			if(clientVars.ep_singlePad.active) result = true;
+
 		}
 
-		// does single pad active
-		if(clientVars.ep_singlePad.active) result = true
-
-		return result
+		return result;
 	}
 
 	const doesLinkHaveFilter = (url) => {
@@ -245,6 +246,9 @@ const linkBoxes = (() => {
 		event.preventDefault();
 		event.stopPropagation();
 		const href = $(this).attr('href');
+
+
+		console.log("internalLinkClick", href, isLinkInternal(href), doesLinkHaveFilter(new URL(href)))
 
 		if(isLinkInternal(href)){
 			const incomeURL = new URL(href);
