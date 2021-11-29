@@ -213,15 +213,12 @@
     display: block;
     z-index: 999000;
     visibility: visible;
-
-    /* background-color: rgb(255, 255, 255);
-    border-color: rgb(218, 220, 224);
-    border-radius: 8px;
-    box-shadow: rgba(60, 64, 67, 0.15) 0px 1px 3px 1px; */
     color: rgb(60, 64, 67);
     font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
     font-size: 14px;
-
+		overflow: hidden;
+		border-radius: 6px;
+    box-shadow: 0 0 0 1px rgb(99 114 130 / 16%), 0 8px 16px rgb(27 39 51 / 8%);
   }
   .disable-link{
     pointer-events: none; cursor: default;
