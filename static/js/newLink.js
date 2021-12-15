@@ -5,7 +5,7 @@ const newLink = (() => {
   const buildLinkFrom = (form) => {
     const text = form.find('#hyperlink-text').val();
     const oldText = form.find('#hyperlink-text-hidden').val();
-    let hyperlink = form.find('#hyperlink-url').val();
+    const hyperlink = form.find('#hyperlink-url').val();
 
     return {
       text,

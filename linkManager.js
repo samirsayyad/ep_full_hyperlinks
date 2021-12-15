@@ -1,3 +1,5 @@
+'use strict'
+
 const _ = require('underscore');
 const db = require('ep_etherpad-lite/node/db/DB').db;
 const ERR = require('ep_etherpad-lite/node_modules/async-stacktrace');

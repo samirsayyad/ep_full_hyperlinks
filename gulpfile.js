@@ -1,3 +1,5 @@
+'use strict'
+
 const gulp = require('gulp');
 const concat = require('gulp-concat');
 const inject = require('gulp-inject-string');

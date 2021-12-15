@@ -1,3 +1,5 @@
+'use strict'
+
 const shared = (() => {
   const collectContentPre = (hook, context) => {
     const link = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(context.cls);

@@ -1,6 +1,6 @@
 {
   "name": "ep_full_hyperlinks",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "etherpad plugin ep_full_hyperlink hyperlink",
   "main": "index.js",
   "scripts": {
@@ -46,12 +46,15 @@
   },
   "homepage": "https://github.com/samirsayyad/ep_full_hyperlinks#readme",
   "devDependencies": {
-    "eslint": "^7.18.0",
-    "eslint-config-etherpad": "^1.0.23",
-    "eslint-plugin-mocha": "^8.0.0",
+    "eslint": "^7.32.0",
+    "eslint-config-etherpad": "^2.0.2",
+    "eslint-plugin-cypress": "^2.12.1",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-mocha": "^9.0.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prefer-arrow": "^1.2.3",
-    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-promise": "^5.1.1",
+    "eslint-plugin-you-dont-need-lodash-underscore": "^6.12.0",
     "gulp": "^4.0.2",
     "gulp-bump": "^3.2.0",
     "gulp-clean-css": "^4.3.0",
