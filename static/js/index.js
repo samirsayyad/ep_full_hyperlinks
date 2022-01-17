@@ -146,7 +146,10 @@ ep_links.prototype.init = function () {
     const linkId = $(this).closest('.link-container')[0].id;
     self.padOuter.find(`#show-form-${linkId}`).hide();
     self.padOuter.find(`#edit-form-${linkId}`).show();
-  });
+		self.padOuter.find(`#edit-form-${linkId}`).find("#hyperlink-text").focus(function(){
+			this.setSelectionRange(this.value.length, this.value.length);
+		}).select();
+	});
 
   this.container.parent().on('click', '.ep_hyperlink_docs_bubble_button_copy', function (e) {
     const dummy = document.createElement('input');
