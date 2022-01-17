@@ -48,6 +48,11 @@ const newLink = (() => {
     // Create btn // link-create-btn
     $('#newLink #link-create-btn').on('click', (e) => submitNewLink(callback));
 
+		$(document).on('submit', 'form.link-edit-form', function(e){
+			e.preventDefault();
+			submitNewLink(callback)
+		})
+
     return newLinkPopup;
   };
 

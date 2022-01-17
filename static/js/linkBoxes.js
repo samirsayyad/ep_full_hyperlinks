@@ -43,7 +43,6 @@ const linkBoxes = (() => {
 			padOuter.find("#outerdocbody").css("padding-top").split("px")[0]
 		);
 
-		linkModal.css({ width: "324px" }); // because of need to determine exact size for putting best area
 		linkModal.css({ left: `${parseInt(targetLeft)}px` });
 		linkModal.css({ top: `${parseInt(targetTop) + 35}px` });
 		linkModal.addClass("hyperlink-display");

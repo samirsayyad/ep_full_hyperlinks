@@ -214,6 +214,7 @@
 		overflow: hidden;
 		border-radius: 6px;
     box-shadow: 0 0 0 1px rgb(99 114 130 / 16%), 0 8px 16px rgb(27 39 51 / 8%);
+		width: 324px;
   }
   .disable-link{
     pointer-events: none; cursor: default;
@@ -265,7 +266,6 @@
   padding: 10px 7px 9px 7px !important;
 }
 .link-title-wrapper{
-  width: 400px;
   display: none;
 }
 .link-title-wrapper-meta{
@@ -330,7 +330,6 @@ input:-internal-autofill-selected {
 	font-weight: 600;
 	font-size: 14px;
 	color: #555;
-	width: 100%;
   display: block;
 }
   .full-display-link .link-title-wrapper .link-text.default-text {
@@ -381,7 +380,6 @@ input:-internal-autofill-selected {
   /* EDITING LINK */
   .link-edit-form{
     width: 100%;
-    /* height: 140px; */
   }
   .link-edit-text {
     width: 100%;

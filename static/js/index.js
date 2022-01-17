@@ -70,9 +70,8 @@ ep_links.prototype.init = function () {
     self.displayNewLinkForm();
   });
 
-  // submit the edition on the text and update the link text
-  this.container.parent().on('click', '.link-edit-submit', function (e) {
-    e.preventDefault();
+	const submitEditeLink = function(e) {
+		e.preventDefault();
     e.stopPropagation();
     const $linkBox = $(this).closest('.link-container');
     const $linkForm = $(this).closest('.link-edit-form');
@@ -131,8 +130,10 @@ ep_links.prototype.init = function () {
         self.setLinkNewText(linkId, linkText, hyperlink);
       }
     });
+	}
 
-  });
+  // submit the edition on the text and update the link text
+	this.container.parent().on('submit', 'form.link-edit-form', submitEditeLink)
 
 	this.container.on('click', '#link-cancel-btn', function(){
 		const linkId = $(this).closest('.link-container')[0].id;
