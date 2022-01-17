@@ -95,10 +95,7 @@
     height: 18px;
     float: left;
     margin-right: 4px;
-    margin-top: 4px;
     display: none;
-    object-fit: cover;
-
   }
   a.ep_hyperlink_title{
     display: none;
@@ -141,8 +138,6 @@
         height: 18px;
         float: left;
         margin-right: 4px;
-        margin-top: 4px;
-
       } 
      
       /* Card title */ 
@@ -231,14 +226,16 @@
     display: none;
   }
   .full-display-link {
-    background-color: #fff;
-    border-radius: 5px;
     overflow: hidden;
-    box-shadow: 0 2px 4px #ddd;
     z-index: 999000;
-    width: 324px;
     padding: 6px 0px;
-    height: 63px;
+    background-color: #fff;
+    border-color: #dadce0;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 1px rgb(60 64 67 / 15%);
+    color: #3c4043;
+    font-family: Roboto,RobotoDraft,Helvetica,Arial,sans-serif;
+    font-size: 14px;
   }
 
   .full-display-link .link-title-wrapper .link-text {
@@ -272,10 +269,10 @@
   display: none;
 }
 .link-title-wrapper-meta{
-  /* margin-bottom: 33px */
   padding: 0px 12px;
-  display: flex;
   height: 29px;
+  display: flex;
+  align-items: center;
 }
 .ep_hyperlink_description{
   font-size: 12px;
@@ -505,24 +502,29 @@ input:-internal-autofill-selected {
 	color: #555;
 }
 
-.ep_hyperlink_docs_bubble_button_edit, .ep_hyperlink_docs_bubble_button_copy, .ep_hyperlink_docs_bubble_button_delete{
-  background-color: transparent;
-  background-image: none;
+.ep_hyperlink_docs_bubble_button_edit,
+.ep_hyperlink_docs_bubble_button_copy,
+.ep_hyperlink_docs_bubble_button_delete{
   height: 32px;
   width: 32px;
   border-radius: 50%;
   border-width: 0;
-  border-color: transparent;
-  /* box-shadow: none; */
-  background-clip: padding-box;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   min-width: unset;
   padding: 5px;
-  justify-content: center;
-  text-align: center;
   display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
+.ep_hyperlink_docs_bubble_button_edit svg,
+.ep_hyperlink_docs_bubble_button_copy svg,
+.ep_hyperlink_docs_bubble_button_delete svg{
+  width: 18px;
+  height: 18px;
+}
+
 .ep_hyperlink_docs_bubble_button_container{
   display: flex;
 }
@@ -532,8 +534,10 @@ input:-internal-autofill-selected {
 
 }
  
-.ep_hyperlink_docs_bubble_button_edit:hover, .ep_hyperlink_docs_bubble_button_copy:hover, .ep_hyperlink_docs_bubble_button_delete:hover{
-  background-color: #f0f0f0;
+.ep_hyperlink_docs_bubble_button_edit:hover,
+.ep_hyperlink_docs_bubble_button_copy:hover,
+.ep_hyperlink_docs_bubble_button_delete:hover{
+  background-color: #ccc;
 }
 .ep_hyperlink_docs_bubble_button_edit svg:focus path, .ep_hyperlink_docs_bubble_button_copy svg:focus path, .ep_hyperlink_docs_bubble_button_delete svg:focus path{
   color: #3873e0;
