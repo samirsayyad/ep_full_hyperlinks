@@ -114,9 +114,7 @@ ep_links.prototype.init = function () {
     data.oldLinkText = oldLinkText;
     data.hyperlink = hyperlink;
     self.socket.emit('updateLinkText', data, (err) => {
-			console.log(data)
       if (!err) {
-        // $linkForm.remove();
         $linkBox.removeClass('editing');
         self.updateLinkBoxText(linkId, linkText, hyperlink);
         linkBoxes.hideLink(linkId);
@@ -776,17 +774,6 @@ var hooks = {
   aceEditorCSS: (hookName, context, cb) => cssFiles,
 };
 
-function getUrlVars(url) {
-  const vars = []; let
-    hash;
-  const hashes = url.slice(url.indexOf('?') + 1).split('&');
-  for (let i = 0; i < hashes.length; i++) {
-    hash = hashes[i].split('=');
-    vars.push(hash[0]);
-    vars[hash[0]] = hash[1];
-  }
-  return vars;
-}
 // Given a CSS selector and a target element (in this case pad inner)
 // return the rep as an array of array of tuples IE [[[0,1],[0,2]], [[1,3],[1,5]]]
 // We have to return an array of a array of tuples because there can be multiple reps

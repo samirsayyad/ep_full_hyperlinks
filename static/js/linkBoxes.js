@@ -20,6 +20,54 @@ const linkBoxes = (() => {
 
 	const hideAllLinks = () => getLinksContainer().find(`.link-container`).hide();
 
+
+	const getPosition = (e) => {
+		let posx = 0;
+		let posy = 0;
+	
+		if (!e) e = window.event;
+		
+		if (e.pageX || e.pageY) {
+			posx = e.pageX;
+			posy = e.pageY;
+		} else if (e.clientX || e.clientY) {
+			posx = e.clientX + document.body.scrollLeft + 
+												 document.documentElement.scrollLeft;
+			posy = e.clientY + document.body.scrollTop + 
+												 document.documentElement.scrollTop;
+		}
+	
+		return { x: posx, y: posy }
+	}
+
+
+	const setPositionModal = (e, linkModal, padInner) => {
+		const clickCoords = getPosition(e);
+		clickCoordsX = clickCoords.x;
+		clickCoordsY = clickCoords.y;
+
+		const modalWith = linkModal.innerWidth()
+		const modalHeight = linkModal.innerHeight()
+
+		windowWidth = padInner.innerWidth();
+		windowHeight = padInner.innerHeight();
+
+		let newL= `${e.clientX +padInner.offset().left}px`;
+		let newT = `${clickCoordsY}px`;
+
+		if ((windowWidth - clickCoordsX) < modalWith) {
+			newL = `${windowWidth - modalWith}px`;
+		}
+	
+		if ((windowHeight - clickCoordsY) < modalHeight) {
+			newT = `${windowHeight - modalHeight}px`;
+		} 
+
+		linkModal.css({ left: newL });
+		linkModal.css({ top: `${parseInt(newT) + 35}px` });
+	}
+
+
 	const showLinkModal = (e, linkObj, socket) => {
 		const padOuter = $('iframe[name="ace_outer"]').contents();
 		const padInner = getPadOuter().find('iframe[name="ace_inner"]');
@@ -33,19 +81,6 @@ const linkBoxes = (() => {
 		let linkModal = getLinksContainer().find(`#${linkId}`);
 		if (!linkModalAppended)
 			linkModal = $("#linkBoxTemplate").tmpl({ ...linkObj });
-
-		// apppend modal position! where it want appear
-		let targetLeft = e.clientX;
-		targetLeft += padInner.offset().left;
-		let targetTop = $(e.target).offset().top;
-		targetTop += parseInt(padInner.css("padding-top").split("px")[0]);
-		targetTop += parseInt(
-			padOuter.find("#outerdocbody").css("padding-top").split("px")[0]
-		);
-
-		linkModal.css({ left: `${parseInt(targetLeft)}px` });
-		linkModal.css({ top: `${parseInt(targetTop) + 35}px` });
-		linkModal.addClass("hyperlink-display");
 
 		const loaded = linkModal.attr("data-loaded");
 
@@ -78,7 +113,6 @@ const linkBoxes = (() => {
 		// TODO: 2/ inside link
 		if (loaded != "true") {
 			let hyperlink = linkObj.hyperlink || linkModal.attr("data-hyperlink");
-			console.log(hyperlink)
 			let dividedUrl;
 			try {
 				dividedUrl = new URL(hyperlink);
@@ -173,6 +207,9 @@ const linkBoxes = (() => {
 					);
 			}
 		}
+
+		setPositionModal(e, linkModal, padInner);
+		linkModal.addClass("hyperlink-display");
 	};
 
 	// Indicates if event was on one of the elements that does not close link
