@@ -91,21 +91,17 @@
     padding-top:12px
   }
   #ep_hyperlink_img{
-    width: 18px;
-    height: 18px;
-    float: left;
+    width: 20px;
+    height: 20px;
     margin-right: 4px;
+    float: left;
     display: none;
   }
   a.ep_hyperlink_title{
     display: none;
-    margin-top: 4px;
     color: #15c!important;
-    font-weight: 500;
     opacity: 1;
-    padding-left: 6px;
-    padding-right: 6px;
-    vertical-align: baseline;
+		padding: 0 16px;
     width: 189px;
     min-width: 189px;
     text-overflow: ellipsis;
@@ -119,23 +115,23 @@
 
         /* Card styles */ 
         .card{ 
-          width: 18px;
+          width: 20px;
+          height: 20px; 
           float: left;
-          height: 18px; 
 
           
       } 
      
       /* Card image loading */ 
       .card__image img { 
-          width: 18px; 
-          height: 18px; 
+          width: 20px; 
+          height: 20px; 
           float: left;
       } 
         
       .card__image.loading { 
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
         float: left;
         margin-right: 4px;
       } 
@@ -221,7 +217,6 @@
   }
   .sidebar-link.full-display .full-display-link {
     display: block;
-    /* margin-top: -10px; */
   }
   .sidebar-link.full-display .compact-display-content {
     display: none;
@@ -229,7 +224,7 @@
   .full-display-link {
     overflow: hidden;
     z-index: 999000;
-    padding: 6px 0px;
+    padding: 6px 8px;
     background-color: #fff;
     border-color: #dadce0;
     border-radius: 8px;
@@ -240,8 +235,6 @@
   }
 
   .full-display-link .link-title-wrapper .link-text {
-    /* display: block; */
-    /* margin-top: 10px; */
     white-space: normal;
     font-weight: bold;
     width: 230px;
@@ -269,10 +262,9 @@
   display: none;
 }
 .link-title-wrapper-meta{
-  padding: 0px 12px;
-  height: 29px;
   display: flex;
   align-items: center;
+	justify-content: space-between;
 }
 .ep_hyperlink_description{
   font-size: 12px;
@@ -503,14 +495,10 @@ input:-internal-autofill-selected {
 .ep_hyperlink_docs_bubble_button_edit,
 .ep_hyperlink_docs_bubble_button_copy,
 .ep_hyperlink_docs_bubble_button_delete{
-  height: 32px;
-  width: 32px;
+  height: 30px;
+  width: 30px;
   border-radius: 50%;
-  border-width: 0;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  min-width: unset;
-  padding: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
