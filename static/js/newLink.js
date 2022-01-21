@@ -71,8 +71,7 @@ const newLink = (() => {
     pad.plugins.ep_full_hyperlinks.preLinkMarker.markSelectedText();
 
     // focus on hyperlink input
-		$('#newLink #hyperlink-url').focus().select();
-   
+		setTimeout(() => $('#newLink #hyperlink-url').focus().select(), 500);
   };
 
   const hideNewLinkPopup = () => {
