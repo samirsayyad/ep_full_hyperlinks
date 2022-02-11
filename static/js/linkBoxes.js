@@ -56,15 +56,14 @@ const linkBoxes = (() => {
 		let newT = `${clickCoordsY}px`;
 
 		if ((windowWidth - clickCoordsX) < modalWith) {
-			newL = `${windowWidth - modalWith}px`;
+			newL = `${(windowWidth - modalWith)}px`;
 		}
 	
 		if ((windowHeight - clickCoordsY) < modalHeight) {
 			newT = `${windowHeight - modalHeight}px`;
 		} 
 
-		linkModal.css({ left: newL });
-		linkModal.css({ top: `${parseInt(newT) + 35}px` });
+		linkModal.css({ left: newL, top: `${parseInt(newT) + 50}px`  });
 	}
 
 
@@ -77,6 +76,11 @@ const linkBoxes = (() => {
 
 		hideAllLinks();
 
+		if(!linkObj.hyperlink){
+			console.error(`[hyperlink]: link does not exist`, linkObj)
+			return false
+		}
+		
 		// find link modal, if does not exist create a link modal
 		let linkModal = getLinksContainer().find(`#${linkId}`);
 		if (!linkModalAppended)
@@ -282,9 +286,6 @@ const linkBoxes = (() => {
 		event.preventDefault();
 		event.stopPropagation();
 		const href = $(this).attr('href');
-
-
-		console.log("internalLinkClick", href, isLinkInternal(href), doesLinkHaveFilter(new URL(href)))
 
 		if(isLinkInternal(href)){
 			const incomeURL = new URL(href);

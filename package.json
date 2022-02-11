@@ -1,6 +1,6 @@
 {
   "name": "ep_full_hyperlinks",
-  "version": "1.0.16",
+  "version": "1.4.0",
   "description": "etherpad plugin ep_full_hyperlink hyperlink",
   "main": "index.js",
   "scripts": {
@@ -32,10 +32,14 @@
     "root": true,
     "extends": "etherpad/plugin",
     "ignorePatterns": [
-      "/static/dist/**/*.js"
+      "/static/dist/**/*.js",
+			"/static/js/validUrl.js",
+			"/static/js/jquery.tmpl.min.js"
     ],
     "globals": {
-      "ep_etherpad-lite": true
+      "ep_etherpad-lite": true,
+			"randomString": true,
+			"shared": true
     }
   },
   "dependencies": {

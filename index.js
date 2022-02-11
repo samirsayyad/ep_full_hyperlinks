@@ -3,23 +3,24 @@
 const eejs = require('ep_etherpad-lite/node/eejs/');
 const settings = require('ep_etherpad-lite/node/utils/Settings');
 const formidable = require('formidable');
-const clientIO = require('socket.io-client');
 const linkManager = require('./linkManager');
 const links = require('./links');
 const apiUtils = require('./apiUtils');
 const _ = require('underscore');
-
+const readOnlyManager = require('ep_etherpad-lite/node/db/ReadOnlyManager.js');
 const Meta = require('html-metadata-parser');
 
-const padRemove = async (hook_name, context, callback) => await Promise.all([linkManager.deleteLinks(context.padID)]);
+let io;
 
-const padCopy = async (hook_name, context, callback) => {
+const padRemove = async (hookName, context, callback) => await Promise.all([linkManager.deleteLinks(context.padID)]);
+
+const padCopy = async (hookName, context, callback) => {
   await Promise.all([
     linkManager.copyLinks(context.originalPad.id, context.destinationID),
   ]);
 };
 
-const handleMessageSecurity = (hook_name, context, callback) => {
+const handleMessageSecurity = (hookName, context, callback) => {
   const {message: {data: {apool} = {}} = {}} = context;
   if (apool && apool[0] && apool[0][0] === 'link') {
     // link change, allow it to override readonly security model!!
@@ -28,78 +29,72 @@ const handleMessageSecurity = (hook_name, context, callback) => {
   return callback();
 };
 
-const socketio = (hook_name, args, cb) => {
-  const io = args.io;
-  io.of('/link').on('connection', (socket) => {
+const socketio = (hookName, args, cb) => {
+  const io = args.io.of('/link');
+  io.on('connection', (socket) => {
+    const handler = (fn) => (...args) => {
+      const respond = args.pop();
+      (async () => await fn(...args))().then(
+          (val) => respond(null, val),
+          (err) => respond({name: err.name, message: err.message}));
+    };
+
     // Join the rooms
-    socket.on('getLinks', (data, callback) => {
-      const padId = data.padId;
+    socket.on('getLinks', handler(async (data) => {
+      const {padId} = await readOnlyManager.getIds(data.padId);
+      // Put read-only and read-write users in the same socket.io "room" so that they can see each
+      // other's updates.
       socket.join(padId);
-      linkManager.getLinks(padId, (err, links) => {
-        callback(links);
-      });
-    });
+      const links = await linkManager.getLinks(padId);
+      return links;
+    }));
 
     // On add events
-    socket.on('addLink', (data, callback) => {
-      const padId = data.padId;
+    socket.on('addLink', handler(async (data) => {
+      const {padId} = await readOnlyManager.getIds(data.padId);
       const content = data.link;
-      linkManager.addLink(padId, content, (err, linkId, link) => {
-        socket.broadcast.to(padId).emit('pushAddLink', linkId, link);
-        callback(linkId, link);
-      });
-    });
+      const [linkId, link] = await linkManager.addLink(padId, content);
+      if (linkId != null && link != null) {
+        socket.broadcast.to(padId).emit('pushAddlink', linkId, link);
+        return [linkId, link];
+      }
+    }));
 
-    socket.on('deleteLink', (data, callback) => {
-      // delete the link on the database
-      linkManager.deleteLink(data.padId, data.linkId, () => {
-        // Broadcast to all other users that this link was deleted
-        socket.broadcast.to(data.padId).emit('linkDeleted', data.linkId);
-      });
-    });
+    socket.on('deleteLink', handler(async (data) => {
+      const {padId} = await readOnlyManager.getIds(data.padId);
+      await linkManager.deleteLink(padId, data.linkId, data.authorId);
+      socket.broadcast.to(padId).emit('linkDeleted', data.linkId);
+    }));
 
-    socket.on('revertChange', (data, callback) => {
+    socket.on('revertChange', handler(async (data) => {
+      const {padId} = await readOnlyManager.getIds(data.padId);
       // Broadcast to all other users that this change was accepted.
-      // Note that linkId here can either be the linkId.
-      const padId = data.padId;
-      linkManager.changeAcceptedState(padId, data.linkId, false, () => {
-        socket.broadcast.to(padId).emit('changeReverted', data.linkId);
-      });
-    });
+      // Note that linkId here can either be the linkId or replyId..
+      await linkManager.changeAcceptedState(padId, data.linkId, false);
+      socket.broadcast.to(padId).emit('changeReverted', data.linkId);
+    }));
 
-    socket.on('acceptChange', (data, callback) => {
+    socket.on('acceptChange', handler(async (data) => {
+      const {padId} = await readOnlyManager.getIds(data.padId);
       // Broadcast to all other users that this change was accepted.
-      // Note that linkId here can either be the linkId.
-      const padId = data.padId;
-      linkManager.changeAcceptedState(padId, data.linkId, true, () => {
-        socket.broadcast.to(padId).emit('changeAccepted', data.linkId);
-      });
-    });
+      // Note that linkId here can either be the linkId or replyId..
+      await linkManager.changeAcceptedState(padId, data.linkId, true);
+      socket.broadcast.to(padId).emit('changeAccepted', data.linkId);
+    }));
 
-    socket.on('bulkAddLink', (padId, data, callback) => {
-      linkManager.bulkAddLinks(padId, data, (error, linksId, links) => {
-        const linkWithLinkId = _.object(linksId, links); // {c-123:data, c-124:data}
-        callback(linkWithLinkId);
-      });
-    });
+    socket.on('bulkAddLink', handler(async (padId, data) => {
+      padId = (await readOnlyManager.getIds(padId)).padId;
+      const [linkIds, links] = await linkManager.bulkAddLinks(padId, data);
+      socket.broadcast.to(padId).emit('pushAddLinkInBulk');
+      return _.object(linkIds, links); // {c-123:data, c-124:data}
+    }));
 
-    socket.on('updateLinkText', (data, callback) => {
-      // Broadcast to all other users that the link text was changed.
-      // Note that linkId here can either be the linkId ..
-      const padId = data.padId;
-      const linkId = data.linkId;
-      const linkText = data.linkText;
-      const hyperlink = data.hyperlink;
-
-      linkManager.changeLinkData(data, (err) => {
-        if (!err) {
-          socket.broadcast
-              .to(padId)
-              .emit('textLinkUpdated', linkId, linkText, hyperlink);
-        }
-        callback(err);
-      });
-    });
+    socket.on('updateLinkText', handler(async (data) => {
+      const {linkId, linkText} = data;
+      const {padId} = await readOnlyManager.getIds(data.padId);
+      await linkManager.changeLinkData({padId, ...data});
+      socket.broadcast.to(padId).emit('textLinkUpdated', linkId, linkText);
+    }));
 
     // resolve meta of url
     socket.on('metaResolver', async (data, callback) => {
@@ -124,7 +119,7 @@ const socketio = (hook_name, args, cb) => {
           last: data.last,
         });
       } catch (e) {
-        console.log(e.message, e.status, 'error');
+        console.error(e.message, e.status, 'error');
         callback({
           metadata: false,
           last: data.last,
@@ -146,12 +141,12 @@ const socketio = (hook_name, args, cb) => {
   return cb();
 };
 
-const eejsBlock_dd_insert = (hook_name, args, cb) => {
+const eejsBlock_dd_insert = (hookName, args, cb) => {
   args.content += eejs.require('ep_full_hyperlinks/templates/menuButtons.ejs');
   return cb();
 };
 
-const eejsBlock_mySettings = (hook_name, args, cb) => {
+const eejsBlock_mySettings = (hookName, args, cb) => {
   args.content += eejs.require('ep_full_hyperlinks/templates/settings.ejs');
   return cb();
 };
@@ -170,7 +165,7 @@ const padInitToolbar = (hookName, args, cb) => {
   return cb();
 };
 
-const eejsBlock_editbarMenuLeft = (hook_name, args, cb) => {
+const eejsBlock_editbarMenuLeft = (hookName, args, cb) => {
   // check if custom button is used
   if (JSON.stringify(settings.toolbar).indexOf('addLink') > -1) {
     return cb();
@@ -181,12 +176,12 @@ const eejsBlock_editbarMenuLeft = (hook_name, args, cb) => {
   return cb();
 };
 
-const eejsBlock_scripts = (hook_name, args, cb) => {
+const eejsBlock_scripts = (hookName, args, cb) => {
   args.content += eejs.require('ep_full_hyperlinks/templates/links.html');
   return cb();
 };
 
-const eejsBlock_styles = (hook_name, args, cb) => {
+const eejsBlock_styles = (hookName, args, cb) => {
   args.content += eejs.require('ep_full_hyperlinks/templates/styles.html');
   return cb();
 };
@@ -204,83 +199,80 @@ const clientVars = (hook, context, cb) => {
   });
 };
 
-const expressCreateServer = (hook_name, args, callback) => {
-  args.app.get('/pluginfw/hyperlink/:pad/links/:linkId', (req, res) => {
+const expressCreateServer = (hookName, args, callback) => {
+  args.app.get('/pluginfw/hyperlink/:pad/links/:linkId', async (req, res) => {
     // sanitize pad id before continuing
     const padId = apiUtils.sanitizePadId(req);
     const {linkId} = req.params;
-
-    links.getPadLink(padId, linkId, (err, data) => {
-      if (err) {
-        return res.json({
-          status: false,
-          message: 'internal error',
-          link: null,
-        });
-      }
-
-      res.json({status: true, link: data});
-    });
+    let data;
+    try {
+      data = await links.getPadLink(padId, linkId);
+    } catch (err) {
+      console.error(err.stack ? err.stack : err.toString());
+      res.json({code: 2, message: 'internal error', data: null});
+      return;
+    }
+    res.json({status: true, link: data});
   });
 
-  args.app.get('/pluginfw/hyperlink/:pad/links', (req, res) => {
+  args.app.get('/pluginfw/hyperlink/:pad/links', async (req, res) => {
+    // sanitize pad id before continuing
+    const padIdReceived = apiUtils.sanitizePadId(req);
+    let data;
+    try {
+      data = await links.getPadLinks(padIdReceived);
+    } catch (err) {
+      console.error(err.stack ? err.stack : err.toString());
+      res.json({code: 2, message: 'internal error', data: null});
+      return;
+    }
+    if (data == null) return;
+    res.json({code: 0, data});
+  });
+
+  args.app.post('/pluginfw/hyperlink/:pad', async (req, res) => {
+    const fields = await new Promise((resolve, reject) => {
+      (new formidable.IncomingForm()).parse(req, (err, fields) => {
+        if (err != null) return reject(err);
+        resolve(fields);
+      });
+    });
+
+    // check the api key
+    if (!apiUtils.validateApiKey(fields, res)) return;
+
+    // check required fields from link data
+    if (!apiUtils.validateRequiredFields(fields, ['data'], res)) return;
+
     // sanitize pad id before continuing
     const padIdReceived = apiUtils.sanitizePadId(req);
 
-    links.getPadLinks(padIdReceived, (err, data) => {
-      if (err) {
-        res.json({code: 2, message: 'internal error', data: null});
-      } else {
-        res.json({code: 0, data});
-      }
-    });
-  });
+    // create data to hold link information:
+    let data;
+    try {
+      data = JSON.parse(fields.data);
+    } catch (err) {
+      res.json({code: 1, message: 'data must be a JSON', data: null});
+      return;
+    }
 
-  args.app.post('/pluginfw/hyperlink/:pad', (req, res) => {
-    new formidable.IncomingForm().parse(req, (err, fields, files) => {
-      // check the api key
-      if (!apiUtils.validateApiKey(fields, res)) return;
-
-      // check required fields from link data
-      if (!apiUtils.validateRequiredFields(fields, ['data'], res)) return;
-
-      // sanitize pad id before continuing
-      const padIdReceived = apiUtils.sanitizePadId(req);
-
-      // create data to hold link information:
-      try {
-        const data = JSON.parse(fields.data);
-
-        links.bulkAddPadLinks(padIdReceived, data, (err, linkIds, links) => {
-          if (err) {
-            res.json({code: 2, message: 'internal error', data: null});
-          } else {
-            broadcastLinksAdded(padIdReceived, linkIds, links);
-            res.json({code: 0, linkIds});
-          }
-        });
-      } catch (e) {
-        res.json({code: 1, message: 'data must be a JSON', data: null});
-      }
-    });
+    let linkIds, links;
+    try {
+      [linkIds, links] = await linkManager.bulkAddPadLinks(padIdReceived, data);
+    } catch (err) {
+      console.error(err.stack ? err.stack : err.toString());
+      res.json({code: 2, message: 'internal error', data: null});
+      return;
+    }
+    if (linkIds == null) return;
+    for (let i = 0; i < linkIds.length; i++) {
+      io.to(padIdReceived).emit('pushAddLink', linkIds[i], links[i]);
+    }
+    res.json({code: 0, linkIds});
   });
 
   return callback();
 };
-
-const broadcastLinksAdded = (padId, linkIds, links) => {
-  const socket = clientIO.connect(broadcastUrl);
-
-  const data = {
-    padId,
-    linkIds,
-    links,
-  };
-
-  socket.emit('apiAddLinks', data);
-};
-
-const broadcastUrl = apiUtils.broadcastUrlFor('/link');
 
 module.exports = {
   padRemove,

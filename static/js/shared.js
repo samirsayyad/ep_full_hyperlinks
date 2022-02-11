@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const shared = (() => {
   const collectContentPre = (hook, context) => {
@@ -22,10 +22,7 @@ const shared = (() => {
     return [];
   };
 
-  const generateLinkId = function () {
-    const linkId = `lc-${randomString(16)}`;
-    return linkId;
-  };
+  const generateLinkId = () => `lc-${randomString(16)}`;
 
   return {
     collectContentPre,

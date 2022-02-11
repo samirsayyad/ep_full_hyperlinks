@@ -10,40 +10,43 @@ const {
 	shared
 } = require('../dist/js/ep.full.hyperlinks.mini').moduleList;
 
-const getLinkIdOnFirstPositionSelected = events.getLinkIdOnFirstPositionSelected;
-const hasLinkOnSelection = events.hasLinkOnSelection;
+
+
 const browser = require('ep_etherpad-lite/static/js/browser');
 const cssFiles = ['ep_full_hyperlinks/static/css/link.css', 'ep_full_hyperlinks/static/dist/css/linkIcon.css'];
 
 /** **********************************************************************/
-/*                         ep_links Plugin                           */
+/*                         epLinks Plugin                           */
 /** **********************************************************************/
 
 // Container
-function ep_links(context) {
+function epLinks(context) {
   this.container = null;
   this.padOuter = null;
   this.padInner = null;
   this.ace = context.ace;
 
-  // Required for instances running on weird ports
+	// Required for instances running on weird ports
   // This probably needs some work for instances running on root or not on /p/
   const loc = document.location;
-  const port = loc.port == '' ? (loc.protocol == 'https:' ? 443 : 80) : loc.port;
-  const url = `${loc.protocol}//${loc.hostname}:${port}/` + 'link';
-  this.socket = io.connect(url);
+  const port = loc.port === '' ? (loc.protocol === 'https:' ? 443 : 80) : loc.port;
+  const url = `${loc.protocol}//${loc.hostname}:${port}/link`;
+
+  this.padId = clientVars.padId;
+  this.socket = io.connect(url, {
+    query: `padId=${this.padId}`,
+  });
 
   this.padId = clientVars.padId;
   this.links = [];
   this.mapFakeLinks = [];
   this.mapOriginalLinksId = [];
-  this.shouldCollectLink = false;
   this.init();
   this.preLinkMarker = preLinkMark.init(this.ace);
 }
 
 // Init Etherpad plugin link pads
-ep_links.prototype.init = function () {
+epLinks.prototype.init = async function () {
   const self = this;
   const ace = this.ace;
 
@@ -51,26 +54,26 @@ ep_links.prototype.init = function () {
   this.findContainers();
   this.insertContainers(); // Insert link containers in sidebar
 
+	const links = await this.getLinks();
+  if (!$.isEmptyObject(links)) {
+    this.setLinks(links);
+  }
 
-  // Get all links
-  this.getLinks((links) => {
-    if (!$.isEmptyObject(links)) {
-      self.setLinks(links);
-    }
-  });
+	this.linkListen();
 
   // Init add push event
   this.pushLink('add', (linkId, link) => {
-    self.setLink(linkId, link);
+    this.setLink(linkId, link);
   });
+
 
   // On click link icon toolbar
   $('.addLink').on('click', (e) => {
     e.preventDefault(); // stops focus from being lost
-    self.displayNewLinkForm();
+    this.displayNewLinkForm();
   });
 
-	const submitEditeLink = function(e) {
+	const submitEditeLink = async function(e) {
 		e.preventDefault();
     e.stopPropagation();
     const $linkBox = $(this).closest('.link-container');
@@ -113,21 +116,31 @@ ep_links.prototype.init = function () {
     data.linkText = linkText;
     data.oldLinkText = oldLinkText;
     data.hyperlink = hyperlink;
-    self.socket.emit('updateLinkText', data, (err) => {
-      if (!err) {
-        $linkBox.removeClass('editing');
-        self.updateLinkBoxText(linkId, linkText, hyperlink);
-        linkBoxes.hideLink(linkId);
 
-        // reverting modal to show because we change it to edit mode
-        self.padOuter.find(`#show-form-${linkId}`).show();
-        self.padOuter.find(`#edit-form-${linkId}`).hide();
-        $linkBox.attr({'data-loaded': false});
-        // although the link was saved on the data base successfully, it needs
-        // to update the link variable with the new text saved
-        self.setLinkNewText(linkId, linkText, hyperlink);
-      }
-    });
+		try {
+      await self._send('updateLinkText', data);
+    } catch (err) {
+      if (err.message !== 'unauth') throw err; // Let the uncaught error handler handle it.
+      $.gritter.add({
+        title: 'Error',
+        text: 'You cannot edit other users links!',
+        class_name: 'error',
+      });
+      return;
+    }
+	
+		$linkBox.removeClass('editing');
+		self.updateLinkBoxText(linkId, linkText, hyperlink);
+		linkBoxes.hideLink(linkId);
+
+		// reverting modal to show because we change it to edit mode
+		self.padOuter.find(`#show-form-${linkId}`).show();
+		self.padOuter.find(`#edit-form-${linkId}`).hide();
+		$linkBox.attr({'data-loaded': false});
+		// although the link was saved on the data base successfully, it needs
+		// to update the link variable with the new text saved
+		self.setLinkNewText(linkId, linkText, hyperlink);
+  
 	}
 
   // submit the edition on the text and update the link text
@@ -163,7 +176,7 @@ ep_links.prototype.init = function () {
     linkBoxes.hideLink(linkId);
   });
 
-  this.container.parent().on('click', '.ep_hyperlink_docs_bubble_button_delete', function () {
+  this.container.parent().on('click', '.ep_hyperlink_docs_bubble_button_delete', async function () {
     const linkId = $(this).closest('.link-container')[0].id;
     self.deleteLink(linkId);
     const padOuter = $('iframe[name="ace_outer"]').contents();
@@ -184,7 +197,22 @@ ep_links.prototype.init = function () {
       });
     }, 'deleteLinkedSelection', true);
     // dispatch event
-    self.socket.emit('deleteLink', {padId: self.padId, linkId}, () => {});
+		try {
+      await self._send('deleteLink', {
+        padId: self.padId,
+        linkId,
+        authorId: clientVars.userId,
+      });
+    } catch (err) {
+      if (err.message !== 'unauth') throw err; // Let the uncaught error handler handle it.
+      $.gritter.add({
+        title: 'Error',
+        text: 'You cannot delete other users links!',
+        class_name: 'error',
+      });
+      return;
+    }
+
   });
 
 	let hideLinkTimer;
@@ -274,8 +302,28 @@ ep_links.prototype.init = function () {
   }
 };
 
+
+epLinks.prototype.linkListen = function () {
+  const socket = this.socket;
+  socket.on('pushAddLinkInBulk', async () => {
+    const allLinks = await this.getLinks();
+    if (!$.isEmptyObject(allLinks)) {
+      // we get the Links in this format {c-123:{author:...}, c-124:{author:...}}
+      // but it's expected to be {c-123: {data: {author:...}}, c-124:{data:{author:...}}}
+      // in this.Links
+
+      const LinksProcessed = {};
+      _.map(allLinks, (link, linkId) => {
+        LinksProcessed[linkId] = {};
+        LinksProcessed[linkId].data = link;
+      });
+      this.Links = LinksProcessed;
+    }
+  });
+};
+
 // Insert links container on element use for linenumbers
-ep_links.prototype.findContainers = function () {
+epLinks.prototype.findContainers = function () {
   const padOuter = $('iframe[name="ace_outer"]').contents();
   this.padOuter = padOuter;
   this.padInner = padOuter.find('iframe[name="ace_inner"]');
@@ -283,7 +331,7 @@ ep_links.prototype.findContainers = function () {
 };
 
 // set the text of the link
-ep_links.prototype.setLinkNewText = function (linkId, text, hyperlink) {
+epLinks.prototype.setLinkNewText = function (linkId, text, hyperlink) {
   if (this.links[linkId]) {
     this.links[linkId].data.text = text;
     this.links[linkId].data.hyperlink = hyperlink;
@@ -293,7 +341,7 @@ ep_links.prototype.setLinkNewText = function (linkId, text, hyperlink) {
   }
 };
 
-ep_links.prototype.addListenersToCloseOpenedLink = function () {
+epLinks.prototype.addListenersToCloseOpenedLink = function () {
   const self = this;
 
   // we need to add listeners to the different iframes of the page
@@ -309,7 +357,7 @@ ep_links.prototype.addListenersToCloseOpenedLink = function () {
 };
 
 // Close link that is opened
-ep_links.prototype.closeOpenedLink = function (e) {
+epLinks.prototype.closeOpenedLink = function (e) {
   // var linkId = this.linkIdOf(e);
   // linkBoxes.hideLink(linkId);
   // it was using like above but I decide check hideAllLink
@@ -317,7 +365,7 @@ ep_links.prototype.closeOpenedLink = function (e) {
 };
 
 // Close link if event target was outside of link or on a link icon
-ep_links.prototype.closeOpenedLinkIfNotOnSelectedElements = function (e) {
+epLinks.prototype.closeOpenedLinkIfNotOnSelectedElements = function (e) {
 	// Don't do anything if clicked on the allowed elements:
   // any of the link icons
   if (linkBoxes.shouldNotCloseLink(e)) { // a link box or the link modal
@@ -327,7 +375,7 @@ ep_links.prototype.closeOpenedLinkIfNotOnSelectedElements = function (e) {
   this.closeOpenedLink(e);
 };
 
-ep_links.prototype.linkIdOf = function (e) {
+epLinks.prototype.linkIdOf = function (e) {
   const cls = e.currentTarget.classList;
   const classLinkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
 
@@ -335,7 +383,7 @@ ep_links.prototype.linkIdOf = function (e) {
 };
 
 // Insert link container in sidebar
-ep_links.prototype.insertContainers = function () {
+epLinks.prototype.insertContainers = function () {
   const linkBoxWrapper = $('iframe[name="ace_outer"]').contents()
 		.find('#outerdocbody')
 		.prepend('<div id="linkBoxWrapper"></div>');
@@ -344,14 +392,14 @@ ep_links.prototype.insertContainers = function () {
 };
 
 // Set links content data
-ep_links.prototype.setLinks = function (links) {
+epLinks.prototype.setLinks = function (links) {
   for (const linkId in links) {
     this.setLink(linkId, links[linkId]);
   }
 };
 
 // Set link data
-ep_links.prototype.setLink = function (linkId, link) {
+epLinks.prototype.setLink = function (linkId, link) {
   const links = this.links;
   // link.date = timeFormat.prettyDate(link.timestamp);
   link.formattedDate = new Date(link.timestamp).toISOString();
@@ -361,22 +409,18 @@ ep_links.prototype.setLink = function (linkId, link) {
 };
 
 // set the text of the link
-ep_links.prototype.setLinkNewText = function (linkId, text, hyperlink) {
+epLinks.prototype.setLinkNewText = function (linkId, text, hyperlink) {
   if (!this.links[linkId]) return
 	this.links[linkId].data.text = text;
 	this.links[linkId].data.hyperlink = hyperlink;
 };
 
 // Get all links
-ep_links.prototype.getLinks = function (callback) {
-  const req = {padId: this.padId};
-
-  this.socket.emit('getLinks', req, (res) => {
-    callback(res.links);
-  });
+epLinks.prototype.getLinks = async function () {
+  return (await this._send('getLinks', {padId: this.padId})).links;
 };
 
-ep_links.prototype.getLinkData = function () {
+epLinks.prototype.getLinkData = function () {
   const data = {};
 
   // Insert link data
@@ -395,12 +439,12 @@ ep_links.prototype.getLinkData = function () {
 };
 
 // Delete a pad link
-ep_links.prototype.deleteLink = function (linkId) {
+epLinks.prototype.deleteLink = function (linkId) {
   $('iframe[name="ace_outer"]').contents().find(`#${linkId}`).remove();
 };
 
 // start modal of new link
-ep_links.prototype.displayNewLinkForm = function () {
+epLinks.prototype.displayNewLinkForm = function () {
   const self = this;
   const rep = {};
   const ace = this.ace;
@@ -438,7 +482,7 @@ ep_links.prototype.displayNewLinkForm = function () {
   $('#newLink').find('#hyperlink-text-hidden').val(selectedText);
 };
 
-ep_links.prototype.scrollViewportIfSelectedTextIsNotVisible = function ($firstSelectedElement) {
+epLinks.prototype.scrollViewportIfSelectedTextIsNotVisible = function ($firstSelectedElement) {
   // Set the top of the form to be the same Y as the target Rep
   const y = $firstSelectedElement.offsetTop;
   const padOuter = $('iframe[name="ace_outer"]').contents();
@@ -446,7 +490,7 @@ ep_links.prototype.scrollViewportIfSelectedTextIsNotVisible = function ($firstSe
   padOuter.find('#outerdocbody').parent().scrollTop(y); // Works in Firefox
 };
 
-ep_links.prototype.isElementInViewport = function (element) {
+epLinks.prototype.isElementInViewport = function (element) {
   const elementPosition = element.getBoundingClientRect();
   const scrollTopFirefox = $('iframe[name="ace_outer"]').contents().find('#outerdocbody').parent().scrollTop(); // works only on firefox
   const scrolltop = $('iframe[name="ace_outer"]').contents().find('#outerdocbody').scrollTop() || scrollTopFirefox;
@@ -466,12 +510,12 @@ ep_links.prototype.isElementInViewport = function (element) {
   return !(elementAboveViewportTop || elementBelowViewportBottom);
 };
 
-ep_links.prototype.getIntValueOfCSSProperty = function ($element, property) {
+epLinks.prototype.getIntValueOfCSSProperty = function ($element, property) {
   const valueString = $element.css(property);
   return parseInt(valueString) || 0;
 };
 
-ep_links.prototype.getFirstElementSelected = function () {
+epLinks.prototype.getFirstElementSelected = function () {
   let element;
 
   this.ace.callWithAce((ace) => {
@@ -487,14 +531,14 @@ ep_links.prototype.getFirstElementSelected = function () {
 };
 
 // Indicates if user selected some text on editor
-ep_links.prototype.checkNoTextSelected = function (rep) {
+epLinks.prototype.checkNoTextSelected = function (rep) {
   const noTextSelected = ((rep.selStart[0] == rep.selEnd[0]) && (rep.selStart[1] == rep.selEnd[1]));
 
   return noTextSelected;
 };
 
 // Create form to add link
-ep_links.prototype.createNewLinkFormIfDontExist = function (rep) {
+epLinks.prototype.createNewLinkFormIfDontExist = function (rep) {
   const data = this.getLinkData();
   const self = this;
 
@@ -508,7 +552,7 @@ ep_links.prototype.createNewLinkFormIfDontExist = function (rep) {
 };
 
 // Get a string representation of the text selected on the editor
-ep_links.prototype.getSelectedText = function (rep) {
+epLinks.prototype.getSelectedText = function (rep) {
   const self = this;
   const firstLine = rep.selStart[0];
   const lastLine = self.getLastLine(firstLine, rep);
@@ -554,7 +598,7 @@ ep_links.prototype.getSelectedText = function (rep) {
   return selectedText;
 };
 
-ep_links.prototype.getLastLine = function (firstLine, rep) {
+epLinks.prototype.getLastLine = function (firstLine, rep) {
   let lastLineSelected = rep.selEnd[0];
 
   if (lastLineSelected > firstLine) {
@@ -566,7 +610,7 @@ ep_links.prototype.getLastLine = function (firstLine, rep) {
   return lastLineSelected;
 };
 
-ep_links.prototype.lastLineSelectedIsEmpty = function (rep, lastLineSelected) {
+epLinks.prototype.lastLineSelectedIsEmpty = function (rep, lastLineSelected) {
   const line = rep.lines.atIndex(lastLineSelected);
   // when we've a line with line attribute, the first char line position
   // in a line is 1 because of the *, otherwise is 0
@@ -576,11 +620,11 @@ ep_links.prototype.lastLineSelectedIsEmpty = function (rep, lastLineSelected) {
   return lastColumnSelected === firstCharLinePosition;
 };
 
-ep_links.prototype.lineHasMarker = function (line) {
+epLinks.prototype.lineHasMarker = function (line) {
   return line.lineMarker === 1;
 };
 
-ep_links.prototype.cleanLine = function (line, lineText) {
+epLinks.prototype.cleanLine = function (line, lineText) {
   const hasALineMarker = this.lineHasMarker(line);
   if (hasALineMarker) {
     lineText = lineText.substring(1);
@@ -589,45 +633,40 @@ ep_links.prototype.cleanLine = function (line, lineText) {
 };
 
 // Save link
-ep_links.prototype.saveLink = function (data, rep) {
-  const self = this;
-  self.socket.emit('addLink', data, (linkId, link) => {
-    link.linkId = linkId;
-    self.ace.callWithAce((ace) => {
-      if (data.link.text !== data.link.oldText) {
-        ace.ace_replaceRange(rep.selStart, rep.selEnd, data.link.text);
-        if (data.link.oldText.length > data.link.text.length) {
-          rep.selEnd[1] -= data.link.oldText.length - data.link.text.length;
-        } else if (data.link.oldText.length < data.link.text.length) {
-          rep.selEnd[1] += data.link.text.length - data.link.oldText.length;
-        }
-      }
-      ace.ace_performSelectionChange(rep.selStart, rep.selEnd, true);
-      ace.ace_setAttributeOnSelection('link', linkId);
-    }, 'insertLink', true);
+epLinks.prototype.saveLink = async function (data, rep) {
+  const res = await this._send('addLink', data);
+  if (res == null) return;
+  const [linkId, link] = res;
+  link.linkId = linkId;
 
-    self.setLink(linkId, link);
-  });
+  this.ace.callWithAce((ace) => {
+    // we should get rep again because the document might have changed..
+    rep = ace.ace_getRep();
+    ace.ace_performSelectionChange(rep.selStart, rep.selEnd, true);
+    ace.ace_setAttributeOnSelection('link', linkId);
+  }, 'insertLink', true);
+
+  this.setLink(linkId, link);
 };
 
-// linkData = {c-newLinkId123: data:{author:..., date:..., ...}, c-newLinkId124: data:{...}}
-ep_links.prototype.saveLinkWithoutSelection = function (padId, linkData) {
-  const self = this;
-  const data = self.buildLinks(linkData);
-  self.socket.emit('bulkAddLink', padId, data, (links) => {
-    self.setLinks(links);
-    self.shouldCollectLink = true;
-  });
+
+// linkData = {c-newlinkId123: data:{author:..., date:..., ...},
+//                c-newlinkId124: data:{...}}
+epLinks.prototype.saveLinkWithoutSelection = async function (padId, linkData) {
+	const data = this.buildLinks(linkData);
+  const links = await this._send('bulkAddLink', padId, data);
+  this.setLinks(links);
 };
 
-ep_links.prototype.buildLinks = function (linksData) {
-  const self = this;
-  const links = _.map(linksData, (linkData, linkId) => self.buildLink(linkId, linkData.data));
+epLinks.prototype.buildLinks = function (linksData) {
+  const links =
+    _.map(linksData, (linkData, linkId) => this.buildLink(linkId, linkData.data));
   return links;
 };
 
+
 // linkData = {c-newLinkId123: data:{author:..., date:..., ...}, ...
-ep_links.prototype.buildLink = function (linkId, linkData) {
+epLinks.prototype.buildLink = function (linkId, linkData) {
   const data = {};
   data.padId = this.padId;
   data.linkId = linkId;
@@ -641,19 +680,29 @@ ep_links.prototype.buildLink = function (linkId, linkData) {
   return data;
 };
 
-ep_links.prototype.getMapfakeLinks = function () {
+
+epLinks.prototype._send = async function (type, ...args) {
+  return await new Promise((resolve, reject) => {
+    this.socket.emit(type, ...args, (errj, val) => {
+      if (errj != null) return reject(Object.assign(new Error(errj.message), {name: errj.name}));
+      resolve(val);
+    });
+  });
+};
+
+epLinks.prototype.getMapfakeLinks = function () {
   return this.mapFakeLinks;
 };
 
-ep_links.prototype.findLinkText = function ($linkBox) {
+epLinks.prototype.findLinkText = function ($linkBox) {
   return $linkBox.find('.compact-display-content .link-text-text, .full-display-link .link-title-wrapper .link-text-text');
 };
 
-ep_links.prototype.findHyperLinkText = function ($linkBox) {
+epLinks.prototype.findHyperLinkText = function ($linkBox) {
   return $linkBox.find('.compact-display-content .link-text-hyperlink, .full-display-link .link-title-wrapper .link-text-hyperlink');
 };
 
-ep_links.prototype.updateLinkBoxText = function (linkId, linkText, hyperlink) {
+epLinks.prototype.updateLinkBoxText = function (linkId, linkText, hyperlink) {
   const $link = this.container.parent().find(`[data-linkid='${linkId}']`);
   $link.attr('data-hyperlink', hyperlink);
 
@@ -666,7 +715,7 @@ ep_links.prototype.updateLinkBoxText = function (linkId, linkText, hyperlink) {
   linkBox.val(hyperlink);
 };
 
-ep_links.prototype.showChangeAsAccepted = function (linkId) {
+epLinks.prototype.showChangeAsAccepted = function (linkId) {
   const self = this;
 
   // Get the link
@@ -677,14 +726,19 @@ ep_links.prototype.showChangeAsAccepted = function (linkId) {
       .each(function () {
         $(this).removeClass('change-accepted');
         const data = {linkId: $(this).attr('data-linkid'), padId: self.padId};
-        self.socket.emit('revertChange', data, () => {});
+        self._send('revertChange', data);
       });
 
   // this link get accepted
   link.addClass('change-accepted');
 };
 
-ep_links.prototype.showChangeAsReverted = function (linkId) {
+
+
+
+
+
+epLinks.prototype.showChangeAsReverted = function (linkId) {
   const self = this;
   // Get the link
   const link = self.container.parent().find(`[data-linkid='${linkId}']`);
@@ -692,7 +746,7 @@ ep_links.prototype.showChangeAsReverted = function (linkId) {
 };
 
 // Push link from collaborators
-ep_links.prototype.pushLink = function (eventType, callback) {
+epLinks.prototype.pushLink = function (eventType, callback) {
   const socket = this.socket;
   const self = this;
 
@@ -729,7 +783,7 @@ var hooks = {
   // Init pad links
   postAceInit: (hook, context) => {
     if (!pad.plugins) pad.plugins = {};
-    const Links = new ep_links(context);
+    const Links = new epLinks(context);
     pad.plugins.ep_full_hyperlinks = Links;
 
     if (!$('#editorcontainerbox').hasClass('flex-layout')) {
@@ -868,8 +922,6 @@ function getRepFromSelector(selector, container) {
 exports.aceInitialized = function (hook, context) {
   const editorInfo = context.editorInfo;
   editorInfo.ace_getRepFromSelector = _(getRepFromSelector).bind(context);
-  editorInfo.ace_getLinkIdOnFirstPositionSelected = _(getLinkIdOnFirstPositionSelected).bind(context);
-  editorInfo.ace_hasLinkOnSelection = _(hasLinkOnSelection).bind(context);
 };
 
 exports.acePostWriteDomLineHTML = function (name, context) {

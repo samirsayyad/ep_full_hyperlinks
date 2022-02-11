@@ -18,7 +18,7 @@ const newLink = (() => {
   const cancelNewLink = () => hideNewLinkPopup();
 
   // Callback for new link Submit
-  const submitNewLink = function (callback) {
+  const submitNewLink = (callback) => {
     const index = 0;
     const form = $(document).find('#newLink');
     const link = buildLinkFrom(form);
@@ -48,10 +48,10 @@ const newLink = (() => {
     // Create btn // link-create-btn
     $('#newLink #link-create-btn').on('click', (e) => submitNewLink(callback));
 
-		$(document).on('submit', 'form.link-edit-form', function(e){
-			e.preventDefault();
-			submitNewLink(callback)
-		})
+    $(document).on('submit', 'form.link-edit-form', (e) => {
+      e.preventDefault();
+      submitNewLink(callback);
+    });
 
     return newLinkPopup;
   };
@@ -71,7 +71,7 @@ const newLink = (() => {
     pad.plugins.ep_full_hyperlinks.preLinkMarker.markSelectedText();
 
     // focus on hyperlink input
-		setTimeout(() => $('#newLink #hyperlink-url').focus().select(), 500);
+    setTimeout(() => $('#newLink #hyperlink-url').focus().select(), 500);
   };
 
   const hideNewLinkPopup = () => {
