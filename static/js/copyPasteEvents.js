@@ -6,21 +6,25 @@ const events = (() => {
     const selectedElements = document.createElement('div');
 
     selectedElements.append(selection.cloneContents());
+		try {
+			selectedElements.querySelectorAll('.link').forEach((el) => {
+				const cls = el.getAttribute('class');
+				const classLinkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
+				const lindId = classLinkId[1];
+	
+				// create a tag
+				const link = document.createElement('a');
+				link.innerHTML = el.innerHTML;
+				link.setAttribute('href', links[lindId].data.hyperlink);
+	
+				// replace the current node with href node
+				const span = selectedElements.querySelector(`.${lindId}`);
+				span.replaceWith(link);
+			});
+		} catch (error) {
+			console.error('[ep_full_hyperlinks]: copy data has an error', error)
+		}
 
-    selectedElements.querySelectorAll('.link').forEach((el) => {
-      const cls = el.getAttribute('class');
-      const classLinkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
-      const lindId = classLinkId[1];
-
-      // create a tag
-      const link = document.createElement('a');
-      link.innerHTML = el.innerHTML;
-      link.setAttribute('href', links[lindId].data.hyperlink);
-
-      // replace the current node with href node
-      const span = selectedElements.querySelector(`.${lindId}`);
-      span.replaceWith(link);
-    });
 
     return selectedElements;
   };

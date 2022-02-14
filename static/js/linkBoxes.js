@@ -63,7 +63,7 @@ const linkBoxes = (() => {
 			newT = `${windowHeight - modalHeight}px`;
 		} 
 
-		linkModal.css({ left: newL, top: `${parseInt(newT) + 50}px`  });
+		linkModal.css({ left: newL, top: `${parseInt(newT) + 35}px`  });
 	}
 
 
