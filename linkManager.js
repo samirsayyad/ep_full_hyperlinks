@@ -126,11 +126,11 @@ exports.changeLinkData = async (data) => {
     logger.debug(`ignoring attempt to edit non-existent link ${linkId}`);
     throw new Error('no_such_link');
   }
-  if (links[linkId].author !== authorId) {
-    logger.debug(`author ${authorId} attempted to edit link ${linkId} ` +
-                 `belonging to author ${links[linkId].author}`);
-    throw new Error('unauth');
-  }
+  // if (links[linkId].author !== authorId) {
+  //   logger.debug(`author ${authorId} attempted to edit link ${linkId} ` +
+  //                `belonging to author ${links[linkId].author}`);
+  //   throw new Error('unauth');
+  // }
   // update the link text
   links[linkId].text = linkText;
   links[data.linkId].hyperlink = hyperlink;
