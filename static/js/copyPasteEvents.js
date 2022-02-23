@@ -6,24 +6,32 @@ const events = (() => {
     const selectedElements = document.createElement('div');
 
     selectedElements.append(selection.cloneContents());
-		try {
-			selectedElements.querySelectorAll('.link').forEach((el) => {
-				const cls = el.getAttribute('class');
-				const classLinkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
-				const lindId = classLinkId[1];
-	
-				// create a tag
-				const link = document.createElement('a');
-				link.innerHTML = el.innerHTML;
-				link.setAttribute('href', links[lindId].data.hyperlink);
-	
-				// replace the current node with href node
-				const span = selectedElements.querySelector(`.${lindId}`);
-				span.replaceWith(link);
-			});
-		} catch (error) {
-			console.error('[ep_full_hyperlinks]: copy data has an error', error)
-		}
+    try {
+      selectedElements.querySelectorAll('.link').forEach((el) => {
+        const cls = el.getAttribute('class');
+        const classLinkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
+        const lindId = classLinkId[1];
+
+        let newTag;
+
+        if (!links[lindId]) {
+          newTag = document.createElement('span');
+          newTag.innerHTML = el.innerHTML;
+        } else {
+        // create a tag
+          newTag = document.createElement('a');
+          newTag.innerHTML = el.innerHTML;
+          newTag.setAttribute('href', links[lindId].data.hyperlink);
+        }
+
+
+        // replace the current node with href node
+        const span = selectedElements.querySelector(`.${lindId}`);
+        span.replaceWith(newTag);
+      });
+    } catch (error) {
+      console.error('[ep_full_hyperlinks]: copy data has an error', error);
+    }
 
 
     return selectedElements;
@@ -66,8 +74,7 @@ const events = (() => {
     if (!pastedDataHtml) {
       const test = new RegExp('([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?').test(pastedData);
       if (test) {
-        const expression =
-					/(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/gi;
+        const expression = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/gi;
         const matches = pastedData.match(expression);
         const allLinks = {};
         if (matches) {
