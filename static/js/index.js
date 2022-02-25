@@ -10,8 +10,6 @@ const {
 	shared
 } = require('../dist/js/ep.full.hyperlinks.mini').moduleList;
 
-
-
 const browser = require('ep_etherpad-lite/static/js/browser');
 const cssFiles = ['ep_full_hyperlinks/static/css/link.css', 'ep_full_hyperlinks/static/dist/css/linkIcon.css'];
 
@@ -140,7 +138,6 @@ epLinks.prototype.init = async function () {
 		// although the link was saved on the data base successfully, it needs
 		// to update the link variable with the new text saved
 		self.setLinkNewText(linkId, linkText, hyperlink);
-  
 	}
 
   // submit the edition on the text and update the link text
@@ -279,29 +276,19 @@ epLinks.prototype.init = async function () {
   // Check to see if we should show already..
   $('#options-links').trigger('change');
 
-  // TODO - Implement to others browser like, Microsoft Edge, Opera, IE
-  // Override  copy, cut, paste events on Google chrome and Mozilla Firefox.
-  // When an user copies a link and selects only the span, or part of it, Google chrome
-  // does not copy the classes only the styles, for example:
-  // <link class='link'><span>text to be copied</span></link>
-  // As the link classes are not only used for styling we have to add these classes when it pastes the content
-  // The same does not occur when the user selects more than the span, for example:
-  // text<link class='link'><span>to be copied</span></link>
-  if (browser.chrome || browser.firefox) {
-    self.padInner.contents().on('copy', (e) => {
-      events.addTextOnClipboard(e, self.ace, self.padInner, false, self.links);
-    });
 
-    self.padInner.contents().on('cut', (e) => {
-      events.addTextOnClipboard(e, self.ace, self.padInner, true, self.links);
-    });
+	self.padInner.contents().on('copy', (e) => {
+		events.addTextOnClipboard(e, self.padInner, false, self.links);
+	});
 
-    self.padInner.contents().on('paste', (e) => {
-      events.saveLinks(e,self.padInner);
-    });
-  }
+	self.padInner.contents().on('cut', (e) => {
+		events.addTextOnClipboard(e, self.padInner, true, self.links);
+	});
+
+	self.padInner.contents().on('paste', (e) => {
+		events.saveLinks(e,self.padInner);
+	});
 };
-
 
 epLinks.prototype.linkListen = function () {
   const socket = this.socket;
