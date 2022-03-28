@@ -57,8 +57,11 @@ const newLink = (() => {
   };
 
   const showNewLinkPopup = () => {
-    // position below link icon
-    $('#newLink').css('left', $('.toolbar .addLink').offset().left);
+    if (!$('body').hasClass('mobileView')) {
+      // position below link icon
+      $('#newLink').css('left', $('.toolbar .addLink').offset().left);
+    }
+
 
     // Reset form to make sure it is all clear
     $('#newLink').find('textarea').val('');

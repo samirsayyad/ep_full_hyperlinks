@@ -1,2 +1,837 @@
-exports.moduleList=(()=>{const e=require("ep_etherpad-lite/static/js/pad_utils").randomString,t=(require("ep_etherpad-lite/static/js/underscore"),function(){"use strict";const e=function(e){return e.match(/(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?/)};function t(t){if(!t)return;if(/[^a-z0-9\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\.\-\_\~\%]/i.test(t))return;if(/%[^0-9a-f]/i.test(t))return;if(/%[0-9a-f](:?[^0-9a-f]|$)/i.test(t))return;let n=[],i="",r="",l="",a="",o="",s="";if(n=e(t),i=n[1],r=n[2],l=n[3],a=n[4],o=n[5],i&&i.length&&l.length>=0){if(r&&r.length){if(0!==l.length&&!/^\//.test(l))return}else if(/^\/\//.test(l))return;if(/^[a-z][a-z0-9\+\-\.]*$/.test(i.toLowerCase()))return s+=i+":",r&&r.length&&(s+="//"+r),s+=l,a&&a.length&&(s+="?"+a),o&&o.length&&(s+="#"+o),s}}function n(n,i){if(!t(n))return;let r=[],l="",a="",o="",s="",c="",d="",p="";if(r=e(n),l=r[1],a=r[2],o=r[3],c=r[4],d=r[5],l){if(i){if("https"!=l.toLowerCase())return}else if("http"!=l.toLowerCase())return;if(a)return/:(\d+)$/.test(a)&&(s=a.match(/:(\d+)$/)[0],a=a.replace(/:\d+$/,"")),p+=l+":",p+="//"+a,s&&(p+=s),p+=o,c&&c.length&&(p+="?"+c),d&&d.length&&(p+="#"+d),p}}function i(e){return n(e,!0)}function r(e){return n(e)||i(e)}return{is_uri:t,is_http_uri:n,is_https_uri:i,is_web_uri:r,isUri:t,isHttpUri:n,isHttpsUri:i,isWebUri:r}}()),n={addTextOnClipboard:(e,t,n,i)=>{e.preventDefault();const r=((e,t)=>{const n=e[0].contentWindow.getSelection().getRangeAt(0),i=document.createElement("div");i.append(n.cloneContents());try{i.querySelectorAll(".link").forEach(e=>{const n=e.getAttribute("class"),r=/(?:^| )(lc-[A-Za-z0-9]*)/.exec(n)[1];let l;t[r]?(l=document.createElement("a"),l.innerHTML=e.innerHTML,l.setAttribute("href",t[r].data.hyperlink)):(l=document.createElement("span"),l.innerHTML=e.innerHTML),i.querySelector("."+r).replaceWith(l)})}catch(e){console.error("[ep_full_hyperlinks]: copy data has an error",e)}return i})(t,i);e.originalEvent.clipboardData.setData("text/html",r.outerHTML),n&&t.contents()[0].execCommand("delete")},saveLinks:(e,t)=>{((e,t)=>{const n=e.originalEvent.clipboardData.getData("text/html");if(!t.contents()[0].getSelection().getRangeAt(0))return!1;e.preventDefault();const i=document.createElement("div");i.innerHTML=n;const r=i.getElementsByTagName("a"),l={};for(const e of r){const t=e.href,n=e.innerHTML,i=a.generateLinkId();e.className=i,e.id=i,l[i]={data:{author:"empty",linkId:i,timestamp:(new Date).getTime(),text:n,originalLinkId:i,hyperlink:t,headerId:null,date:new Date,formattedDate:new Date}}}pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(clientVars.padId,l),t.contents()[0].execCommand("insertHTML",!1,$("<div>").append($(i).clone()).html())})(e,t)}},i=(()=>{let e;const n=()=>e=e||$('iframe[name="ace_outer"]').contents(),r=()=>n().find("#linkBoxWrapper"),l=()=>r().find(".link-container").hide(),a=(e,t,n)=>{const i=(e=>{let t=0,n=0;return e||(e=window.event),e.pageX||e.pageY?(t=e.pageX,n=e.pageY):(e.clientX||e.clientY)&&(t=e.clientX+document.body.scrollLeft+document.documentElement.scrollLeft,n=e.clientY+document.body.scrollTop+document.documentElement.scrollTop),{x:t,y:n}})(e);clickCoordsX=i.x,clickCoordsY=i.y;const r=t.innerWidth(),l=t.innerHeight();windowWidth=n.innerWidth(),windowHeight=n.innerHeight();let a=e.clientX+n.offset().left+"px",o=clickCoordsY+"px";windowWidth-clickCoordsX<r&&(a=windowWidth-r+"px"),windowHeight-clickCoordsY<l&&(o=windowHeight-l+"px"),t.css({left:a,top:parseInt(o)+35+"px"})};return{showLink:e=>r().find("#"+e).show(),hideLink:t=>{r().find("#"+t).hide(),e.find("#show-form-"+t).show(),e.find("#edit-form-"+t).hide()},hideAllLinks:l,showLinkModal:(e,o,s)=>{const c=$('iframe[name="ace_outer"]').contents(),d=n().find('iframe[name="ace_inner"]'),p=o.linkId,h=0!==r().find("#"+p).length;if(l(),!o.hyperlink)return console.error("[hyperlink]: link does not exist",o),!1;let u=r().find("#"+p);h||(u=$("#linkBoxTemplate").tmpl({...o}));const k=u.attr("data-loaded");h?(u.show(),o.hyperlink!==u.find("a.ep_hyperlink_title").attr("href")&&u.attr("data-loaded","false"),u.attr("data-hyperlink",o.hyperlink),u.find("input#hyperlink-url").val(o.hyperlink),u.find("a.ep_hyperlink_title").attr({title:o.hyperlink,href:o.hyperlink})):c.find("#linkBoxWrapper").append(u);const f=d.contents().find("."+p).text();if(u.find("input#hyperlink-text-hidden").val(f),u.find("input#hyperlink-text").val(f),"true"!=k){let e,n=o.hyperlink||u.attr("data-hyperlink");try{e=new URL(n)}catch(e){return console.error("[hyperlink]: "+e),void i.hideLink(p)}const r=u.find("#ep_hyperlink_img"),l=u.find("a.ep_hyperlink_title"),a=u.find("#card_loading_hyperlink"),c=u.find("#ep_hyperlink_description");c.text(""),l.text(n),r.hide(),l.show(),a.show(),/^http:\/\//.test(n)||/^https:\/\//.test(n)||(n="https://"+n);const d=function(e,t,n){r.attr("src",n),r.on("load",()=>{a.fadeOut(500,()=>{r.fadeIn(),l.text(t.replace(/^(?:https?:\/\/)?(?:www\.)?/i,"")),c.text(e.replace(/^(?:https?:\/\/)?(?:www\.)?/i,"")),u.attr({"data-loaded":!0})})})};if(!t.isUri(n)){return d(n,n,"../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png"),!1}const h=function(t){if(t.metadata.image&&t.metadata.title)d(n,t.metadata.title,t.metadata.image);else{var i="https://"+e.hostname;!0!==t.last?s.emit("metaResolver",{padId:clientVars.padId,editedHyperlink:i,last:!0},h):d(n,t.metadata.title||n,"../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png")}};switch(e.hostname){case"twitter.com":d(n,n,"../static/plugins/ep_full_hyperlinks/static/dist/img/twitter.png");break;default:s.emit("metaResolver",{padId:clientVars.padId,hyperlink:n,last:!1},h)}}a(e,u,d),u.addClass("hyperlink-display")},getLinksContainer:r,shouldNotCloseLink:function(e){return!!($(e.target).closest(".link").length||$(e.target).closest(".link-modal").length||$(e.target).closest(".ep_hyperlink_docs_bubble_button_edit").length||$(e.target).closest(".ep_hyperlink_docs_bubble_button_delete").length||$(e.target).closest(".ep_hyperlink_docs_bubble_button_copy").length||$(e.target).closest(".full-display-link").length||$(e.target).closest(".link-title-wrapper").length||$(e.target).closest(".link-edit-form").length||$(e.target).closest(".link-text-text").length||$(e.target).closest(".link-text-hyperlink").length)},internalLinkClick:function(e){e.preventDefault(),e.stopPropagation();const t=$(this).attr("href");if((e=>{const t=new URL(e);let n=!1;if(t.origin!==location.origin)return!1;if(t.origin===location.origin){const e=location.pathname.split("/").indexOf("p")>0,t=clientVars.padId,i=e?"/p/"+t:"/"+t;location.pathname.substring(0,i.length)===i&&(n=!0),clientVars.ep_singlePad.active&&(n=!0)}return n})(t)){const e=new URL(t);let n=""+e.search;const i=(e=>{const t=[],n=clientVars.padId,i=e.pathname.split("/");let r=i.indexOf(n)+1;clientVars.ep_singlePad.active&&(r=0);const l=[...i].splice(r,i.length-1);return t.push(...l),t})(e);if(i.length>0){n=location.pathname.split("/").indexOf("p")>0?"/p":"",clientVars.ep_singlePad.active||(n+="/"+clientVars.padId),n+=`/${i.join("/")}${e.search}`}0===e.search.length&&(n=t);const r=i.length>0?"filter":"other";window.history.pushState({type:"hyperLink",href:t,target:r},document.title,n),l()}else window.open(t,"_blank");return!1}}})(),r=(()=>{const e=e=>{const i=$(document).find("#newLink"),r=(e=>({text:e.find("#hyperlink-text").val(),oldText:e.find("#hyperlink-text-hidden").val(),hyperlink:e.find("#hyperlink-url").val()}))(i);return r.text.length>0&&t.isUri(r.hyperlink)?(i.find("#hyperlink-text, #hyperlink-url").removeClass("error"),n(),e(r,0)):(0===r.text.length&&i.find("#hyperlink-text").addClass("error"),t.isUri(r.hyperlink)||i.find("#hyperlink-url").addClass("error")),!1},n=()=>{$("#newLink").removeClass("popup-show"),$("#newLink").find(":focus").blur(),pad.plugins.ep_full_hyperlinks.preLinkMarker.unmarkSelectedText()};return{insertNewLinkPopupIfDontExist:(t,i)=>{$("#newLink").remove(),t.linkId="";const r=$("#newLinkTemplate").tmpl(t);return r.appendTo($("#editorcontainerbox")),$("#newLink #link-cancel-btn").on("click",e=>n()),$("#newLink #link-create-btn").on("click",t=>e(i)),$(document).on("submit","form.link-edit-form",t=>{t.preventDefault(),e(i)}),r},showNewLinkPopup:()=>{$("#newLink").css("left",$(".toolbar .addLink").offset().left),$("#newLink").find("textarea").val(""),$("#newLink").find(".link-content, .to-value").removeClass("error"),$("#newLink").addClass("popup-show"),pad.plugins.ep_full_hyperlinks.preLinkMarker.markSelectedText(),setTimeout(()=>$("#newLink #hyperlink-url").focus().select(),500)},hideNewLinkPopup:n}})(),l=(()=>{const e="pre-selected-link",t=function(e){this.ace=e;const t=this;this.highlightSelectedText()&&setTimeout(()=>{t.unmarkSelectedText()},0)};t.prototype.highlightSelectedText=function(){return clientVars.highlightSelectedText},t.prototype.markSelectedText=function(){this.highlightSelectedText()&&this.ace.callWithAce(n,"markPreSelectedTextToLink",!0)},t.prototype.unmarkSelectedText=function(){this.highlightSelectedText()&&this.ace.callWithAce(n,"unmarkPreSelectedTextToLink",!0)},t.prototype.performNonUnduableEvent=function(e,t,n){t.startNewEvent("nonundoable"),n(),t.startNewEvent(e)},t.prototype.handleMarkText=function(e){const t=e.editorInfo,n=e.rep,i=e.callstack;this.removeMarks(t,n,i),this.addMark(t,i)},t.prototype.handleUnmarkText=function(e){const t=e.editorInfo,n=e.rep,i=e.callstack;this.removeMarks(t,n,i)},t.prototype.addMark=function(t,n){const i=n.editEvent.eventType;this.performNonUnduableEvent(i,n,()=>{t.ace_setAttributeOnSelection(e,clientVars.userId)})},t.prototype.removeMarks=function(t,n,i){const r=i.editEvent.eventType,l=n.selStart,a=n.selEnd;this.performNonUnduableEvent(r,i,()=>{const n=$('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]'),i=t.ace_getRepFromSelector(".pre-selected-link",n);$.each(i,(n,i)=>{t.ace_performSelectionChange(i[0],i[1],!0),t.ace_setAttributeOnSelection(e,!1)}),t.ace_performSelectionChange(l,a,!0)})};const n=()=>{};return{MARK_CLASS:e,init:e=>new t(e)}})(),a={collectContentPre:(e,t)=>{const n=/(?:^| )(lc-[A-Za-z0-9]*)/.exec(t.cls),i=/(?:^| )(fakelink-[A-Za-z0-9]*)/.exec(t.cls);if(n&&n[1]&&t.cc.doAttrib(t.state,"link::"+n[1]),i){const e=pad.plugins.ep_full_hyperlinks.getMapfakeLinks()[i[1]];t.cc.doAttrib(t.state,"link::"+e)}return[]},generateLinkId:()=>"lc-"+e(16)};return{validUrl:t,events:n,linkBoxes:i,newLink:r,preLinkMark:l,shared:a}})();
-//# sourceMappingURL=ep.full.hyperlinks.mini.js.map
+exports.moduleList = (()=>{
+
+	const randomString = require('ep_etherpad-lite/static/js/pad_utils').randomString;
+	const _ = require('ep_etherpad-lite/static/js/underscore');
+ 
+// https://github.com/ogt/valid-url
+
+const validUrl = (function () {
+  'use strict';
+
+  // private function
+  // internal URI spitter method - direct from RFC 3986
+  const splitUri = function (uri) {
+    const splitted = uri.match(/(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?/);
+    return splitted;
+  };
+
+  function is_iri(value) {
+    if (!value) {
+      return;
+    }
+
+    // check for illegal characters
+    if (/[^a-z0-9\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\.\-\_\~\%]/i.test(value)) return;
+
+    // check for hex escapes that aren't complete
+    if (/%[^0-9a-f]/i.test(value)) return;
+    if (/%[0-9a-f](:?[^0-9a-f]|$)/i.test(value)) return;
+
+    let splitted = [];
+    let scheme = '';
+    let authority = '';
+    let path = '';
+    let query = '';
+    let fragment = '';
+    let out = '';
+
+    // from RFC 3986
+    splitted = splitUri(value);
+    scheme = splitted[1];
+    authority = splitted[2];
+    path = splitted[3];
+    query = splitted[4];
+    fragment = splitted[5];
+
+    // scheme and path are required, though the path can be empty
+    if (!(scheme && scheme.length && path.length >= 0)) return;
+
+    // if authority is present, the path must be empty or begin with a /
+    if (authority && authority.length) {
+      if (!(path.length === 0 || /^\//.test(path))) return;
+    } else {
+      // if authority is not present, the path must not start with //
+      if (/^\/\//.test(path)) return;
+    }
+
+    // scheme must begin with a letter, then consist of letters, digits, +, ., or -
+    if (!/^[a-z][a-z0-9\+\-\.]*$/.test(scheme.toLowerCase())) return;
+
+    // re-assemble the URL per section 5.3 in RFC 3986
+    out += `${scheme}:`;
+    if (authority && authority.length) {
+      out += `//${authority}`;
+    }
+
+    out += path;
+
+    if (query && query.length) {
+      out += `?${query}`;
+    }
+
+    if (fragment && fragment.length) {
+      out += `#${fragment}`;
+    }
+
+    return out;
+  }
+
+  function is_http_iri(value, allowHttps) {
+    if (!is_iri(value)) {
+      return;
+    }
+
+    let splitted = [];
+    let scheme = '';
+    let authority = '';
+    let path = '';
+    let port = '';
+    let query = '';
+    let fragment = '';
+    let out = '';
+
+    // from RFC 3986
+    splitted = splitUri(value);
+    scheme = splitted[1];
+    authority = splitted[2];
+    path = splitted[3];
+    query = splitted[4];
+    fragment = splitted[5];
+
+    if (!scheme) return;
+
+    if (allowHttps) {
+      if (scheme.toLowerCase() != 'https') return;
+    } else if (scheme.toLowerCase() != 'http') { return; }
+
+    // fully-qualified URIs must have an authority section that is
+    // a valid host
+    if (!authority) {
+      return;
+    }
+
+    // enable port component
+    if (/:(\d+)$/.test(authority)) {
+      port = authority.match(/:(\d+)$/)[0];
+      authority = authority.replace(/:\d+$/, '');
+    }
+
+    out += `${scheme}:`;
+    out += `//${authority}`;
+
+    if (port) {
+      out += port;
+    }
+
+    out += path;
+
+    if (query && query.length) {
+      out += `?${query}`;
+    }
+
+    if (fragment && fragment.length) {
+      out += `#${fragment}`;
+    }
+
+    return out;
+  }
+
+  function is_https_iri(value) {
+    return is_http_iri(value, true);
+  }
+
+  function is_web_iri(value) {
+    return (is_http_iri(value) || is_https_iri(value));
+  }
+
+  return {
+    is_uri: is_iri,
+    is_http_uri: is_http_iri,
+    is_https_uri: is_https_iri,
+    is_web_uri: is_web_iri,
+    isUri: is_iri,
+    isHttpUri: is_http_iri,
+    isHttpsUri: is_https_iri,
+    isWebUri: is_web_iri,
+  };
+})();
+
+'use strict';
+
+const events = (() => {
+  const getSelectionFormated = (padInner, links) => {
+    const selection = padInner[0].contentWindow.getSelection().getRangeAt(0);
+    const selectedElements = document.createElement('div');
+
+    selectedElements.append(selection.cloneContents());
+
+    try {
+      selectedElements.querySelectorAll('.link').forEach((el) => {
+        const cls = el.getAttribute('class');
+        const classLinkId = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(cls);
+        const lindId = classLinkId[1];
+
+        let newTag;
+
+        if (!links[lindId]) {
+          newTag = document.createElement('span');
+          newTag.innerHTML = el.innerHTML;
+        } else {
+        // create a tag
+          newTag = document.createElement('a');
+          newTag.innerHTML = el.innerHTML;
+          newTag.setAttribute('href', links[lindId].data.hyperlink);
+        }
+
+        // replace the current node with href node
+        const span = selectedElements.querySelector(`.${lindId}`);
+        span.replaceWith(newTag);
+      });
+    } catch (error) {
+      console.error('[ep_full_hyperlinks]: copy data has an error', error);
+    }
+
+    return selectedElements;
+  };
+
+  const addTextOnClipboard = (e, padInner, removeSelection, links) => {
+    e.preventDefault();
+    const getFormatedHrefElements = getSelectionFormated(padInner, links);
+
+    e.originalEvent.clipboardData.setData('text/html', getFormatedHrefElements.outerHTML);
+
+    // if it is a cut event we have to remove the selection
+    if (removeSelection) {
+      padInner.contents()[0].execCommand('delete');
+    }
+  };
+
+  const makeClipboarRedyForSaveLinks = (e, padInner) => {
+    const clipboardData = e.originalEvent.clipboardData;
+    const pastedDataHtml = clipboardData.getData('text/html');
+    const range = padInner.contents()[0].getSelection().getRangeAt(0);
+
+    if (!range) return false;
+
+    e.preventDefault();
+    const pastedHtmlHolderElemenet = document.createElement('div');
+    pastedHtmlHolderElemenet.innerHTML = pastedDataHtml;
+    const allLinksElement = pastedHtmlHolderElemenet.getElementsByTagName('a');
+    const allLinksData = {};
+
+    for (const element of allLinksElement) {
+      const tempHyperLink = element.href;
+      const tempHyperLinkText = element.innerHTML;
+      const newLinkId = shared.generateLinkId();
+      element.className = newLinkId;
+      element.id = newLinkId;
+      allLinksData[newLinkId] = {
+        data: {
+          author: 'empty',
+          linkId: newLinkId,
+          timestamp: new Date().getTime(),
+          text: tempHyperLinkText,
+          originalLinkId: newLinkId,
+          hyperlink: tempHyperLink,
+          headerId: null,
+          date: new Date(),
+          formattedDate: new Date(),
+        },
+      };
+    }
+
+    pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(
+        clientVars.padId,
+        allLinksData
+    );
+
+    padInner
+        .contents()[0]
+        .execCommand(
+            'insertHTML',
+            false,
+            $('<div>').append($(pastedHtmlHolderElemenet).clone()).html()
+        );
+  };
+
+  const saveLinks = (e, padInner) => {
+    makeClipboarRedyForSaveLinks(e, padInner);
+  };
+
+  return {
+    addTextOnClipboard,
+    saveLinks,
+  };
+})();
+
+'use strict'
+
+
+const linkBoxes = (() => {
+	let padOuter;
+	const getPadOuter = () =>
+		(padOuter = padOuter || $('iframe[name="ace_outer"]').contents());
+
+	const getLinksContainer = () => getPadOuter().find("#linkBoxWrapper");
+
+	/* ***** Public methods: ***** */
+
+	const showLink = (linkId) => getLinksContainer().find(`#${linkId}`).show();
+
+	const hideLink = (linkId) => {
+		getLinksContainer().find(`#${linkId}`).hide();
+		padOuter.find(`#show-form-${linkId}`).show();
+		padOuter.find(`#edit-form-${linkId}`).hide();
+	};
+
+	const hideAllLinks = () => getLinksContainer().find(`.link-container`).hide();
+
+
+	const getPosition = (e) => {
+		let posx = 0;
+		let posy = 0;
+	
+		if (!e) e = window.event;
+		
+		if (e.pageX || e.pageY) {
+			posx = e.pageX;
+			posy = e.pageY;
+		} else if (e.clientX || e.clientY) {
+			posx = e.clientX + document.body.scrollLeft + 
+												 document.documentElement.scrollLeft;
+			posy = e.clientY + document.body.scrollTop + 
+												 document.documentElement.scrollTop;
+		}
+	
+		return { x: posx, y: posy }
+	}
+
+
+	const setPositionModal = (e, linkModal, padInner) => {
+		const clickCoords = getPosition(e);
+		clickCoordsX = clickCoords.x;
+		clickCoordsY = clickCoords.y;
+
+		const modalWith = linkModal.innerWidth()
+		const modalHeight = linkModal.innerHeight()
+
+		windowWidth = padInner.innerWidth();
+		windowHeight = padInner.innerHeight();
+
+		let newL= `${e.clientX +padInner.offset().left}px`;
+		let newT = `${clickCoordsY}px`;
+
+		if ((windowWidth - clickCoordsX) < modalWith) {
+			newL = `${(windowWidth - modalWith)}px`;
+		}
+	
+		if ((windowHeight - clickCoordsY) < modalHeight) {
+			newT = `${windowHeight - modalHeight}px`;
+		} 
+
+		linkModal.css({ left: newL, top: `${parseInt(newT) + 35}px`  });
+	}
+
+
+	const showLinkModal = (e, linkObj, socket) => {
+		const padOuter = $('iframe[name="ace_outer"]').contents();
+		const padInner = getPadOuter().find('iframe[name="ace_inner"]');
+		const linkId = linkObj.linkId;
+		const linkModalAppended =
+			getLinksContainer().find(`#${linkId}`).length === 0 ? false : true;
+
+		hideAllLinks();
+
+		if(!linkObj.hyperlink){
+			console.error(`[hyperlink]: link does not exist`, linkObj)
+			return false
+		}
+		
+		// find link modal, if does not exist create a link modal
+		let linkModal = getLinksContainer().find(`#${linkId}`);
+		if (!linkModalAppended)
+			linkModal = $("#linkBoxTemplate").tmpl({ ...linkObj });
+
+		const loaded = linkModal.attr("data-loaded");
+
+		// if the linkModal was not appended, create a modal and append it to #linkBoxWrapper
+		if (!linkModalAppended) {
+			padOuter.find("#linkBoxWrapper").append(linkModal);
+		} else {
+			// if the modal was exist update text and hypertext
+			linkModal.show();
+			// if the old hyperlink was not same as new hyperlink
+			if (linkObj.hyperlink !== linkModal.find("a.ep_hyperlink_title").attr("href")) {
+				linkModal.attr("data-loaded", "false");
+			}
+
+			linkModal.attr("data-hyperlink", linkObj.hyperlink);
+			linkModal.find("input#hyperlink-url").val(linkObj.hyperlink);
+
+			linkModal.find("a.ep_hyperlink_title").attr({
+				title: linkObj.hyperlink,
+				href: linkObj.hyperlink,
+			});
+		}
+
+		// If the text we saved has changed and is different from the contents of the pad
+		const text = padInner.contents().find(`.${linkId}`).text()
+		linkModal.find("input#hyperlink-text-hidden").val(text);
+		linkModal.find("input#hyperlink-text").val(text);
+
+		// TODO: 1/ hyperlink for social and
+		// TODO: 2/ inside link
+		if (loaded != "true") {
+			let hyperlink = linkObj.hyperlink || linkModal.attr("data-hyperlink");
+			let dividedUrl;
+			try {
+				dividedUrl = new URL(hyperlink);
+			} catch (error) {
+				console.error(`[hyperlink]: ${error}`);
+				linkBoxes.hideLink(linkId);
+				return
+			}
+
+			const ep_hyperlink_img = linkModal.find("#ep_hyperlink_img");
+			const ep_hyperlink_title = linkModal.find("a.ep_hyperlink_title");
+			const card_loading_hyperlink = linkModal.find("#card_loading_hyperlink");
+			const ep_hyperlink_description = linkModal.find(
+				"#ep_hyperlink_description"
+			);
+
+			ep_hyperlink_description.text("");
+			ep_hyperlink_title.text(hyperlink);
+
+			ep_hyperlink_img.hide();
+			ep_hyperlink_title.show();
+			card_loading_hyperlink.show();
+
+			// raise for og:title resolving
+
+			if (!/^http:\/\//.test(hyperlink) && !/^https:\/\//.test(hyperlink)) {
+				hyperlink = `https://${hyperlink}`;
+			}
+
+			const changeMetaView = function (hyperlink, title, image) {
+				ep_hyperlink_img.attr("src", image);
+				ep_hyperlink_img.on("load", () => {
+					card_loading_hyperlink.fadeOut(500, () => {
+						ep_hyperlink_img.fadeIn();
+						ep_hyperlink_title.text(
+							title.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
+						);
+						ep_hyperlink_description.text(
+							hyperlink.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
+						);
+						linkModal.attr({ "data-loaded": true });
+					});
+				});
+			};
+			
+			if (!validUrl.isUri(hyperlink)) {
+				const img =
+					"../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png";
+				changeMetaView(hyperlink, hyperlink, img);
+				return false;
+			}
+			// ........
+			const metaResolverCallBack = function (result) {
+
+				if (result.metadata.image && result.metadata.title) {
+					changeMetaView(
+						hyperlink,
+						result.metadata.title,
+						result.metadata.image
+					);
+				} else {
+					var editedHyperlink = `https://${dividedUrl.hostname}`;
+					if (result.last !== true) {
+						socket.emit(
+							"metaResolver",
+							{ padId: clientVars.padId, editedHyperlink, last: true },
+							metaResolverCallBack
+						);
+					} else {
+						changeMetaView(
+							hyperlink,
+							result.metadata.title || hyperlink,
+							"../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png"
+						);
+					}
+				}
+			};
+			// ........
+			switch (dividedUrl.hostname) {
+				case "twitter.com":
+					changeMetaView(
+						hyperlink,
+						hyperlink,
+						"../static/plugins/ep_full_hyperlinks/static/dist/img/twitter.png"
+					);
+					break;
+				default:
+					socket.emit(
+						"metaResolver",
+						{ padId: clientVars.padId, hyperlink, last: false },
+						metaResolverCallBack
+					);
+			}
+		}
+
+		setPositionModal(e, linkModal, padInner);
+		linkModal.addClass("hyperlink-display");
+	};
+
+	// Indicates if event was on one of the elements that does not close link
+	const shouldNotCloseLink = function (e) {
+		// a link box
+		if (
+			$(e.target).closest(".link").length ||
+			$(e.target).closest(".link-modal").length ||
+			$(e.target).closest(".ep_hyperlink_docs_bubble_button_edit").length ||
+			$(e.target).closest(".ep_hyperlink_docs_bubble_button_delete").length ||
+			$(e.target).closest(".ep_hyperlink_docs_bubble_button_copy").length ||
+			$(e.target).closest(".full-display-link").length ||
+			$(e.target).closest(".link-title-wrapper").length ||
+			$(e.target).closest(".link-edit-form").length ||
+			$(e.target).closest(".link-text-text").length ||
+			$(e.target).closest(".link-text-hyperlink").length
+		) {
+			// the link modal
+			return true;
+		}
+		return false;
+	};
+
+	const isLinkInternal = (url) => {
+		const incomeURL = new URL(url);
+		let result = false;
+
+		// 1/ check the origin
+		if(incomeURL.origin !== location.origin) return false;
+
+
+		// 2/ origin the same but diff pad name
+		// check if the income url related to filter url
+		if(incomeURL.origin === location.origin){
+			// does have p
+			const doesPInURL = location.pathname.split('/').indexOf('p') > 0;
+			const padName = clientVars.padId;
+			const padMainPathname = doesPInURL ? `/p/${padName}` : `/${padName}`;
+			// check if the income url pad name is the same current pad name
+			if(location.pathname.substring(0, padMainPathname.length) === padMainPathname) result = true
+
+			// does single pad active
+			if(clientVars.ep_singlePad.active) result = true;
+
+		}
+
+		return result;
+	}
+
+	const doesLinkHaveFilter = (url) => {
+		const result = [];
+		const padName = clientVars.padId;
+
+		const currentPathname = url.pathname.split("/");
+
+		let padNameIndex = currentPathname.indexOf(padName) + 1;
+
+		if(clientVars.ep_singlePad.active) padNameIndex = 0;
+
+		const filters = [...currentPathname].splice(padNameIndex, currentPathname.length - 1);
+
+		result.push(...filters);
+
+		return result;
+	}
+
+	// internal link
+	// other plugin must listen for pushstate to get new data and excute they part.
+	const internalLinkClick = function (event) {
+		event.preventDefault();
+		event.stopPropagation();
+		const href = $(this).attr('href');
+
+		if(isLinkInternal(href)){
+			const incomeURL = new URL(href);
+			let targetPath = `${incomeURL.search}`
+			const filters = doesLinkHaveFilter(incomeURL);
+
+			if(filters.length>0){
+				const doesPInURL = location.pathname.split('/').indexOf('p') > 0;
+				targetPath = doesPInURL ? '/p': '';
+				if(!clientVars.ep_singlePad.active) targetPath += `/${clientVars.padId}`;
+				targetPath += `/${filters.join('/')}${incomeURL.search}`;
+			}
+
+			if(incomeURL.search.length===0) targetPath = href;
+
+			// The Target is which plugin should listen more for more functionality
+			// In this example, if we find a slug filter in your URL,
+			// the target should be the filter plugin
+			const tartge = filters.length>0 ? "filter" : "other";
+		
+			window.history.pushState({type: "hyperLink", href, target: tartge}, document.title, targetPath);
+			// close all link
+			hideAllLinks();
+		}else {
+			window.open(href, '_blank');
+		}
+		return false;
+	}
+
+	return {
+		showLink,
+		hideLink,
+		hideAllLinks,
+		showLinkModal,
+		getLinksContainer,
+		shouldNotCloseLink,
+		internalLinkClick,
+	};
+})();
+
+'use strict';
+
+const newLink = (() => {
+  // Create a link object with data filled on the given form
+  const buildLinkFrom = (form) => {
+    const text = form.find('#hyperlink-text').val();
+    const oldText = form.find('#hyperlink-text-hidden').val();
+    const hyperlink = form.find('#hyperlink-url').val();
+
+    return {
+      text,
+      oldText,
+      hyperlink,
+    };
+  };
+
+  // Callback for new link Cancel
+  const cancelNewLink = () => hideNewLinkPopup();
+
+  // Callback for new link Submit
+  const submitNewLink = (callback) => {
+    const index = 0;
+    const form = $(document).find('#newLink');
+    const link = buildLinkFrom(form);
+    if (link.text.length > 0 && validUrl.isUri(link.hyperlink)) {
+      form.find('#hyperlink-text, #hyperlink-url').removeClass('error');
+      hideNewLinkPopup();
+      callback(link, index);
+    } else {
+      if (link.text.length === 0) form.find('#hyperlink-text').addClass('error');
+      if (!validUrl.isUri(link.hyperlink)) form.find('#hyperlink-url').addClass('error');
+    }
+    return false;
+  };
+
+  /* ***** Public methods: ***** */
+
+  // Insert new Link Form
+  const insertNewLinkPopupIfDontExist = (link, callback) => {
+    $('#newLink').remove();
+    link.linkId = '';
+    const newLinkPopup = $('#newLinkTemplate').tmpl(link);
+    newLinkPopup.appendTo($('#editorcontainerbox'));
+
+    // Cancel btn
+    $('#newLink #link-cancel-btn').on('click', (e) => cancelNewLink());
+
+    // Create btn // link-create-btn
+    $('#newLink #link-create-btn').on('click', (e) => submitNewLink(callback));
+
+    $(document).on('submit', 'form.link-edit-form', (e) => {
+      e.preventDefault();
+      submitNewLink(callback);
+    });
+
+    return newLinkPopup;
+  };
+
+  const showNewLinkPopup = () => {
+    if (!$('body').hasClass('mobileView')) {
+      // position below link icon
+      $('#newLink').css('left', $('.toolbar .addLink').offset().left);
+    }
+
+
+    // Reset form to make sure it is all clear
+    $('#newLink').find('textarea').val('');
+    $('#newLink').find('.link-content, .to-value').removeClass('error');
+
+    // Show popup
+    $('#newLink').addClass('popup-show');
+
+    // mark selected text, so it is clear to user which text range the link is being applied to
+    pad.plugins.ep_full_hyperlinks.preLinkMarker.markSelectedText();
+
+    // focus on hyperlink input
+    setTimeout(() => $('#newLink #hyperlink-url').focus().select(), 500);
+  };
+
+  const hideNewLinkPopup = () => {
+    $('#newLink').removeClass('popup-show');
+
+    // force focus to be lost, so virtual keyboard is hidden on mobile devices
+    $('#newLink').find(':focus').blur();
+
+    // unmark selected text, as now there is no text being linked
+    pad.plugins.ep_full_hyperlinks.preLinkMarker.unmarkSelectedText();
+  };
+
+  return {
+    // localizenewLinkPopup,
+    insertNewLinkPopupIfDontExist,
+    showNewLinkPopup,
+    hideNewLinkPopup,
+  };
+})();
+
+'use strict';
+
+const preLinkMark = (() => {
+  const MARK_CLASS = 'pre-selected-link';
+
+  const preLinkMarker = function (ace) {
+    this.ace = ace;
+    const self = this;
+
+    // do nothing if this feature is not enabled
+    if (!this.highlightSelectedText()) return;
+
+    // remove any existing marks, as there is no link being added on plugin initialization
+    // (we need the timeout to let the plugin be fully initialized before starting to remove
+    // marked texts)
+    setTimeout(() => {
+      self.unmarkSelectedText();
+    }, 0);
+  };
+
+  // Indicates if Etherpad is configured to highlight text
+  preLinkMarker.prototype.highlightSelectedText = function () {
+    return clientVars.highlightSelectedText;
+  };
+
+  preLinkMarker.prototype.markSelectedText = function () {
+    // do nothing if this feature is not enabled
+    if (!this.highlightSelectedText()) return;
+
+    this.ace.callWithAce(doNothing, 'markPreSelectedTextToLink', true);
+  };
+
+  preLinkMarker.prototype.unmarkSelectedText = function () {
+    // do nothing if this feature is not enabled
+    if (!this.highlightSelectedText()) return;
+
+    this.ace.callWithAce(doNothing, 'unmarkPreSelectedTextToLink', true);
+  };
+
+  preLinkMarker.prototype.performNonUnduableEvent = function (eventType, callstack, action) {
+    callstack.startNewEvent('nonundoable');
+    action();
+    callstack.startNewEvent(eventType);
+  };
+
+  preLinkMarker.prototype.handleMarkText = function (context) {
+    const editorInfo = context.editorInfo;
+    const rep = context.rep;
+    const callstack = context.callstack;
+
+    // first we need to unmark any existing text, otherwise we'll have 2 text ranges marked
+    this.removeMarks(editorInfo, rep, callstack);
+
+    this.addMark(editorInfo, callstack);
+  };
+
+  preLinkMarker.prototype.handleUnmarkText = function (context) {
+    const editorInfo = context.editorInfo;
+    const rep = context.rep;
+    const callstack = context.callstack;
+
+    this.removeMarks(editorInfo, rep, callstack);
+  };
+
+  preLinkMarker.prototype.addMark = function (editorInfo, callstack) {
+    const eventType = callstack.editEvent.eventType;
+
+    // we don't want the text marking to be undoable
+    this.performNonUnduableEvent(eventType, callstack, () => {
+      editorInfo.ace_setAttributeOnSelection(MARK_CLASS, clientVars.userId);
+    });
+  };
+
+  preLinkMarker.prototype.removeMarks = function (editorInfo, rep, callstack) {
+    const eventType = callstack.editEvent.eventType;
+    const originalSelStart = rep.selStart;
+    const originalSelEnd = rep.selEnd;
+
+    // we don't want the text marking to be undoable
+    this.performNonUnduableEvent(eventType, callstack, () => {
+      // remove marked text
+      const padInner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
+      const selector = `.${MARK_CLASS}`;
+      const repArr = editorInfo.ace_getRepFromSelector(selector, padInner);
+      // repArr is an array of reps
+      $.each(repArr, (index, rep) => {
+        editorInfo.ace_performSelectionChange(rep[0], rep[1], true);
+        editorInfo.ace_setAttributeOnSelection(MARK_CLASS, false);
+      });
+
+      // make sure selected text is back to original value
+      editorInfo.ace_performSelectionChange(originalSelStart, originalSelEnd, true);
+    });
+  };
+
+  // we do nothing on callWithAce; actions will be handled on aceEditEvent
+  const doNothing = () => {};
+
+  const init = (ace) => new preLinkMarker(ace);
+
+  return {
+    MARK_CLASS,
+    init,
+  };
+})();
+
+'use strict';
+
+const shared = (() => {
+  const collectContentPre = (hook, context) => {
+    const link = /(?:^| )(lc-[A-Za-z0-9]*)/.exec(context.cls);
+    const fakeLink = /(?:^| )(fakelink-[A-Za-z0-9]*)/.exec(context.cls);
+
+    if (link && link[1]) {
+      context.cc.doAttrib(context.state, `link::${link[1]}`);
+    }
+
+    // a fake link is a link copied from this or another pad. To avoid conflicts
+    // with existing links, a fake linkId is used, so then we generate a new one
+    // when the link is saved
+    if (fakeLink) {
+      const mapFakeLinks = pad.plugins.ep_full_hyperlinks.getMapfakeLinks();
+      const fakeLinkId = fakeLink[1];
+      const linkId = mapFakeLinks[fakeLinkId];
+      context.cc.doAttrib(context.state, `link::${linkId}`);
+    }
+
+    return [];
+  };
+
+  const generateLinkId = () => `lc-${randomString(16)}`;
+
+  return {
+    collectContentPre,
+    generateLinkId,
+  };
+})();
+return {
+validUrl
+,events
+,linkBoxes
+,newLink
+,preLinkMark
+,shared
+}
+})();

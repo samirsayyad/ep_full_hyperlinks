@@ -441,8 +441,14 @@ input:-internal-autofill-selected {
 
 #newLink{
   width: 477px;
+	top: 50%;
+	left: 50%!important;
+	transform: translate(-50%, -50%);
 }
 
+body.mobileView #newLink{
+	width: 96vw;
+}
 
 .hyperlink-popup{
 	font-family: Quicksand, Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
