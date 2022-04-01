@@ -1,327 +1,323 @@
-'use strict'
+'use strict';
 
 
 const linkBoxes = (() => {
-	let padOuter;
-	const getPadOuter = () =>
-		(padOuter = padOuter || $('iframe[name="ace_outer"]').contents());
+  let padOuter;
+  const getPadOuter = () => (padOuter = padOuter || $('iframe[name="ace_outer"]').contents());
 
-	const getLinksContainer = () => getPadOuter().find("#linkBoxWrapper");
+  const getLinksContainer = () => getPadOuter().find('#linkBoxWrapper');
 
-	/* ***** Public methods: ***** */
+  /* ***** Public methods: ***** */
 
-	const showLink = (linkId) => getLinksContainer().find(`#${linkId}`).show();
+  const showLink = (linkId) => getLinksContainer().find(`#${linkId}`).show();
 
-	const hideLink = (linkId) => {
-		getLinksContainer().find(`#${linkId}`).hide();
-		padOuter.find(`#show-form-${linkId}`).show();
-		padOuter.find(`#edit-form-${linkId}`).hide();
-	};
+  const hideLink = (linkId) => {
+    getLinksContainer().find(`#${linkId}`).hide();
+    padOuter.find(`#show-form-${linkId}`).show();
+    padOuter.find(`#edit-form-${linkId}`).hide();
+  };
 
-	const hideAllLinks = () => getLinksContainer().find(`.link-container`).hide();
+  const hideAllLinks = () => getLinksContainer().find('.link-container').hide();
 
 
-	const getPosition = (e) => {
-		let posx = 0;
-		let posy = 0;
-	
-		if (!e) e = window.event;
-		
-		if (e.pageX || e.pageY) {
-			posx = e.pageX;
-			posy = e.pageY;
-		} else if (e.clientX || e.clientY) {
-			posx = e.clientX + document.body.scrollLeft + 
+  const getPosition = (e) => {
+    let posx = 0;
+    let posy = 0;
+
+    if (!e) e = window.event;
+
+    if (e.pageX || e.pageY) {
+      posx = e.pageX;
+      posy = e.pageY;
+    } else if (e.clientX || e.clientY) {
+      posx = e.clientX + document.body.scrollLeft +
 												 document.documentElement.scrollLeft;
-			posy = e.clientY + document.body.scrollTop + 
+      posy = e.clientY + document.body.scrollTop +
 												 document.documentElement.scrollTop;
-		}
-	
-		return { x: posx, y: posy }
-	}
+    }
+
+    return {x: posx, y: posy};
+  };
 
 
-	const setPositionModal = (e, linkModal, padInner) => {
-		const clickCoords = getPosition(e);
-		clickCoordsX = clickCoords.x;
-		clickCoordsY = clickCoords.y;
+  const setPositionModal = (e, linkModal, padInner) => {
+    const clickCoords = getPosition(e);
+    clickCoordsX = clickCoords.x;
+    clickCoordsY = clickCoords.y;
 
-		const modalWith = linkModal.innerWidth()
-		const modalHeight = linkModal.innerHeight()
+    const modalWith = linkModal.innerWidth();
+    const modalHeight = linkModal.innerHeight();
 
-		windowWidth = padInner.innerWidth();
-		windowHeight = padInner.innerHeight();
+    windowWidth = padInner.innerWidth();
+    windowHeight = padInner.innerHeight();
 
-		let newL= `${e.clientX +padInner.offset().left}px`;
-		let newT = `${clickCoordsY}px`;
+    let newL = `${e.clientX + padInner.offset().left}px`;
+    let newT = `${clickCoordsY}px`;
 
-		if ((windowWidth - clickCoordsX) < modalWith) {
-			newL = `${(windowWidth - modalWith)}px`;
-		}
-	
-		if ((windowHeight - clickCoordsY) < modalHeight) {
-			newT = `${windowHeight - modalHeight}px`;
-		} 
+    if ((windowWidth - clickCoordsX) < modalWith) {
+      newL = `${(windowWidth - modalWith)}px`;
+    }
 
-		linkModal.css({ left: newL, top: `${parseInt(newT) + 35}px`  });
-	}
+    if ((windowHeight - clickCoordsY) < modalHeight) {
+      newT = `${windowHeight - modalHeight}px`;
+    }
+
+    linkModal.css({left: newL, top: `${parseInt(newT) + 35}px`});
+  };
 
 
-	const showLinkModal = (e, linkObj, socket) => {
-		const padOuter = $('iframe[name="ace_outer"]').contents();
-		const padInner = getPadOuter().find('iframe[name="ace_inner"]');
-		const linkId = linkObj.linkId;
-		const linkModalAppended =
+  const showLinkModal = (e, linkObj, socket) => {
+    const padOuter = $('iframe[name="ace_outer"]').contents();
+    const padInner = getPadOuter().find('iframe[name="ace_inner"]');
+    const linkId = linkObj.linkId;
+    const linkModalAppended =
 			getLinksContainer().find(`#${linkId}`).length === 0 ? false : true;
 
-		hideAllLinks();
+    hideAllLinks();
 
-		if(!linkObj.hyperlink){
-			console.error(`[hyperlink]: link does not exist`, linkObj)
-			return false
-		}
-		
-		// find link modal, if does not exist create a link modal
-		let linkModal = getLinksContainer().find(`#${linkId}`);
-		if (!linkModalAppended)
-			linkModal = $("#linkBoxTemplate").tmpl({ ...linkObj });
+    if (!linkObj.hyperlink) {
+      console.error('[hyperlink]: link does not exist', linkObj);
+      return false;
+    }
 
-		const loaded = linkModal.attr("data-loaded");
+    // find link modal, if does not exist create a link modal
+    let linkModal = getLinksContainer().find(`#${linkId}`);
+    if (!linkModalAppended) linkModal = $('#linkBoxTemplate').tmpl({...linkObj});
 
-		// if the linkModal was not appended, create a modal and append it to #linkBoxWrapper
-		if (!linkModalAppended) {
-			padOuter.find("#linkBoxWrapper").append(linkModal);
-		} else {
-			// if the modal was exist update text and hypertext
-			linkModal.show();
-			// if the old hyperlink was not same as new hyperlink
-			if (linkObj.hyperlink !== linkModal.find("a.ep_hyperlink_title").attr("href")) {
-				linkModal.attr("data-loaded", "false");
-			}
+    const loaded = linkModal.attr('data-loaded');
 
-			linkModal.attr("data-hyperlink", linkObj.hyperlink);
-			linkModal.find("input#hyperlink-url").val(linkObj.hyperlink);
+    // if the linkModal was not appended, create a modal and append it to #linkBoxWrapper
+    if (!linkModalAppended) {
+      padOuter.find('#linkBoxWrapper').append(linkModal);
+    } else {
+      // if the modal was exist update text and hypertext
+      linkModal.show();
+      // if the old hyperlink was not same as new hyperlink
+      if (linkObj.hyperlink !== linkModal.find('a.ep_hyperlink_title').attr('href')) {
+        linkModal.attr('data-loaded', 'false');
+      }
 
-			linkModal.find("a.ep_hyperlink_title").attr({
-				title: linkObj.hyperlink,
-				href: linkObj.hyperlink,
-			});
-		}
+      linkModal.attr('data-hyperlink', linkObj.hyperlink);
+      linkModal.find('input#hyperlink-url').val(linkObj.hyperlink);
 
-		// If the text we saved has changed and is different from the contents of the pad
-		const text = padInner.contents().find(`.${linkId}`).text()
-		linkModal.find("input#hyperlink-text-hidden").val(text);
-		linkModal.find("input#hyperlink-text").val(text);
+      linkModal.find('a.ep_hyperlink_title').attr({
+        title: linkObj.hyperlink,
+        href: linkObj.hyperlink,
+      });
+    }
 
-		// TODO: 1/ hyperlink for social and
-		// TODO: 2/ inside link
-		if (loaded != "true") {
-			let hyperlink = linkObj.hyperlink || linkModal.attr("data-hyperlink");
-			let dividedUrl;
-			try {
-				dividedUrl = new URL(hyperlink);
-			} catch (error) {
-				console.error(`[hyperlink]: ${error}`);
-				linkBoxes.hideLink(linkId);
-				return
-			}
+    // If the text we saved has changed and is different from the contents of the pad
+    const text = padInner.contents().find(`.${linkId}`).text();
+    linkModal.find('input#hyperlink-text-hidden').val(text);
+    linkModal.find('input#hyperlink-text').val(text);
 
-			const ep_hyperlink_img = linkModal.find("#ep_hyperlink_img");
-			const ep_hyperlink_title = linkModal.find("a.ep_hyperlink_title");
-			const card_loading_hyperlink = linkModal.find("#card_loading_hyperlink");
-			const ep_hyperlink_description = linkModal.find(
-				"#ep_hyperlink_description"
-			);
+    // TODO: 1/ hyperlink for social and
+    // TODO: 2/ inside link
+    if (loaded != 'true') {
+      let hyperlink = linkObj.hyperlink || linkModal.attr('data-hyperlink');
+      let dividedUrl;
+      try {
+        dividedUrl = new URL(hyperlink);
+      } catch (error) {
+        console.error(`[hyperlink]: ${error}`);
+        linkBoxes.hideLink(linkId);
+        return;
+      }
 
-			ep_hyperlink_description.text("");
-			ep_hyperlink_title.text(hyperlink);
+      const ep_hyperlink_img = linkModal.find('#ep_hyperlink_img');
+      const ep_hyperlink_title = linkModal.find('a.ep_hyperlink_title');
+      const card_loading_hyperlink = linkModal.find('#card_loading_hyperlink');
+      const ep_hyperlink_description = linkModal.find(
+          '#ep_hyperlink_description'
+      );
 
-			ep_hyperlink_img.hide();
-			ep_hyperlink_title.show();
-			card_loading_hyperlink.show();
+      ep_hyperlink_description.text('');
+      ep_hyperlink_title.text(hyperlink);
 
-			// raise for og:title resolving
+      ep_hyperlink_img.hide();
+      ep_hyperlink_title.show();
+      card_loading_hyperlink.show();
 
-			if (!/^http:\/\//.test(hyperlink) && !/^https:\/\//.test(hyperlink)) {
-				hyperlink = `https://${hyperlink}`;
-			}
+      // raise for og:title resolving
 
-			const changeMetaView = function (hyperlink, title, image) {
-				ep_hyperlink_img.attr("src", image);
-				ep_hyperlink_img.on("load", () => {
-					card_loading_hyperlink.fadeOut(500, () => {
-						ep_hyperlink_img.fadeIn();
-						ep_hyperlink_title.text(
-							title.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
-						);
-						ep_hyperlink_description.text(
-							hyperlink.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
-						);
-						linkModal.attr({ "data-loaded": true });
-					});
-				});
-			};
-			
-			if (!validUrl.isUri(hyperlink)) {
-				const img =
-					"../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png";
-				changeMetaView(hyperlink, hyperlink, img);
-				return false;
-			}
-			// ........
-			const metaResolverCallBack = function (result) {
+      if (!/^http:\/\//.test(hyperlink) && !/^https:\/\//.test(hyperlink)) {
+        hyperlink = `https://${hyperlink}`;
+      }
 
-				if (result.metadata.image && result.metadata.title) {
-					changeMetaView(
-						hyperlink,
-						result.metadata.title,
-						result.metadata.image
-					);
-				} else {
-					var editedHyperlink = `https://${dividedUrl.hostname}`;
-					if (result.last !== true) {
-						socket.emit(
-							"metaResolver",
-							{ padId: clientVars.padId, editedHyperlink, last: true },
-							metaResolverCallBack
-						);
-					} else {
-						changeMetaView(
-							hyperlink,
-							result.metadata.title || hyperlink,
-							"../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png"
-						);
-					}
-				}
-			};
-			// ........
-			switch (dividedUrl.hostname) {
-				case "twitter.com":
-					changeMetaView(
-						hyperlink,
-						hyperlink,
-						"../static/plugins/ep_full_hyperlinks/static/dist/img/twitter.png"
-					);
-					break;
-				default:
-					socket.emit(
-						"metaResolver",
-						{ padId: clientVars.padId, hyperlink, last: false },
-						metaResolverCallBack
-					);
-			}
-		}
+      const changeMetaView = function (hyperlink, title, image) {
+        ep_hyperlink_img.attr('src', image);
+        ep_hyperlink_img.on('load', () => {
+          card_loading_hyperlink.fadeOut(500, () => {
+            ep_hyperlink_img.fadeIn();
+            ep_hyperlink_title.text(
+                title.replace(/^(?:https?:\/\/)?(?:www\.)?/i, '')
+            );
+            ep_hyperlink_description.text(
+                hyperlink.replace(/^(?:https?:\/\/)?(?:www\.)?/i, '')
+            );
+            linkModal.attr({'data-loaded': true});
+          });
+        });
+      };
 
-		setPositionModal(e, linkModal, padInner);
-		linkModal.addClass("hyperlink-display");
-	};
+      if (!validUrl.isUri(hyperlink)) {
+        const img =
+					'../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png';
+        changeMetaView(hyperlink, hyperlink, img);
+        return false;
+      }
+      // ........
+      const metaResolverCallBack = function (result) {
+        if (result.metadata.image && result.metadata.title) {
+          changeMetaView(
+              hyperlink,
+              result.metadata.title,
+              result.metadata.image
+          );
+        } else {
+          const editedHyperlink = `https://${dividedUrl.hostname}`;
+          if (result.last !== true) {
+            socket.emit(
+                'metaResolver',
+                {padId: clientVars.padId, editedHyperlink, last: true},
+                metaResolverCallBack
+            );
+          } else {
+            changeMetaView(
+                hyperlink,
+                result.metadata.title || hyperlink,
+                '../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png'
+            );
+          }
+        }
+      };
+      // ........
+      switch (dividedUrl.hostname) {
+        case 'twitter.com':
+          changeMetaView(
+              hyperlink,
+              hyperlink,
+              '../static/plugins/ep_full_hyperlinks/static/dist/img/twitter.png'
+          );
+          break;
+        default:
+          socket.emit(
+              'metaResolver',
+              {padId: clientVars.padId, hyperlink, last: false},
+              metaResolverCallBack
+          );
+      }
+    }
 
-	// Indicates if event was on one of the elements that does not close link
-	const shouldNotCloseLink = function (e) {
-		// a link box
-		if (
-			$(e.target).closest(".link").length ||
-			$(e.target).closest(".link-modal").length ||
-			$(e.target).closest(".ep_hyperlink_docs_bubble_button_edit").length ||
-			$(e.target).closest(".ep_hyperlink_docs_bubble_button_delete").length ||
-			$(e.target).closest(".ep_hyperlink_docs_bubble_button_copy").length ||
-			$(e.target).closest(".full-display-link").length ||
-			$(e.target).closest(".link-title-wrapper").length ||
-			$(e.target).closest(".link-edit-form").length ||
-			$(e.target).closest(".link-text-text").length ||
-			$(e.target).closest(".link-text-hyperlink").length
-		) {
-			// the link modal
-			return true;
-		}
-		return false;
-	};
+    setPositionModal(e, linkModal, padInner);
+    linkModal.addClass('hyperlink-display');
+  };
 
-	const isLinkInternal = (url) => {
-		const incomeURL = new URL(url);
-		let result = false;
+  // Indicates if event was on one of the elements that does not close link
+  const shouldNotCloseLink = function (e) {
+    // a link box
+    if (
+      $(e.target).closest('.link').length ||
+			$(e.target).closest('.link-modal').length ||
+			$(e.target).closest('.ep_hyperlink_docs_bubble_button_edit').length ||
+			$(e.target).closest('.ep_hyperlink_docs_bubble_button_delete').length ||
+			$(e.target).closest('.ep_hyperlink_docs_bubble_button_copy').length ||
+			$(e.target).closest('.full-display-link').length ||
+			$(e.target).closest('.link-title-wrapper').length ||
+			$(e.target).closest('.link-edit-form').length ||
+			$(e.target).closest('.link-text-text').length ||
+			$(e.target).closest('.link-text-hyperlink').length
+    ) {
+      // the link modal
+      return true;
+    }
+    return false;
+  };
 
-		// 1/ check the origin
-		if(incomeURL.origin !== location.origin) return false;
+  const isLinkInternal = (url) => {
+    const incomeURL = new URL(url);
+    let result = false;
+
+    // 1/ check the origin
+    if (incomeURL.origin !== location.origin) return false;
 
 
-		// 2/ origin the same but diff pad name
-		// check if the income url related to filter url
-		if(incomeURL.origin === location.origin){
-			// does have p
-			const doesPInURL = location.pathname.split('/').indexOf('p') > 0;
-			const padName = clientVars.padId;
-			const padMainPathname = doesPInURL ? `/p/${padName}` : `/${padName}`;
-			// check if the income url pad name is the same current pad name
-			if(location.pathname.substring(0, padMainPathname.length) === padMainPathname) result = true
+    // 2/ origin the same but diff pad name
+    // check if the income url related to filter url
+    if (incomeURL.origin === location.origin) {
+      // does have p
+      const doesPInURL = location.pathname.split('/').indexOf('p') > 0;
+      const padName = clientVars.padId;
+      const padMainPathname = doesPInURL ? `/p/${padName}` : `/${padName}`;
+      // check if the income url pad name is the same current pad name
+      if (location.pathname.substring(0, padMainPathname.length) === padMainPathname) result = true;
 
-			// does single pad active
-			if(clientVars.ep_singlePad.active) result = true;
+      // does single pad active
+      if (clientVars.ep_singlePad.active) result = true;
+    }
 
-		}
+    return result;
+  };
 
-		return result;
-	}
+  const doesLinkHaveFilter = (url) => {
+    const result = [];
+    const padName = clientVars.padId;
 
-	const doesLinkHaveFilter = (url) => {
-		const result = [];
-		const padName = clientVars.padId;
+    const currentPathname = url.pathname.split('/');
 
-		const currentPathname = url.pathname.split("/");
+    let padNameIndex = currentPathname.indexOf(padName) + 1;
 
-		let padNameIndex = currentPathname.indexOf(padName) + 1;
+    if (clientVars.ep_singlePad.active) padNameIndex = 0;
 
-		if(clientVars.ep_singlePad.active) padNameIndex = 0;
+    const filters = [...currentPathname].splice(padNameIndex, currentPathname.length - 1);
 
-		const filters = [...currentPathname].splice(padNameIndex, currentPathname.length - 1);
+    result.push(...filters);
 
-		result.push(...filters);
+    return result;
+  };
 
-		return result;
-	}
+  // internal link
+  // other plugin must listen for pushstate to get new data and excute they part.
+  const internalLinkClick = function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const href = $(this).attr('href');
 
-	// internal link
-	// other plugin must listen for pushstate to get new data and excute they part.
-	const internalLinkClick = function (event) {
-		event.preventDefault();
-		event.stopPropagation();
-		const href = $(this).attr('href');
+    if (isLinkInternal(href)) {
+      const incomeURL = new URL(href);
+      let targetPath = `${incomeURL.search}`;
+      const filters = doesLinkHaveFilter(incomeURL);
 
-		if(isLinkInternal(href)){
-			const incomeURL = new URL(href);
-			let targetPath = `${incomeURL.search}`
-			const filters = doesLinkHaveFilter(incomeURL);
+      if (filters.length > 0) {
+        const doesPInURL = location.pathname.split('/').indexOf('p') > 0;
+        targetPath = doesPInURL ? '/p' : '';
+        if (!clientVars.ep_singlePad.active) targetPath += `/${clientVars.padId}`;
+        targetPath += `/${filters.join('/')}${incomeURL.search}`;
+      }
 
-			if(filters.length>0){
-				const doesPInURL = location.pathname.split('/').indexOf('p') > 0;
-				targetPath = doesPInURL ? '/p': '';
-				if(!clientVars.ep_singlePad.active) targetPath += `/${clientVars.padId}`;
-				targetPath += `/${filters.join('/')}${incomeURL.search}`;
-			}
+      if (incomeURL.search.length === 0) targetPath = href;
 
-			if(incomeURL.search.length===0) targetPath = href;
+      // The Target is which plugin should listen more for more functionality
+      // In this example, if we find a slug filter in your URL,
+      // the target should be the filter plugin
+      const tartge = filters.length > 0 ? 'filter' : 'other';
 
-			// The Target is which plugin should listen more for more functionality
-			// In this example, if we find a slug filter in your URL,
-			// the target should be the filter plugin
-			const tartge = filters.length>0 ? "filter" : "other";
-		
-			window.history.pushState({type: "hyperLink", href, target: tartge}, document.title, targetPath);
-			// close all link
-			hideAllLinks();
-		}else {
-			window.open(href, '_blank');
-		}
-		return false;
-	}
+      window.history.pushState({type: 'hyperLink', href, target: tartge}, document.title, targetPath);
+      // close all link
+      hideAllLinks();
+    } else {
+      window.open(href, '_blank');
+    }
+    return false;
+  };
 
-	return {
-		showLink,
-		hideLink,
-		hideAllLinks,
-		showLinkModal,
-		getLinksContainer,
-		shouldNotCloseLink,
-		internalLinkClick,
-	};
+  return {
+    showLink,
+    hideLink,
+    hideAllLinks,
+    showLinkModal,
+    getLinksContainer,
+    shouldNotCloseLink,
+    internalLinkClick,
+  };
 })();

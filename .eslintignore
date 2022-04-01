@@ -1,0 +1,3 @@
+static/dist/**/*.js
+static/js/validUrl.js
+static/js/jquery.tmpl.min.js

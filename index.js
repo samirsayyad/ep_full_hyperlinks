@@ -100,7 +100,7 @@ const socketio = (hookName, args, cb) => {
     socket.on('metaResolver', async (data, callback) => {
       try {
         const result = await Meta.parser(
-            data.hyperlink || data.editedHyperlink
+            data.hyperlink || data.editedHyperlink,
         );
         let image = null;
         if (result.og.images.length) {
@@ -171,7 +171,7 @@ const eejsBlock_editbarMenuLeft = (hookName, args, cb) => {
     return cb();
   }
   args.content += eejs.require(
-      'ep_full_hyperlinks/templates/linkBarButtons.ejs'
+      'ep_full_hyperlinks/templates/linkBarButtons.ejs',
   );
   return cb();
 };
