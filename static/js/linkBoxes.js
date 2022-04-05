@@ -30,10 +30,8 @@ const linkBoxes = (() => {
       posx = e.pageX;
       posy = e.pageY;
     } else if (e.clientX || e.clientY) {
-      posx = e.clientX + document.body.scrollLeft +
-												 document.documentElement.scrollLeft;
-      posy = e.clientY + document.body.scrollTop +
-												 document.documentElement.scrollTop;
+      posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+      posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
     }
 
     return {x: posx, y: posy};
@@ -42,27 +40,35 @@ const linkBoxes = (() => {
 
   const setPositionModal = (e, linkModal, padInner) => {
     const clickCoords = getPosition(e);
-    clickCoordsX = clickCoords.x;
-    clickCoordsY = clickCoords.y;
+    const clickCoordsX = clickCoords.x;
+    const clickCoordsY = clickCoords.y;
 
     const modalWith = linkModal.innerWidth();
-    const modalHeight = linkModal.innerHeight();
+    const modalHeight = linkModal.outerHeight(true);
 
-    windowWidth = padInner.innerWidth();
-    windowHeight = padInner.innerHeight();
+    const windowWidth = padInner.innerWidth();
+    const windowHeight = padInner.outerHeight(true);
 
-    let newL = `${e.clientX + padInner.offset().left}px`;
-    let newT = `${clickCoordsY}px`;
+    const windoPaddingTop = parseInt(padInner.css('padding-top'));
+    const linkElementTop = parseInt($(e.target).offset().top);
+    const linkElementHeight = parseInt($(e.target).outerHeight(true));
+
+    let newL = e.clientX + padInner.offset().left;
+    let newT = linkElementTop + linkElementHeight + (windoPaddingTop / 2);
 
     if ((windowWidth - clickCoordsX) < modalWith) {
-      newL = `${(windowWidth - modalWith)}px`;
+      newL = windowWidth - modalWith - 16;
     }
 
     if ((windowHeight - clickCoordsY) < modalHeight) {
-      newT = `${windowHeight - modalHeight}px`;
+      newT = windowHeight - modalHeight;
     }
 
-    linkModal.css({left: newL, top: `${parseInt(newT) + 35}px`});
+    if (!$('body').hasClass('mobileView')) {
+      newT += 35;
+    }
+
+    linkModal.css({left: `${newL}px`, top: `${newT}px`});
   };
 
 
