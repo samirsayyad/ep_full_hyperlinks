@@ -67,7 +67,7 @@ epLinks.prototype.init = async function () {
 
 
   // On click link icon toolbar
-  $('.addLink').on('click', (e) => {
+  $('.addLink').on('click touchstart', (e) => {
     e.preventDefault(); // stops focus from being lost
     this.displayNewLinkForm();
   });
