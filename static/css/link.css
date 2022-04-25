@@ -541,8 +541,7 @@ body.mobileView #newLink{
 }
 
 
-.ep_hyperlink_icon{
-  background-image: url("../img/icon.png");
-  width: 28px;
-  height: 28px;
+.ep_hyperlink_icon:before{
+	content: "\e84d";
+	font-size: 14px;
 }
