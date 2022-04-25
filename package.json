@@ -1,6 +1,6 @@
 {
   "name": "ep_full_hyperlinks",
-  "version": "1.4.7",
+  "version": "1.4.8",
   "description": "etherpad plugin ep_full_hyperlink hyperlink",
   "main": "index.js",
   "scripts": {
