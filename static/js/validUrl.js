@@ -38,9 +38,6 @@ const validUrl = (function () {
     query = splitted[4];
     fragment = splitted[5];
 
-    // scheme and path are required, though the path can be empty
-    if (!(scheme && scheme.length && path.length >= 0)) return;
-
     // if authority is present, the path must be empty or begin with a /
     if (authority && authority.length) {
       if (!(path.length === 0 || /^\//.test(path))) return;
@@ -49,11 +46,15 @@ const validUrl = (function () {
       if (/^\/\//.test(path)) return;
     }
 
-    // scheme must begin with a letter, then consist of letters, digits, +, ., or -
-    if (!/^[a-z][a-z0-9\+\-\.]*$/.test(scheme.toLowerCase())) return;
+    if (scheme && scheme.length) {
+      // scheme must begin with a letter, then consist of letters, digits, +, ., or -
+      if (!/^[a-z][a-z0-9\+\-\.]*$/.test(scheme.toLowerCase())) return;
+    }
 
     // re-assemble the URL per section 5.3 in RFC 3986
-    out += `${scheme}:`;
+    if (scheme && scheme.length) {
+      out += `${scheme}:`;
+    }
     if (authority && authority.length) {
       out += `//${authority}`;
     }
