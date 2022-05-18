@@ -267,7 +267,6 @@ const events = (() => {
 
 'use strict';
 
-
 const linkBoxes = (() => {
   let padOuter;
   const getPadOuter = () => (padOuter = padOuter || $('iframe[name="ace_outer"]').contents());
@@ -388,6 +387,9 @@ const linkBoxes = (() => {
     // TODO: 2/ inside link
     if (loaded != 'true') {
       let hyperlink = linkObj.hyperlink || linkModal.attr('data-hyperlink');
+      if (!/^http:\/\//.test(hyperlink) && !/^https:\/\//.test(hyperlink) && !/^ftp:\/\//.test(hyperlink)) {
+        hyperlink = `https://${hyperlink}`;
+      }
       let dividedUrl;
       try {
         dividedUrl = new URL(hyperlink);
@@ -412,10 +414,6 @@ const linkBoxes = (() => {
       card_loading_hyperlink.show();
 
       // raise for og:title resolving
-
-      if (!/^http:\/\//.test(hyperlink) && !/^https:\/\//.test(hyperlink)) {
-        hyperlink = `https://${hyperlink}`;
-      }
 
       const changeMetaView = function (hyperlink, title, image) {
         ep_hyperlink_img.attr('src', image);
