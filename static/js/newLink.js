@@ -28,7 +28,7 @@ const newLink = (() => {
     const link = buildLinkFrom(form);
 
     // if scheme not present, add "https://"
-    if (!validUrl.splitUri(link.hyperlink)[1]) {
+    if (!validUrl.splitUri(link.hyperlink).scheme) {
       link.hyperlink = `https://${link.hyperlink}`;
     }
 

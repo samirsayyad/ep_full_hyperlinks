@@ -3,10 +3,27 @@
 const validUrl = (function () {
   'use strict';
 
-  // internal URI spitter method - direct from RFC 3986
-  const splitUri = function (uri) {
-    const splitted = uri.match(/(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?/);
-    return splitted;
+  /**
+   * URI spitter method - direct from RFC 3986
+   * @param {string} link uri e.g. 'https://www.google.com'
+   * @returns URI object with properties uri, scheme, authority, path, query, fragment.
+   */
+  const splitUri = function (link) {
+    const splitted = link.match(/(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?/);
+    let uri = splitted[0];
+    let scheme = splitted[1];
+    let authority = splitted[2];
+    let path = splitted[3];
+    let query = splitted[4];
+    let fragment = splitted[5];
+    return {
+      uri,
+      scheme,
+      authority,
+      path,
+      query,
+      fragment,
+    };
   };
 
   function is_iri(value) {
@@ -31,11 +48,11 @@ const validUrl = (function () {
 
     // from RFC 3986
     splitted = splitUri(value);
-    scheme = splitted[1];
-    authority = splitted[2];
-    path = splitted[3];
-    query = splitted[4];
-    fragment = splitted[5];
+    scheme = splitted.scheme;
+    authority = splitted.authority;
+    path = splitted.path;
+    query = splitted.query;
+    fragment = splitted.fragment;
 
     // if authority is present, the path must be empty or begin with a /
     if (authority && authority.length) {
@@ -87,11 +104,11 @@ const validUrl = (function () {
 
     // from RFC 3986
     splitted = splitUri(value);
-    scheme = splitted[1];
-    authority = splitted[2];
-    path = splitted[3];
-    query = splitted[4];
-    fragment = splitted[5];
+    scheme = splitted.scheme;
+    authority = splitted.authority;
+    path = splitted.path;
+    query = splitted.query;
+    fragment = splitted.fragment;
 
     if (!scheme) return;
 
