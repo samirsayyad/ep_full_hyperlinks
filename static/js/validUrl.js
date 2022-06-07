@@ -3,7 +3,6 @@
 const validUrl = (function () {
   'use strict';
 
-  // private function
   // internal URI spitter method - direct from RFC 3986
   const splitUri = function (uri) {
     const splitted = uri.match(/(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?/);
@@ -149,5 +148,6 @@ const validUrl = (function () {
     isHttpUri: is_http_iri,
     isHttpsUri: is_https_iri,
     isWebUri: is_web_iri,
+    splitUri: splitUri
   };
 })();

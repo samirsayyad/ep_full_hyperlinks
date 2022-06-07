@@ -1,7 +1,11 @@
 'use strict';
 
 const newLink = (() => {
-  // Create a link object with data filled on the given form
+  /**
+   * Create a link object with data filled on the given form
+   * @param {jQuery} form .link-edit-form
+   * @returns link object (vars text, oldText, hyperlink)
+   */
   const buildLinkFrom = (form) => {
     const text = form.find('#hyperlink-text').val();
     const oldText = form.find('#hyperlink-text-hidden').val();
@@ -22,6 +26,12 @@ const newLink = (() => {
     const index = 0;
     const form = $(document).find('#newLink');
     const link = buildLinkFrom(form);
+
+    // if scheme not present, add "https://"
+    if (!validUrl.splitUri(link.hyperlink)[1]) {
+      link.hyperlink = `https://${link.hyperlink}`;
+    }
+
     if (link.text.length > 0 && validUrl.isUri(link.hyperlink)) {
       form.find('#hyperlink-text, #hyperlink-url').removeClass('error');
       hideNewLinkPopup();
