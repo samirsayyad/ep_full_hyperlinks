@@ -466,6 +466,7 @@ input:-internal-autofill-selected {
 	margin: 0!important;
 	width: 100%!important;
   font-family: inherit;
+  font-weight: normal;
 }
 
 .hyperlink-popup input:focus{
