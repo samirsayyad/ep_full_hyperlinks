@@ -91,8 +91,8 @@
     padding-top:12px
   }
   #ep_hyperlink_img{
-    width: 20px;
-    height: 20px;
+    max-width: 20px;
+    max-height: 20px;
     margin-right: 4px;
     float: left;
     display: none;
