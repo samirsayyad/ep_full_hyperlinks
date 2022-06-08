@@ -1,6 +1,6 @@
 {
   "name": "ep_full_hyperlinks",
-  "version": "1.4.10",
+  "version": "1.4.11",
   "description": "etherpad plugin ep_full_hyperlink hyperlink",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,8 @@
     "build": "gulp js minify-css minify-image",
     "build:prod": "gulp build --production",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "gulp": "gulp"
   },
   "repository": {
     "type": "git",
@@ -48,6 +49,7 @@
     "gulp-mode": "^1.0.2",
     "gulp-sourcemaps": "^3.0.0",
     "gulp-uglify-es": "^2.0.0",
+    "gulp-watch": "^5.0.1",
     "typescript": "^4.6.3"
   }
 }
