@@ -1,22 +1,35 @@
 'use strict';
 
-
 const linkBoxes = (() => {
   let padOuter;
-  const getPadOuter = () => (padOuter = padOuter || $('iframe[name="ace_outer"]').contents());
+  const getPadOuter = () => (padOuter = padOuter || $('iframe[name="ace_outer"]').contents());  // finds the ace_outer iframe and assigns its contents to padOuter, then returns it
 
+  /**
+   * @returns wrapper for all the link modals on the page
+   */
   const getLinksContainer = () => getPadOuter().find('#linkBoxWrapper');
 
   /* ***** Public methods: ***** */
 
+  /**
+   * Displays the parent div of a specific link modal.
+   * @param {string} linkId   ID of a specific link 
+   */
   const showLink = (linkId) => getLinksContainer().find(`#${linkId}`).show();
 
+  /**
+   * Hides the parent div of a specific link modal.
+   * @param {string} linkId   ID of a specific link
+   */
   const hideLink = (linkId) => {
-    getLinksContainer().find(`#${linkId}`).hide();
-    padOuter.find(`#show-form-${linkId}`).show();
-    padOuter.find(`#edit-form-${linkId}`).hide();
+    getLinksContainer().find(`#${linkId}`).hide();  // hides the entire modal (highest in hierarchy)
+    padOuter.find(`#show-form-${linkId}`).show();  // removes display:none from the link info viewer
+    padOuter.find(`#edit-form-${linkId}`).hide();  // adds display:none to link editor (accessed throughh pen icon on show-form-linkId)
   };
 
+  /**
+   * Hides all link modals on the page.
+   */
   const hideAllLinks = () => getLinksContainer().find('.link-container').hide();
 
 
@@ -138,6 +151,7 @@ const linkBoxes = (() => {
     if (loaded != 'true') {
       let hyperlink = linkObj.hyperlink || linkModal.attr('data-hyperlink');
       let dividedUrl;
+
       try {
         dividedUrl = new URL(hyperlink);
       } catch (error) {

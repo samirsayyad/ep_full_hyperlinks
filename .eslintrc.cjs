@@ -7,3 +7,7 @@ module.exports = {
   root: true,
   extends: 'etherpad/plugin',
 };
+
+rules: {
+  'linebreak-style': ['error', process.platform === 'win32' ? 'windows' : 'unix'],
+}

@@ -3,11 +3,27 @@
 const validUrl = (function () {
   'use strict';
 
-  // private function
-  // internal URI spitter method - direct from RFC 3986
-  const splitUri = function (uri) {
-    const splitted = uri.match(/(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?/);
-    return splitted;
+  /**
+   * URI spitter method - direct from RFC 3986
+   * @param {string} link uri e.g. 'https://www.google.com'
+   * @returns URI object with properties uri, scheme, authority, path, query, fragment.
+   */
+  const splitUri = function (link) {
+    const splitted = link.match(/(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?/);
+    let uri = splitted[0];
+    let scheme = splitted[1];
+    let authority = splitted[2];
+    let path = splitted[3];
+    let query = splitted[4];
+    let fragment = splitted[5];
+    return {
+      uri,
+      scheme,
+      authority,
+      path,
+      query,
+      fragment,
+    };
   };
 
   function is_iri(value) {
@@ -32,14 +48,11 @@ const validUrl = (function () {
 
     // from RFC 3986
     splitted = splitUri(value);
-    scheme = splitted[1];
-    authority = splitted[2];
-    path = splitted[3];
-    query = splitted[4];
-    fragment = splitted[5];
-
-    // scheme and path are required, though the path can be empty
-    if (!(scheme && scheme.length && path.length >= 0)) return;
+    scheme = splitted.scheme;
+    authority = splitted.authority;
+    path = splitted.path;
+    query = splitted.query;
+    fragment = splitted.fragment;
 
     // if authority is present, the path must be empty or begin with a /
     if (authority && authority.length) {
@@ -49,11 +62,15 @@ const validUrl = (function () {
       if (/^\/\//.test(path)) return;
     }
 
-    // scheme must begin with a letter, then consist of letters, digits, +, ., or -
-    if (!/^[a-z][a-z0-9\+\-\.]*$/.test(scheme.toLowerCase())) return;
+    if (scheme && scheme.length) {
+      // scheme must begin with a letter, then consist of letters, digits, +, ., or -
+      if (!/^[a-z][a-z0-9\+\-\.]*$/.test(scheme.toLowerCase())) return;
+    }
 
     // re-assemble the URL per section 5.3 in RFC 3986
-    out += `${scheme}:`;
+    if (scheme && scheme.length) {
+      out += `${scheme}:`;
+    }
     if (authority && authority.length) {
       out += `//${authority}`;
     }
@@ -87,11 +104,11 @@ const validUrl = (function () {
 
     // from RFC 3986
     splitted = splitUri(value);
-    scheme = splitted[1];
-    authority = splitted[2];
-    path = splitted[3];
-    query = splitted[4];
-    fragment = splitted[5];
+    scheme = splitted.scheme;
+    authority = splitted.authority;
+    path = splitted.path;
+    query = splitted.query;
+    fragment = splitted.fragment;
 
     if (!scheme) return;
 
@@ -148,5 +165,6 @@ const validUrl = (function () {
     isHttpUri: is_http_iri,
     isHttpsUri: is_https_iri,
     isWebUri: is_web_iri,
+    splitUri: splitUri
   };
 })();
