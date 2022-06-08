@@ -1,3 +1,7 @@
+:root {
+  --fonts: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+}
+
 /* Text linked inside editor */
 #innerdocbody .ace-line .link {
     background-color: none;
@@ -108,7 +112,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-decoration: none !important;
-    font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+    font-family: var(--fonts);
 
   }
   
@@ -205,7 +209,7 @@
     z-index: 999000;
     visibility: visible;
     color: rgb(60, 64, 67);
-    font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+    font-family: var(--fonts);
     font-size: 14px;
 		overflow: hidden;
 		border-radius: 6px;
@@ -230,7 +234,7 @@
     border-radius: 8px;
     box-shadow: 0 1px 3px 1px rgb(60 64 67 / 15%);
     color: #3c4043;
-    font-family: Roboto,RobotoDraft,Helvetica,Arial,sans-serif;
+    font-family: var(--fonts);
     font-size: 14px;
   }
 
@@ -451,7 +455,7 @@ body.mobileView #newLink{
 }
 
 .hyperlink-popup{
-	font-family: Quicksand, Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+	font-family: var(--fonts);
 	padding: 2px 15px 11px!important;
 }
 
@@ -465,6 +469,7 @@ body.mobileView #newLink{
 	padding: 4px 6px!important;
 	margin: 0!important;
 	width: 100%!important;
+  font-family: inherit;
 }
 
 .hyperlink-popup input:focus{
