@@ -446,10 +446,6 @@ input:-internal-autofill-selected {
 	transform: translate(-50%, -50%);
 }
 
-body.mobileView #newLink{
-	width: 96vw;
-}
-
 .hyperlink-popup{
 	font-family: Quicksand, Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
 	padding: 2px 15px 11px!important;
@@ -544,4 +540,17 @@ body.mobileView #newLink{
 .ep_hyperlink_icon:before{
 	content: "\e84d";
 	font-size: 14px;
+}
+
+
+/* mobile view*/
+body.mobileView #newLink{
+	width: 96vw;
+}
+
+body.mobileView a.ep_hyperlink_title {
+	margin-left: 4px;
+}
+body.mobileView .ep_hyperlink_docs_bubble_button_container {
+	margin-left: auto;
 }
