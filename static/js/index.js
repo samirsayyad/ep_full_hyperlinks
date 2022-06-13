@@ -120,11 +120,11 @@ epLinks.prototype.init = async function () {
       await self._send('updateLinkText', data);
     } catch (err) {
       if (err.message !== 'unauth') throw err; // Let the uncaught error handler handle it.
-      $.gritter.add({
-        title: 'Error',
-        text: 'You cannot edit other users links!',
-        class_name: 'error',
-      });
+      // $.gritter.add({
+      //   title: 'Error',
+      //   text: 'You cannot edit other users links!',
+      //   class_name: 'error',
+      // });
       return;
     }
 
@@ -203,11 +203,11 @@ epLinks.prototype.init = async function () {
       });
     } catch (err) {
       if (err.message !== 'unauth') throw err; // Let the uncaught error handler handle it.
-      $.gritter.add({
-        title: 'Error',
-        text: 'You cannot delete other users links!',
-        class_name: 'error',
-      });
+      // $.gritter.add({
+      //   title: 'Error',
+      //   text: 'You cannot delete other users links!',
+      //   class_name: 'error',
+      // });
       return;
     }
   });

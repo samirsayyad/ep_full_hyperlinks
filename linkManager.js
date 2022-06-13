@@ -30,11 +30,11 @@ exports.deleteLink = async (padId, linkId, authorId) => {
     logger.debug(`ignoring attempt to delete non-existent link ${linkId}`);
     throw new Error('no_such_link');
   }
-  if (links[linkId].author !== authorId) {
-    logger.debug(`author ${authorId} attempted to delete link ${linkId} ` +
-                 `belonging to author ${links[linkId].author}`);
-    throw new Error('unauth');
-  }
+  // if (links[linkId].author !== authorId) {
+  //   logger.debug(`author ${authorId} attempted to delete link ${linkId} ` +
+  //                `belonging to author ${links[linkId].author}`);
+  //   throw new Error('unauth');
+  // }
   delete links[linkId];
   await db.set(`links:${padId}`, links);
 };
