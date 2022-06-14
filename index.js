@@ -9,6 +9,7 @@ const apiUtils = require('./apiUtils');
 const _ = require('underscore');
 const readOnlyManager = require('ep_etherpad-lite/node/db/ReadOnlyManager.js');
 const Meta = require('html-metadata-parser');
+const urlExist = require("url-exist");
 
 let io;
 
@@ -99,11 +100,14 @@ const socketio = (hookName, args, cb) => {
     // resolve meta of url
     socket.on('metaResolver', async (data, callback) => {
       try {
-        const result = await Meta.parser(
-            data.hyperlink || data.editedHyperlink,
-        );
+        let hyperlink = data.hyperlink || data.editedHyperlink;
+        const result = await Meta.parser(hyperlink);
+
+        const isFaviPresent = await urlExist(`${hyperlink}/favicon.ico`);
         let image = null;
-        if (result.og.images.length) {
+        if (isFaviPresent) {
+          image = `${hyperlink}/favicon.ico`;
+        } else if (result.og.images.length) {
           image = result.og.images[0].url;
         } else if (result.images.length) {
           image = result.images[0].url;
