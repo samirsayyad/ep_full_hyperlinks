@@ -8,8 +8,8 @@ const links = require('./links');
 const apiUtils = require('./apiUtils');
 const _ = require('underscore');
 const readOnlyManager = require('ep_etherpad-lite/node/db/ReadOnlyManager.js');
-const Meta = require('html-metadata-parser');
-const urlExist = require("url-exist");
+const axios = require('axios');
+const HTMLparser = require('node-html-parser');
 
 let io;
 
@@ -97,28 +97,29 @@ const socketio = (hookName, args, cb) => {
       socket.broadcast.to(padId).emit('textLinkUpdated', linkId, linkText);
     }));
 
-    // resolve meta of url
+    /**
+     * Loads the favicon and title of the webpage.
+     */
     socket.on('metaResolver', async (data, callback) => {
       try {
         let hyperlink = data.hyperlink || data.editedHyperlink;
-        const result = await Meta.parser(hyperlink);
+        const response = await axios(hyperlink);
+        const html = HTMLparser.parse(response.data);
 
-        const isFaviPresent = await urlExist(`${hyperlink}/favicon.ico`);
-        let image = null;
-        if (isFaviPresent) {
-          image = `${hyperlink}/favicon.ico`;
-        } else if (result.og.images.length) {
-          image = result.og.images[0].url;
-        } else if (result.images.length) {
-          image = result.images[0].url;
-        } else if (result.og.image) {
-          image = result.og.image;
+        const iconTag = html.querySelector("head link[rel*='icon']");
+        let favicon;
+        if (iconTag) {
+          favicon = hyperlink + iconTag.getAttribute('href');
+        } else {
+          favicon = hyperlink + '/favicon.ico';
         }
+
+        let siteTitle = html.querySelector("title").text;
 
         callback({
           metadata: {
-            image,
-            title: result.meta.title || null,
+            image: favicon || null,
+            title: siteTitle || null,
           },
           last: data.last,
         });

@@ -30,11 +30,11 @@
     "url": "https://github.com/samirsayyad/ep_full_hyperlinks/issues"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "formidable": "^2.0.1",
-    "html-metadata-parser": "^1.0.3",
+    "node-html-parser": "^5.3.3",
     "socket.io-client": "^2",
-    "underscore": "^1.12.1",
-    "url-exist": "^2.0.2"
+    "underscore": "^1.12.1"
   },
   "homepage": "https://github.com/samirsayyad/ep_full_hyperlinks#readme",
   "devDependencies": {
