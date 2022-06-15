@@ -231,19 +231,19 @@ const linkBoxes = (() => {
       if (dividedUrl.hostname.indexOf('twitter.com') >= 0) {
         changeMetaView(
           hyperlink,
-          hyperlink,
+          "Twitter",
           '../static/plugins/ep_full_hyperlinks/static/dist/img/twitter.png'
         );
       } else if (dividedUrl.protocol.indexOf('mailto') >= 0) {
         changeMetaView(
           hyperlink,
-          hyperlink,
+          "Send email",
           '../static/plugins/ep_full_hyperlinks/static/dist/img/envelope.svg'
         );
       } else if (dividedUrl.protocol.indexOf('skype') >= 0) {
         changeMetaView(
           hyperlink,
-          hyperlink,
+          "Open Skype",
           '../static/plugins/ep_full_hyperlinks/static/dist/img/skype.svg'
         );
       } else {
