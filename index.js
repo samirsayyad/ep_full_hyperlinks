@@ -106,12 +106,18 @@ const socketio = (hookName, args, cb) => {
         const response = await axios(hyperlink);
         const html = HTMLparser.parse(response.data);
 
+        // get "https://en.wikipedia.org" from "https://en.wikipedia.org/wiki/The_Thing_(1982_film)"
+        const splitUri = validUrl.splitUri(hyperlink);
+        const baseLink = splitUri.scheme + "://" + splitUri.authority;  
+        // search the head section for a link tag with a link attribute that contains 'icon'.
         const iconTag = html.querySelector("head link[rel*='icon']");
         let favicon;
         if (iconTag) {
-          favicon = hyperlink + iconTag.getAttribute('href');
+          // if link tag with attribute 'icon' was found, that's where the favicon should be
+          favicon = baseLink + iconTag.getAttribute('href');
         } else {
-          favicon = hyperlink + '/favicon.ico';
+          // if not check the default path for favicons
+          favicon = baseLink + '/favicon.ico';  // e.g. "en.wikipedia.org/favicon.ico"
         }
 
         let siteTitle = html.querySelector("title").text;
