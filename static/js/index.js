@@ -151,6 +151,31 @@ epLinks.prototype.init = async function () {
     linkBoxes.hideLink(linkId);
   });
 
+	const scrollToFixViewPort = (viewport) => {
+    const selection = $(document).find('iframe[name="ace_outer"]')
+        .contents().find('iframe[name="ace_inner"]').contents()[0].getSelection();
+
+    const targetNode = selection.anchorNode.parentElement.closest('div');
+    if (!targetNode) return;
+    const $outerdoc = $('iframe[name="ace_outer"]').contents().find('#outerdocbody');
+    const $outerdocHTML = $outerdoc.parent();
+    if (targetNode.offsetTop > viewport.height) {
+      // center of viewport
+      const offsetTop = targetNode.offsetTop - (viewport.height / 2) + 60;
+      $outerdoc.animate({scrollTop: offsetTop});
+      $outerdocHTML.animate({scrollTop: offsetTop});
+    }
+  };
+
+	const viewportHandler = (event) => {
+    event.preventDefault();
+		const viewPortHeight = window.innerHeight;
+    const viewport = event.target;
+    if (viewport.height < viewPortHeight) {
+      scrollToFixViewPort(viewport);
+    }
+  };
+
   this.container.parent().on('click', '.ep_hyperlink_docs_bubble_button_edit', function (e) {
     const linkId = $(this).closest('.link-container')[0].id;
     self.padOuter.find(`#show-form-${linkId}`).hide();
@@ -158,6 +183,9 @@ epLinks.prototype.init = async function () {
     self.padOuter.find(`#edit-form-${linkId}`).find('#hyperlink-text').focus(function () {
       this.setSelectionRange(this.value.length, this.value.length);
     }).select();
+
+		if (clientVars.userAgent.isMobile)
+			viewportHandler(e);
   });
 
   this.container.parent().on('click', '.ep_hyperlink_docs_bubble_button_copy', function (e) {
