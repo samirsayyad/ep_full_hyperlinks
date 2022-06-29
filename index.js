@@ -5,6 +5,7 @@ const settings = require('ep_etherpad-lite/node/utils/Settings');
 const formidable = require('formidable');
 const linkManager = require('./linkManager');
 const links = require('./links');
+const linkUtils = require('./linkUtils');
 const apiUtils = require('./apiUtils');
 const _ = require('underscore');
 const readOnlyManager = require('ep_etherpad-lite/node/db/ReadOnlyManager.js');
@@ -107,24 +108,23 @@ const socketio = (hookName, args, cb) => {
         const html = HTMLparser.parse(response.data);
 
         // get "https://en.wikipedia.org" from "https://en.wikipedia.org/wiki/The_Thing_(1982_film)"
-        const splitUri = validUrl.splitUri(hyperlink);
+        const splitUri = linkUtils.splitUri(hyperlink);
         const baseLink = splitUri.scheme + "://" + splitUri.authority;  
         // search the head section for a link tag with a link attribute that contains 'icon'.
         const iconTag = html.querySelector("head link[rel*='icon']");
-        let favicon;
+        let faviconUrl;
         if (iconTag) {
           // if link tag with attribute 'icon' was found, that's where the favicon should be
-          favicon = baseLink + iconTag.getAttribute('href');
+          faviconUrl = baseLink + iconTag.getAttribute('href');
         } else {
           // if not check the default path for favicons
-          favicon = baseLink + '/favicon.ico';  // e.g. "en.wikipedia.org/favicon.ico"
+          faviconUrl = baseLink + '/favicon.ico';  // e.g. "en.wikipedia.org/favicon.ico"
         }
-
         let siteTitle = html.querySelector("title").text;
 
         callback({
           metadata: {
-            image: favicon || null,
+            image: faviconUrl || null,
             title: siteTitle || null,
           },
           last: data.last,
