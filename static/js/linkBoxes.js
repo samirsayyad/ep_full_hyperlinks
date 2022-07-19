@@ -196,18 +196,12 @@ const linkBoxes = (() => {
         });
       };
 
-      if (!validUrl.isUri(hyperlink)) {
-        const img =
-					'../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png';
-        changeMetaView(hyperlink, hyperlink, img);
-        return false;
-      }
       // ........
       const metaResolverCallBack = function (result) {
-        if (result.metadata.image && result.metadata.title) {
+        if (result.metadata.image) {
           changeMetaView(
               hyperlink,
-              result.metadata.title,
+              result.metadata.title || hyperlink,
               result.metadata.image
           );
         } else {
@@ -227,6 +221,14 @@ const linkBoxes = (() => {
           }
         }
       };
+      
+      if (!validUrl.isUri(hyperlink)) {
+        const img =
+					'../static/plugins/ep_full_hyperlinks/static/dist/img/nometa.png';
+        changeMetaView(hyperlink, hyperlink, img);
+        return false;
+      }
+
       // ........
       if (dividedUrl.hostname.indexOf('twitter.com') >= 0) {
         changeMetaView(

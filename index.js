@@ -109,18 +109,27 @@ const socketio = (hookName, args, cb) => {
 
         // get "https://en.wikipedia.org" from "https://en.wikipedia.org/wiki/The_Thing_(1982_film)"
         const splitUri = linkUtils.splitUri(hyperlink);
-        const baseLink = splitUri.scheme + "://" + splitUri.authority;  
+        const baseLink = splitUri.scheme + "://" + splitUri.authority;
         // search the head section for a link tag with a link attribute that contains 'icon'.
         const iconTag = html.querySelector("head link[rel*='icon']");
         let faviconUrl;
         if (iconTag) {
           // if link tag with attribute 'icon' was found, that's where the favicon should be
-          faviconUrl = baseLink + iconTag.getAttribute('href');
+          let iconSubLink = iconTag.getAttribute('href');
+          if (/\.\.\//.test(iconSubLink)) {
+            // strip any "../../"
+            iconSubLink = "/" + iconSubLink.replaceAll('../', '');
+          }
+          faviconUrl = baseLink + iconSubLink;
         } else {
           // if not check the default path for favicons
           faviconUrl = baseLink + '/favicon.ico';  // e.g. "en.wikipedia.org/favicon.ico"
         }
-        let siteTitle = html.querySelector("title").text;
+        let titleTag = html.querySelector("title");
+        let siteTitle;
+        if (titleTag) {
+          siteTitle = titleTag.text;
+        }
 
         callback({
           metadata: {
