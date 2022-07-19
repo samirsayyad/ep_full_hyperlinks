@@ -22,3 +22,20 @@ exports.splitUri = function (link) {
         fragment,
     };
 }
+
+/**
+ * Checks whether the passed in string is a valid URL or not. Returns True only if the protocol is http or https.
+ * @param {string} hyperlink string to be evaluated
+ * @returns True if the arg string is a valid URL with https or https as protocol.
+ */
+exports.isValidHttpUrl = function (hyperlink) {
+    let url;
+    
+    try {
+      url = new URL(hyperlink);
+    } catch (_) {
+      return false;  
+    }
+  
+    return url.protocol === "http:" || url.protocol === "https:";
+  }

@@ -107,20 +107,35 @@ const socketio = (hookName, args, cb) => {
         const response = await axios(hyperlink);
         const html = HTMLparser.parse(response.data);
 
-        // get "https://en.wikipedia.org" from "https://en.wikipedia.org/wiki/The_Thing_(1982_film)"
+      // get "https://en.wikipedia.org" from "https://en.wikipedia.org/wiki/The_Thing_(1982_film)"
         const splitUri = linkUtils.splitUri(hyperlink);
-        const baseLink = splitUri.scheme + "://" + splitUri.authority;  
-        // search the head section for a link tag with a link attribute that contains 'icon'.
+        const baseLink = splitUri.scheme + "://" + splitUri.authority;
+      // search the head section for a link tag with a link attribute that contains 'icon'.
         const iconTag = html.querySelector("head link[rel*='icon']");
         let faviconUrl;
         if (iconTag) {
-          // if link tag with attribute 'icon' was found, that's where the favicon should be
-          faviconUrl = baseLink + iconTag.getAttribute('href');
+        // if link tag with attribute 'icon' was found, that's where the favicon should be
+          let iconSubLink = iconTag.getAttribute('href');
+          // if link tag contains a valid uri, fetch straight from that uri
+          if (linkUtils.isValidHttpUrl(iconSubLink)) {
+            faviconUrl = iconSubLink;
+          } else {
+            const regEx = /\.\.\//;
+            if (regEx.test(iconSubLink)) {
+            // if sub-directory includes "../", strip themn
+              iconSubLink = "/" + iconSubLink.replaceAll('../', '');
+            }
+            faviconUrl = baseLink + iconSubLink;
+          }
         } else {
-          // if not check the default path for favicons
+        // if link tag with attribute 'icon' doesn't exist, check the default path for favicons
           faviconUrl = baseLink + '/favicon.ico';  // e.g. "en.wikipedia.org/favicon.ico"
         }
-        let siteTitle = html.querySelector("title").text;
+        let titleTag = html.querySelector("title");
+        let siteTitle;
+        if (titleTag) {
+          siteTitle = titleTag.text;
+        }
 
         callback({
           metadata: {
