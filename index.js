@@ -103,13 +103,13 @@ const socketio = (hookName, args, cb) => {
      */
     socket.on('metaResolver', async (data, callback) => {
       try {
-        let hyperlink = data.hyperlink || data.editedHyperlink;
+        const hyperlink = data.hyperlink || data.editedHyperlink;
         const response = await axios(hyperlink);
         const html = HTMLparser.parse(response.data);
 
         // get "https://en.wikipedia.org" from "https://en.wikipedia.org/wiki/The_Thing_(1982_film)"
         const splitUri = linkUtils.splitUri(hyperlink);
-        const baseLink = splitUri.scheme + "://" + splitUri.authority;  
+        const baseLink = `${splitUri.scheme}://${splitUri.authority}`;
         // search the head section for a link tag with a link attribute that contains 'icon'.
         const iconTag = html.querySelector("head link[rel*='icon']");
         let faviconUrl;
@@ -118,9 +118,9 @@ const socketio = (hookName, args, cb) => {
           faviconUrl = baseLink + iconTag.getAttribute('href');
         } else {
           // if not check the default path for favicons
-          faviconUrl = baseLink + '/favicon.ico';  // e.g. "en.wikipedia.org/favicon.ico"
+          faviconUrl = `${baseLink}/favicon.ico`; // e.g. "en.wikipedia.org/favicon.ico"
         }
-        let siteTitle = html.querySelector("title").text;
+        const siteTitle = html.querySelector('title').text;
 
         callback({
           metadata: {

@@ -151,26 +151,25 @@ epLinks.prototype.init = async function () {
     linkBoxes.hideLink(linkId);
   });
 
-	const scrollToFixEditFormInViewport = (linkId) => {
+  const scrollToFixEditFormInViewport = (linkId) => {
     const $outerdoc = $('iframe[name="ace_outer"]').contents().find('#outerdocbody');
     const $outerdocHTML = $outerdoc.parent();
-		const mainHeder = $("#mainHeader").innerHeight()
-		const offsetTop = self.padOuter.find(`#edit-form-${ linkId }`).closest('.link-container').offset().top - mainHeder - 25
-		$outerdocHTML.animate({ scrollTop: offsetTop });
-	};
+    const mainHeder = $('#mainHeader').innerHeight();
+    const offsetTop = self.padOuter.find(`#edit-form-${linkId}`).closest('.link-container').offset().top - mainHeder - 25;
+    $outerdocHTML.animate({scrollTop: offsetTop});
+  };
 
   this.container.parent().on('click', '.ep_hyperlink_docs_bubble_button_edit', function (e) {
     const linkId = $(this).closest('.link-container')[0].id;
     self.padOuter.find(`#show-form-${linkId}`).hide();
     self.padOuter.find(`#edit-form-${linkId}`).show();
-		self.padOuter.find(`#edit-form-${ linkId }`)
-			.find('#hyperlink-text')
-			.focus(function () {
-				this.setSelectionRange(this.value.length, this.value.length);
-			}).select();
+    self.padOuter.find(`#edit-form-${linkId}`)
+        .find('#hyperlink-text')
+        .focus(function () {
+          this.setSelectionRange(this.value.length, this.value.length);
+        }).select();
 
-		if (clientVars.userAgent.isMobile)
-			scrollToFixEditFormInViewport(linkId);
+    if (clientVars.userAgent.isMobile) scrollToFixEditFormInViewport(linkId);
   });
 
   this.container.parent().on('click', '.ep_hyperlink_docs_bubble_button_copy', function (e) {

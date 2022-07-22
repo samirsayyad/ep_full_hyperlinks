@@ -2,7 +2,7 @@
 
 const linkBoxes = (() => {
   let padOuter;
-  const getPadOuter = () => (padOuter = padOuter || $('iframe[name="ace_outer"]').contents());  // finds the ace_outer iframe and assigns its contents to padOuter, then returns it
+  const getPadOuter = () => (padOuter = padOuter || $('iframe[name="ace_outer"]').contents()); // finds the ace_outer iframe and assigns its contents to padOuter, then returns it
 
   /**
    * @returns wrapper for all the link modals on the page
@@ -13,7 +13,7 @@ const linkBoxes = (() => {
 
   /**
    * Displays the parent div of a specific link modal.
-   * @param {string} linkId   ID of a specific link 
+   * @param {string} linkId   ID of a specific link
    */
   const showLink = (linkId) => getLinksContainer().find(`#${linkId}`).show();
 
@@ -22,9 +22,9 @@ const linkBoxes = (() => {
    * @param {string} linkId   ID of a specific link
    */
   const hideLink = (linkId) => {
-    getLinksContainer().find(`#${linkId}`).hide();  // hides the entire modal (highest in hierarchy)
-    padOuter.find(`#show-form-${linkId}`).show();  // removes display:none from the link info viewer
-    padOuter.find(`#edit-form-${linkId}`).hide();  // adds display:none to link editor (accessed throughh pen icon on show-form-linkId)
+    getLinksContainer().find(`#${linkId}`).hide(); // hides the entire modal (highest in hierarchy)
+    padOuter.find(`#show-form-${linkId}`).show(); // removes display:none from the link info viewer
+    padOuter.find(`#edit-form-${linkId}`).hide(); // adds display:none to link editor (accessed throughh pen icon on show-form-linkId)
   };
 
   /**
@@ -81,22 +81,22 @@ const linkBoxes = (() => {
       newT += 35;
     }
 
-		if ($('body').hasClass('mobileView')) {
+    if ($('body').hasClass('mobileView')) {
       linkModal.css({
         left: '50%',
         top: `${newT}px`,
         transform: 'translateX(-50%)',
         width: '96vw',
       });
-			linkModal.find('a.ep_hyperlink_title').css({
-				'margin-left': '4px',
-			});
-			linkModal.find('.ep_hyperlink_docs_bubble_button_container').css({
-				'margin-left': 'auto',
-			});
-		} else {
+      linkModal.find('a.ep_hyperlink_title').css({
+        'margin-left': '4px',
+      });
+      linkModal.find('.ep_hyperlink_docs_bubble_button_container').css({
+        'margin-left': 'auto',
+      });
+    } else {
       linkModal.css({left: `${newL}px`, top: `${newT}px`});
-		}
+    }
   };
 
 
@@ -229,27 +229,27 @@ const linkBoxes = (() => {
       // ........
       if (dividedUrl.hostname.indexOf('twitter.com') >= 0) {
         changeMetaView(
-          hyperlink,
-          "Twitter",
-          '../static/plugins/ep_full_hyperlinks/static/dist/img/twitter.png'
+            hyperlink,
+            'Twitter',
+            '../static/plugins/ep_full_hyperlinks/static/dist/img/twitter.png'
         );
       } else if (dividedUrl.protocol.indexOf('mailto') >= 0) {
         changeMetaView(
-          hyperlink,
-          "Send email",
-          '../static/plugins/ep_full_hyperlinks/static/dist/img/envelope.svg'
+            hyperlink,
+            'Send email',
+            '../static/plugins/ep_full_hyperlinks/static/dist/img/envelope.svg'
         );
       } else if (dividedUrl.protocol.indexOf('skype') >= 0) {
         changeMetaView(
-          hyperlink,
-          "Open Skype",
-          '../static/plugins/ep_full_hyperlinks/static/dist/img/skype.svg'
+            hyperlink,
+            'Open Skype',
+            '../static/plugins/ep_full_hyperlinks/static/dist/img/skype.svg'
         );
       } else {
         socket.emit(
-          'metaResolver',
-          {padId: clientVars.padId, hyperlink, last: false},
-          metaResolverCallBack
+            'metaResolver',
+            {padId: clientVars.padId, hyperlink, last: false},
+            metaResolverCallBack
         );
       }
     }
