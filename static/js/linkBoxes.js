@@ -81,23 +81,22 @@ const linkBoxes = (() => {
       newT += 35;
     }
 
-    if ($('body').hasClass('mobileView')) {
+		if ($('body').hasClass('mobileView')) {
       linkModal.css({
         left: '50%',
         top: `${newT}px`,
         transform: 'translateX(-50%)',
         width: '96vw',
       });
-      linkModal.find('a.ep_hyperlink_title').css({
-        'margin-left': '4px',
-      });
-
-      linkModal.find('.ep_hyperlink_docs_bubble_button_container').css({
-        'margin-left': 'auto',
-      });
-    } else {
+			linkModal.find('a.ep_hyperlink_title').css({
+				'margin-left': '4px',
+			});
+			linkModal.find('.ep_hyperlink_docs_bubble_button_container').css({
+				'margin-left': 'auto',
+			});
+		} else {
       linkModal.css({left: `${newL}px`, top: `${newT}px`});
-    }
+		}
   };
 
 
