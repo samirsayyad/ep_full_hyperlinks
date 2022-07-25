@@ -1,16 +1,3 @@
-'use strict';
-
-import _, { map } from 'underscore';
-// TODO: replace with local storage
-// import {padcookie} from 'ep_etherpad-lite/static/js/pad_cookie'
-
-import * as linkBoxes from "./linkBoxes"
-import * as newLink from "./newLink"
-import * as preLinkMark from "./preLinkMark"
-import * as events from "./copyPasteEvents"
-import * as shared from "./shared"
-
-const browser = require('ep_etherpad-lite/static/js/browser');
 const cssFiles = ['ep_full_hyperlinks/static/css/link.css'];
 
 /** **********************************************************************/
@@ -46,7 +33,6 @@ function epLinks(context) {
 // Init Etherpad plugin link pads
 epLinks.prototype.init = async function () {
   const self = this;
-  const ace = this.ace;
 
   // Init prerequisite
   this.findContainers();
@@ -309,12 +295,13 @@ epLinks.prototype.linkListen = function () {
       // we get the Links in this format {c-123:{author:...}, c-124:{author:...}}
       // but it's expected to be {c-123: {data: {author:...}}, c-124:{data:{author:...}}}
       // in this.Links
-
       const LinksProcessed = {};
-      _.map(allLinks, (link, linkId) => {
-        LinksProcessed[linkId] = {};
-        LinksProcessed[linkId].data = link;
-      });
+      for (const linkId in allLinks) {
+        if (!Object.hasOwn(allLinks, linkId)) {
+          LinksProcessed[linkId] = {};
+          LinksProcessed[linkId].data = allLinks[linkId];
+        }
+      }
       this.Links = LinksProcessed;
     }
   });
@@ -530,7 +517,7 @@ epLinks.prototype.getFirstElementSelected = function () {
 
 // Indicates if user selected some text on editor
 epLinks.prototype.checkNoTextSelected = function (rep) {
-  const noTextSelected = ((rep.selStart[0] == rep.selEnd[0]) && (rep.selStart[1] == rep.selEnd[1]));
+  const noTextSelected = ((rep.selStart[0] === rep.selEnd[0]) && (rep.selStart[1] === rep.selEnd[1]));
 
   return noTextSelected;
 };
@@ -551,49 +538,30 @@ epLinks.prototype.createNewLinkFormIfDontExist = function (rep) {
 
 // Get a string representation of the text selected on the editor
 epLinks.prototype.getSelectedText = function (rep) {
-  const self = this;
-  const firstLine = rep.selStart[0];
-  const lastLine = self.getLastLine(firstLine, rep);
-  let selectedText = '';
-
-  _(_.range(firstLine, lastLine + 1)).each((lineNumber) => {
-    // rep looks like -- starts at line 2, character 1, ends at line 4 char 1
-    /*
-     {
-        rep.selStart[2,0],
-        rep.selEnd[4,2]
-     }
-     */
+  // The selection representation looks like this if it starts with the fifth character in the
+  // second line and ends at (but does not include) the third character in the eighth line:
+  //     rep.selStart = [1, 4]; // 2nd line 5th char
+  //     rep.selEnd = [7, 2]; // 8th line 3rd char
+  const selectedTextLines = [];
+  const lastLine = this.getLastLine(rep.selStart[0], rep);
+  for (let lineNumber = rep.selStart[0]; lineNumber <= lastLine; ++lineNumber) {
     const line = rep.lines.atIndex(lineNumber);
-    // If we span over multiple lines
-    if (rep.selStart[0] === lineNumber) {
-      // Is this the first line?
-      if (rep.selStart[1] > 0) {
-        var posStart = rep.selStart[1];
-      } else {
-        var posStart = 0;
-      }
-    }
-    if (rep.selEnd[0] === lineNumber) {
-      if (rep.selEnd[1] <= line.text.length) {
-        var posEnd = rep.selEnd[1];
-      } else {
-        var posEnd = 0;
-      }
-    }
-    let lineText = line.text.substring(posStart, posEnd);
-    // When it has a selection with more than one line we select at least the beginning
-    // of the next line after the first line. As it is not possible to select the beginning
-    // of the first line, we skip it.
-    if (lineNumber > firstLine) {
-      // if the selection takes the very beginning of line, and the element has a lineMarker,
-      // it means we select the * as well, so we need to clean it from the text selected
-      lineText = self.cleanLine(line, lineText);
-      lineText = `\n${lineText}`;
-    }
-    selectedText += lineText;
-  });
-  return selectedText;
+    const selStartsAfterLine = rep.selStart[0] > lineNumber ||
+      (rep.selStart[0] === lineNumber && rep.selStart[1] >= line.text.length);
+    if (selStartsAfterLine) continue; // Nothing in this line is selected.
+    const selEndsBeforeLine = rep.selEnd[0] < lineNumber ||
+      (rep.selEnd[0] === lineNumber && rep.selEnd[1] <= 0);
+    if (selEndsBeforeLine) continue; // Nothing in this line is selected.
+    const selStartsBeforeLine = rep.selStart[0] < lineNumber || rep.selStart[1] < 0;
+    const posStart = selStartsBeforeLine ? 0 : rep.selStart[1];
+    const selEndsAfterLine = rep.selEnd[0] > lineNumber || rep.selEnd[1] > line.text.length;
+    const posEnd = selEndsAfterLine ? line.text.length : rep.selEnd[1];
+    // If the selection includes the very beginning of line, and the line has a line marker, it
+    // means the line marker was selected as well. Exclude it from the selected text.
+    selectedTextLines.push(
+        line.text.substring((posStart === 0 && this.lineHasMarker(line)) ? 1 : posStart, posEnd));
+  }
+  return selectedTextLines.join('\n');
 };
 
 epLinks.prototype.getLastLine = function (firstLine, rep) {
@@ -657,8 +625,13 @@ epLinks.prototype.saveLinkWithoutSelection = async function (padId, linkData) {
 };
 
 epLinks.prototype.buildLinks = function (linksData) {
-  const links =
-    _.map(linksData, (linkData, linkId) => this.buildLink(linkId, linkData.data));
+  const links = [];
+  for (const linkId in linksData) {
+    if (!Object.hasOwn(linksData, linkId)) {
+      const newLink = this.buildLink(linkId, linksData[linkId].data);
+      links.push(newLink);
+    }
+  }
   return links;
 };
 
@@ -772,7 +745,7 @@ epLinks.prototype.pushLink = function (eventType, callback) {
 /*                           Etherpad Hooks                             */
 /** **********************************************************************/
 
-var hooks = {
+const hooks = {
 
   // Init pad links
   postAceInit: (hook, context) => {
@@ -796,7 +769,7 @@ var hooks = {
     // first check if some text is being marked/unmarked to add link to it
     const eventType = context.callstack.editEvent.eventType;
 
-    if (eventType == 'setup' || eventType == 'setBaseText' || eventType == 'importText') return;
+    if (eventType === 'setup' || eventType === 'setBaseText' || eventType === 'importText') return;
 
     if (eventType === 'unmarkPreSelectedTextToLink') {
       pad.plugins.ep_full_hyperlinks.preLinkMarker.handleUnmarkText(context);
@@ -905,7 +878,7 @@ function getRepFromSelector(selector, container) {
     rep[0][1] = leftOffset;
 
     // All we need to know is span text length and it's left offset in chars
-    const spanLength = $(span).text().length;
+    // const spanLength = $(span).text().length;
 
     rep[1][1] = rep[0][1] + $(span).text().length; // Easy!
     repArr.push(rep);
@@ -913,12 +886,12 @@ function getRepFromSelector(selector, container) {
   return repArr;
 }
 // Once ace is initialized, we set ace_doInsertHeading and bind it to the context
-export const aceInitialized = function (hook, context) {
+export const aceInitialized = (hook, context) => {
   const editorInfo = context.editorInfo;
-  editorInfo.ace_getRepFromSelector = _(getRepFromSelector).bind(context);
+  editorInfo.ace_getRepFromSelector = getRepFromSelector.bind(context);
 };
 
-export const acePostWriteDomLineHTML = function (name, context) {
+export const acePostWriteDomLineHTML = (name, context) => {
   const hasHyperlink = $(context.node).find('a');
   if (hasHyperlink.length > 0) {
     hasHyperlink.each(function () {
