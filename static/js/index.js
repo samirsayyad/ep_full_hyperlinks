@@ -1,3 +1,12 @@
+// TODO: replace with local storage
+// import {padcookie} from 'ep_etherpad-lite/static/js/pad_cookie'
+
+import * as linkBoxes from './linkBoxes';
+import * as newLink from './newLink';
+import * as preLinkMark from './preLinkMark';
+import * as events from './copyPasteEvents';
+import * as shared from './shared';
+
 const cssFiles = ['ep_full_hyperlinks/static/css/link.css'];
 
 /** **********************************************************************/
