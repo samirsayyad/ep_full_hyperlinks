@@ -1,5 +1,3 @@
-'use strict';
-
 const gulp = require('gulp');
 const concat = require('gulp-concat');
 const bump = require('gulp-bump');
@@ -56,8 +54,8 @@ gulp.task('rollup-build', (cb) => {
   });
 });
 
-gulp.task('build', () => gulp.series([
-  'roullup-build',
+gulp.task('build', gulp.series([
+  'rollup-build',
   'minify-css',
   'minify-image',
   'bump',
