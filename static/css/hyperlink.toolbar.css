@@ -1,0 +1,88 @@
+:root {
+  --fonts: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+}
+
+.ep_hyperlink_icon:before {
+  content: "\e84d";
+  font-size: 14px;
+}
+
+/* create a new link modal */
+#newLink {
+  width: 477px;
+  top: 50%;
+  left: 50% !important;
+  transform: translate(-50%, -50%);
+}
+
+.hyperlink-popup {
+  font-family: var(--fonts);
+  padding: 2px 15px 11px !important;
+}
+
+.hyperlink-popup .title {
+  font-weight: 500;
+  font-size: 1.4rem;
+}
+
+.hyperlink-popup input {
+  border: 2px solid transparent;
+  padding: 4px 6px !important;
+  margin: 0 !important;
+  width: 100% !important;
+  font-family: inherit;
+  font-weight: normal;
+}
+
+.hyperlink-popup input:focus {
+  border-color: #2678ff;
+}
+
+#link-create-btn,
+#link-cancel-btn {
+  background: #2678ff;
+  font-size: 18px;
+  color: #fff;
+  border: 2px solid #2678ff;
+  padding: 4px 38px;
+  font-size: 1.06rem;
+  transition: all .2s;
+}
+
+#link-create-btn:hover {
+  border-color: #0849b3;
+}
+
+#link-cancel-btn {
+  background-color: transparent;
+  color: #aaa;
+  border-color: transparent;
+}
+
+#link-cancel-btn:hover {
+  border-color: #aaa;
+  color: #555;
+}
+
+.hyperlink-form-lable-section {
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-top: 14px;
+}
+
+.hyperlink-form-lable-section label {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  color: #555;
+  display: block;
+}
+
+.hyperlink-form-btn-section {
+  text-align: right;
+  margin-top: 18px;
+}
+
+.link-edit-form {
+  width: 100%;
+}

@@ -1,18 +1,17 @@
 'use strict';
 
-const _ = require('underscore');
-const padcookie = require('ep_etherpad-lite/static/js/pad_cookie').padcookie;
+import _, { map } from 'underscore';
+// TODO: replace with local storage
+// import {padcookie} from 'ep_etherpad-lite/static/js/pad_cookie'
 
-const {
-  linkBoxes,
-  newLink,
-  preLinkMark,
-  events,
-  shared,
-} = require('../dist/js/ep.full.hyperlinks.mini').moduleList;
+import * as linkBoxes from "./linkBoxes"
+import * as newLink from "./newLink"
+import * as preLinkMark from "./preLinkMark"
+import * as events from "./copyPasteEvents"
+import * as shared from "./shared"
 
 const browser = require('ep_etherpad-lite/static/js/browser');
-const cssFiles = ['ep_full_hyperlinks/static/css/link.css', 'ep_full_hyperlinks/static/dist/css/linkIcon.css'];
+const cssFiles = ['ep_full_hyperlinks/static/css/link.css'];
 
 /** **********************************************************************/
 /*                         epLinks Plugin                           */
@@ -255,35 +254,35 @@ epLinks.prototype.init = async function () {
   this.addListenersToCloseOpenedLink();
 
   // Enable and handle cookies
-  if (padcookie.getPref('links') === false) {
-    self.padOuter.find('#links').removeClass('active');
-    $('#options-links').attr('checked', 'unchecked');
-    $('#options-links').attr('checked', false);
-  } else {
-    $('#options-links').attr('checked', 'checked');
-  }
+  // if (padcookie.getPref('links') === false) {
+  //   self.padOuter.find('#links').removeClass('active');
+  //   $('#options-links').attr('checked', 'unchecked');
+  //   $('#options-links').attr('checked', false);
+  // } else {
+  //   $('#options-links').attr('checked', 'checked');
+  // }
 
-  $('#options-links').on('change', () => {
-    if ($('#options-links').is(':checked')) {
-      enableLinks();
-    } else {
-      disableLinks();
-    }
-  });
+  // $('#options-links').on('change', () => {
+  //   if ($('#options-links').is(':checked')) {
+  //     enableLinks();
+  //   } else {
+  //     disableLinks();
+  //   }
+  // });
 
-  function enableLinks() {
-    padcookie.setPref('links', true);
-    self.padOuter.find('#links').addClass('active');
-    $('body').addClass('links-active');
-    $('iframe[name="ace_outer"]').contents().find('body').addClass('links-active');
-  }
+  // function enableLinks() {
+  //   padcookie.setPref('links', true);
+  //   self.padOuter.find('#links').addClass('active');
+  //   $('body').addClass('links-active');
+  //   $('iframe[name="ace_outer"]').contents().find('body').addClass('links-active');
+  // }
 
-  function disableLinks() {
-    padcookie.setPref('links', false);
-    self.padOuter.find('#links').removeClass('active');
-    $('body').removeClass('links-active');
-    $('iframe[name="ace_outer"]').contents().find('body').removeClass('links-active');
-  }
+  // function disableLinks() {
+  //   padcookie.setPref('links', false);
+  //   self.padOuter.find('#links').removeClass('active');
+  //   $('body').removeClass('links-active');
+  //   $('iframe[name="ace_outer"]').contents().find('body').removeClass('links-active');
+  // }
 
   // Check to see if we should show already..
   $('#options-links').trigger('change');
@@ -914,12 +913,12 @@ function getRepFromSelector(selector, container) {
   return repArr;
 }
 // Once ace is initialized, we set ace_doInsertHeading and bind it to the context
-exports.aceInitialized = function (hook, context) {
+export const aceInitialized = function (hook, context) {
   const editorInfo = context.editorInfo;
   editorInfo.ace_getRepFromSelector = _(getRepFromSelector).bind(context);
 };
 
-exports.acePostWriteDomLineHTML = function (name, context) {
+export const acePostWriteDomLineHTML = function (name, context) {
   const hasHyperlink = $(context.node).find('a');
   if (hasHyperlink.length > 0) {
     hasHyperlink.each(function () {
@@ -928,8 +927,8 @@ exports.acePostWriteDomLineHTML = function (name, context) {
   }
 };
 
-exports.aceEditorCSS = hooks.aceEditorCSS;
-exports.postAceInit = hooks.postAceInit;
-exports.aceAttribsToClasses = hooks.aceAttribsToClasses;
-exports.aceEditEvent = hooks.aceEditEvent;
-exports.collectContentPre = shared.collectContentPre;
+export const aceEditorCSS = hooks.aceEditorCSS;
+export const postAceInit = hooks.postAceInit;
+export const aceAttribsToClasses = hooks.aceAttribsToClasses;
+export const aceEditEvent = hooks.aceEditEvent;
+export const collectContentPre = shared.collectContentPre;

@@ -11,6 +11,7 @@ const _ = require('underscore');
 const readOnlyManager = require('ep_etherpad-lite/node/db/ReadOnlyManager.js');
 const axios = require('axios');
 const HTMLparser = require('node-html-parser');
+const packageJson = require('./package.json');
 
 let io;
 
@@ -188,12 +189,13 @@ const eejsBlock_editbarMenuLeft = (hookName, args, cb) => {
 };
 
 const eejsBlock_scripts = (hookName, args, cb) => {
-  args.content += eejs.require('ep_full_hyperlinks/templates/links.html');
+  args.content += eejs.require('ep_full_hyperlinks/templates/links.html', {});
   return cb();
 };
 
 const eejsBlock_styles = (hookName, args, cb) => {
-  args.content += eejs.require('ep_full_hyperlinks/templates/styles.html');
+  const link = `<link rel="stylesheet" href="../static/plugins/ep_full_hyperlinks/static/css/hyperlink.toolbar.css?v=${packageJson.version}" type="text/css">`
+  args.content += link;
   return cb();
 };
 
