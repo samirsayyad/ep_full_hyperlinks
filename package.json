@@ -1,6 +1,6 @@
 {
   "name": "ep_full_hyperlinks",
-  "version": "1.6.0",
+  "version": "2.0.0",
   "description": "etherpad plugin ep_full_hyperlink hyperlink",
   "main": "index.js",
   "scripts": {
@@ -31,20 +31,17 @@
     "url": "https://github.com/samirsayyad/ep_full_hyperlinks/issues"
   },
   "dependencies": {
-    "@babel/preset-env": "^7.18.9",
-    "@rollup/plugin-babel": "^5.3.1",
-    "@rollup/plugin-commonjs": "^22.0.1",
-    "@rollup/plugin-node-resolve": "^13.3.0",
     "axios": "^0.27.2",
     "formidable": "^2.0.1",
-    "gulp-exec": "^5.0.0",
     "node-html-parser": "^5.3.3",
-    "rollup": "^2.77.0",
-    "rollup-plugin-terser": "^7.0.2",
     "socket.io-client": "^2"
   },
   "homepage": "https://github.com/samirsayyad/ep_full_hyperlinks#readme",
   "devDependencies": {
+    "@babel/preset-env": "^7.18.9",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-commonjs": "^22.0.1",
+    "@rollup/plugin-node-resolve": "^13.3.0",
     "clean-css": "^5.3.1",
     "eslint": "^8.20.0",
     "eslint-config-etherpad": "^3.0.13",
@@ -54,16 +51,9 @@
     "gulp-concat": "^2.6.1",
     "gulp-git": "^2.10.1",
     "gulp-imagemin": "^7.1.0",
-    "gulp-inject-string": "^1.1.2",
-    "gulp-mode": "^1.0.2",
     "gulp-rollup": "^2.17.0",
-    "gulp-sourcemaps": "^3.0.0",
-    "gulp-uglify-es": "^2.0.0",
     "gulp-watch": "^5.0.1",
-    "rollup-plugin-css-only": "^3.1.0",
-    "rollup-plugin-sass": "^1.2.13",
-    "rollup-plugin-scss": "^2.6.1",
-    "rollup-plugin-styles": "^4.0.0",
+    "rollup-plugin-terser": "^7.0.2",
     "typescript": "^4.7.4"
   }
 }
