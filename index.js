@@ -1,5 +1,3 @@
-'use strict';
-
 const eejs = require('ep_etherpad-lite/node/eejs/');
 const settings = require('ep_etherpad-lite/node/utils/Settings');
 const formidable = require('formidable');
@@ -194,7 +192,7 @@ const eejsBlock_scripts = (hookName, args, cb) => {
 };
 
 const eejsBlock_styles = (hookName, args, cb) => {
-  const link = `<link rel="stylesheet" href="../static/plugins/ep_full_hyperlinks/static/css/hyperlink.toolbar.css?v=${packageJson.version}" type="text/css">`
+  const link = `<link rel="stylesheet" href="../static/plugins/ep_full_hyperlinks/static/css/hyperlink.toolbar.css?v=${packageJson.version}" type="text/css">`;
   args.content += link;
   return cb();
 };
