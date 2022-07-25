@@ -1,4 +1,3 @@
-'use strict';
 import * as validUrl from './validUrl';
 import * as linkBoxes from './linkBoxes';
 let padOuter;
