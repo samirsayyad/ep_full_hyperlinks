@@ -1,5 +1,3 @@
-'use strict';
-
 const linkManager = require('./linkManager');
 
 exports.getPadLink = async (padId, linkId) => linkManager.getLink(padId, linkId);

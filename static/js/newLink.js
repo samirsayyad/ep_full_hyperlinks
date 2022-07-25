@@ -1,5 +1,4 @@
-'use strict';
-import * as validUrl from "./validUrl"
+import * as validUrl from './validUrl';
 /**
  * Create a link object with data filled on the given form
  * @param {jQuery} form .link-edit-form
@@ -28,7 +27,7 @@ const submitNewLink = (callback) => {
 
   // if scheme not present, add "https://"
   if (!validUrl.splitUri(link.hyperlink).scheme) {
-    link.hyperlink = `https://${ link.hyperlink }`;
+    link.hyperlink = `https://${link.hyperlink}`;
   }
 
   if (link.text.length > 0 && validUrl.isUri(link.hyperlink)) {
@@ -45,7 +44,7 @@ const submitNewLink = (callback) => {
 /* ***** Public methods: ***** */
 
 // Insert new Link Form
-const insertNewLinkPopupIfDontExist = (link, callback) => {
+export const insertNewLinkPopupIfDontExist = (link, callback) => {
   $('#newLink').remove();
   link.linkId = '';
   const newLinkPopup = $('#newLinkTemplate').tmpl(link);
@@ -65,7 +64,7 @@ const insertNewLinkPopupIfDontExist = (link, callback) => {
   return newLinkPopup;
 };
 
-const showNewLinkPopup = () => {
+export const showNewLinkPopup = () => {
   if (!$('body').hasClass('mobileView')) {
     // position below link icon
     $('#newLink').css('left', $('.toolbar .addLink').offset().left);
@@ -86,7 +85,7 @@ const showNewLinkPopup = () => {
   setTimeout(() => $('#newLink #hyperlink-url').focus().select(), 500);
 };
 
-const hideNewLinkPopup = () => {
+export const hideNewLinkPopup = () => {
   $('#newLink').removeClass('popup-show');
 
   // force focus to be lost, so virtual keyboard is hidden on mobile devices
@@ -95,9 +94,3 @@ const hideNewLinkPopup = () => {
   // unmark selected text, as now there is no text being linked
   pad.plugins.ep_full_hyperlinks.preLinkMarker.unmarkSelectedText();
 };
-
-export {
-  insertNewLinkPopupIfDontExist,
-  showNewLinkPopup,
-  hideNewLinkPopup,
-}

@@ -1,6 +1,4 @@
-'use strict';
-
-const MARK_CLASS = 'pre-selected-link';
+export const MARK_CLASS = 'pre-selected-link';
 
 const preLinkMarker = function (ace) {
   this.ace = ace;
@@ -79,7 +77,7 @@ preLinkMarker.prototype.removeMarks = function (editorInfo, rep, callstack) {
   this.performNonUnduableEvent(eventType, callstack, () => {
     // remove marked text
     const padInner = $('iframe[name="ace_outer"]').contents().find('iframe[name="ace_inner"]');
-    const selector = `.${ MARK_CLASS }`;
+    const selector = `.${MARK_CLASS}`;
     const repArr = editorInfo.ace_getRepFromSelector(selector, padInner);
     // repArr is an array of reps
     $.each(repArr, (index, rep) => {
@@ -95,10 +93,4 @@ preLinkMarker.prototype.removeMarks = function (editorInfo, rep, callstack) {
 // we do nothing on callWithAce; actions will be handled on aceEditEvent
 const doNothing = () => { };
 
-const init = (ace) => new preLinkMarker(ace);
-
-
-export {
-  MARK_CLASS,
-  init,
-}
+export const init = (ace) => new preLinkMarker(ace);

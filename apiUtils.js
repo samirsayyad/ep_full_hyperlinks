@@ -1,5 +1,3 @@
-'use strict';
-
 const fs = require('fs');
 const padManager = require('ep_etherpad-lite/node/db/PadManager');
 const settings = require('ep_etherpad-lite/node/utils/Settings');

@@ -1,4 +1,4 @@
-'use strict';
+import * as shared from './shared';
 
 const getSelectionFormated = (padInner, links) => {
   const selection = padInner[0].contentWindow.getSelection().getRangeAt(0);
@@ -25,7 +25,7 @@ const getSelectionFormated = (padInner, links) => {
       }
 
       // replace the current node with href node
-      const span = selectedElements.querySelector(`.${ lindId }`);
+      const span = selectedElements.querySelector(`.${lindId}`);
       span.replaceWith(newTag);
     });
   } catch (error) {
@@ -82,17 +82,17 @@ const makeClipboarRedyForSaveLinks = (e, padInner) => {
   }
 
   pad.plugins.ep_full_hyperlinks.saveLinkWithoutSelection(
-    clientVars.padId,
-    allLinksData
+      clientVars.padId,
+      allLinksData
   );
 
   padInner
-    .contents()[0]
-    .execCommand(
-      'insertHTML',
-      false,
-      $('<div>').append($(pastedHtmlHolderElemenet).clone()).html()
-    );
+      .contents()[0]
+      .execCommand(
+          'insertHTML',
+          false,
+          $('<div>').append($(pastedHtmlHolderElemenet).clone()).html()
+      );
 };
 
 const saveLinks = (e, padInner) => {
@@ -102,4 +102,4 @@ const saveLinks = (e, padInner) => {
 export {
   addTextOnClipboard,
   saveLinks,
-}
+};

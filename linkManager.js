@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('underscore');
 const db = require('ep_etherpad-lite/node/db/DB');
 const log4js = require('ep_etherpad-lite/node_modules/log4js');
