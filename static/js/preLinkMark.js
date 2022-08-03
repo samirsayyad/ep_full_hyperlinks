@@ -1,6 +1,8 @@
 export const MARK_CLASS = 'pre-selected-link';
 
-const preLinkMarker = function (ace) {
+// we do nothing on callWithAce; actions will be handled on aceEditEvent
+const doNothing = () => { };
+const PreLinkMarker = function (ace) {
   this.ace = ace;
   const self = this;
 
@@ -15,32 +17,34 @@ const preLinkMarker = function (ace) {
   }, 0);
 };
 
+export const init = (ace) => new PreLinkMarker(ace);
+
 // Indicates if Etherpad is configured to highlight text
-preLinkMarker.prototype.highlightSelectedText = function () {
+PreLinkMarker.prototype.highlightSelectedText = function () {
   return clientVars.highlightSelectedText;
 };
 
-preLinkMarker.prototype.markSelectedText = function () {
+PreLinkMarker.prototype.markSelectedText = function () {
   // do nothing if this feature is not enabled
   if (!this.highlightSelectedText()) return;
 
   this.ace.callWithAce(doNothing, 'markPreSelectedTextToLink', true);
 };
 
-preLinkMarker.prototype.unmarkSelectedText = function () {
+PreLinkMarker.prototype.unmarkSelectedText = function () {
   // do nothing if this feature is not enabled
   if (!this.highlightSelectedText()) return;
 
   this.ace.callWithAce(doNothing, 'unmarkPreSelectedTextToLink', true);
 };
 
-preLinkMarker.prototype.performNonUnduableEvent = function (eventType, callstack, action) {
+PreLinkMarker.prototype.performNonUnduableEvent = function (eventType, callstack, action) {
   callstack.startNewEvent('nonundoable');
   action();
   callstack.startNewEvent(eventType);
 };
 
-preLinkMarker.prototype.handleMarkText = function (context) {
+PreLinkMarker.prototype.handleMarkText = function (context) {
   const editorInfo = context.editorInfo;
   const rep = context.rep;
   const callstack = context.callstack;
@@ -51,7 +55,7 @@ preLinkMarker.prototype.handleMarkText = function (context) {
   this.addMark(editorInfo, callstack);
 };
 
-preLinkMarker.prototype.handleUnmarkText = function (context) {
+PreLinkMarker.prototype.handleUnmarkText = function (context) {
   const editorInfo = context.editorInfo;
   const rep = context.rep;
   const callstack = context.callstack;
@@ -59,7 +63,7 @@ preLinkMarker.prototype.handleUnmarkText = function (context) {
   this.removeMarks(editorInfo, rep, callstack);
 };
 
-preLinkMarker.prototype.addMark = function (editorInfo, callstack) {
+PreLinkMarker.prototype.addMark = function (editorInfo, callstack) {
   const eventType = callstack.editEvent.eventType;
 
   // we don't want the text marking to be undoable
@@ -68,7 +72,7 @@ preLinkMarker.prototype.addMark = function (editorInfo, callstack) {
   });
 };
 
-preLinkMarker.prototype.removeMarks = function (editorInfo, rep, callstack) {
+PreLinkMarker.prototype.removeMarks = function (editorInfo, rep, callstack) {
   const eventType = callstack.editEvent.eventType;
   const originalSelStart = rep.selStart;
   const originalSelEnd = rep.selEnd;
@@ -89,8 +93,3 @@ preLinkMarker.prototype.removeMarks = function (editorInfo, rep, callstack) {
     editorInfo.ace_performSelectionChange(originalSelStart, originalSelEnd, true);
   });
 };
-
-// we do nothing on callWithAce; actions will be handled on aceEditEvent
-const doNothing = () => { };
-
-export const init = (ace) => new preLinkMarker(ace);

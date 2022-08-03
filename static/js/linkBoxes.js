@@ -1,5 +1,5 @@
 import * as validUrl from './validUrl';
-import * as linkBoxes from './linkBoxes';
+
 let padOuter;
 const getPadOuter = () => (padOuter = padOuter || $('iframe[name="ace_outer"]').contents()); // finds the ace_outer iframe and assigns its contents to padOuter, then returns it
 
@@ -154,7 +154,7 @@ export const showLinkModal = (e, linkObj, socket) => {
       dividedUrl = new URL(hyperlink);
     } catch (error) {
       console.error(`[hyperlink]: ${error}`);
-      linkBoxes.hideLink(linkId);
+      hideLink(linkId);
       return;
     }
 

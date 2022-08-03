@@ -1,4 +1,13 @@
-import {randomString} from 'ep_etherpad-lite/static/js/pad_utils';
+const randomString = (len) => {
+  const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  let randomstring = '';
+  len = len || 20;
+  for (let i = 0; i < len; i++) {
+    const rnum = Math.floor(Math.random() * chars.length);
+    randomstring += chars.substring(rnum, rnum + 1);
+  }
+  return randomstring;
+};
 
 export const generateLinkId = () => `lc-${randomString(16)}`;
 

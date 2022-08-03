@@ -16,6 +16,16 @@ const buildLinkFrom = (form) => {
   };
 };
 
+export const hideNewLinkPopup = () => {
+  $('#newLink').removeClass('popup-show');
+
+  // force focus to be lost, so virtual keyboard is hidden on mobile devices
+  $('#newLink').find(':focus').blur();
+
+  // unmark selected text, as now there is no text being linked
+  pad.plugins.ep_full_hyperlinks.preLinkMarker.unmarkSelectedText();
+};
+
 // Callback for new link Cancel
 const cancelNewLink = () => hideNewLinkPopup();
 
@@ -83,14 +93,4 @@ export const showNewLinkPopup = () => {
 
   // focus on hyperlink input
   setTimeout(() => $('#newLink #hyperlink-url').focus().select(), 500);
-};
-
-export const hideNewLinkPopup = () => {
-  $('#newLink').removeClass('popup-show');
-
-  // force focus to be lost, so virtual keyboard is hidden on mobile devices
-  $('#newLink').find(':focus').blur();
-
-  // unmark selected text, as now there is no text being linked
-  pad.plugins.ep_full_hyperlinks.preLinkMarker.unmarkSelectedText();
 };
