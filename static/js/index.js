@@ -138,7 +138,8 @@ epLinks.prototype.init = async function () {
   // submit the edition on the text and update the link text
   this.container.parent().on('submit', 'form.link-edit-form', submitEditeLink);
 
-  this.container.on('click', '#link-cancel-btn', function () {
+  this.container.on('click', '#link-cancel-btn', function (e) {
+    e.preventDefault();
     const linkId = $(this).closest('.link-container')[0].id;
     self.padOuter.find(`#show-form-${linkId}`).show();
     self.padOuter.find(`#edit-form-${linkId}`).hide();

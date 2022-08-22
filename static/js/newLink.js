@@ -61,7 +61,10 @@ export const insertNewLinkPopupIfDontExist = (link, callback) => {
   newLinkPopup.appendTo($('#editorcontainerbox'));
 
   // Cancel btn
-  $('#newLink #link-cancel-btn').on('click', (e) => cancelNewLink());
+  $('#newLink #link-cancel-btn').on('click', (e) => {
+    e.preventDefault();
+    cancelNewLink();
+  });
 
   // Create btn // link-create-btn
   $('#newLink #link-create-btn').on('click', (e) => submitNewLink(callback));
