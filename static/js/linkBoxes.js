@@ -69,7 +69,8 @@ const setPositionModal = (e, linkModal, padInner) => {
   let newT = linkElementTop + linkElementHeight + (windoPaddingTop / 2);
 
   if ((windowWidth - clickCoordsX) < modalWith) {
-    newL = windowWidth - modalWith - 16;
+    // reverse position
+    newL -= modalWith;
   }
 
   if ((windowHeight - clickCoordsY) < modalHeight) {
@@ -77,7 +78,7 @@ const setPositionModal = (e, linkModal, padInner) => {
   }
 
   if (!$('body').hasClass('mobileView')) {
-    newT += 35;
+    newT += e.target.offsetHeight + 2;
   }
 
   if ($('body').hasClass('mobileView')) {
