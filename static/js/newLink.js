@@ -77,9 +77,11 @@ export const insertNewLinkPopupIfDontExist = (link, callback) => {
 export const showNewLinkPopup = () => {
   if (!$('body').hasClass('mobileView')) {
     // position below link icon
-    $('#newLink').css('left', $('.toolbar .addLink').offset().left);
+    const offset = $('.toolbar .addLink').offset();
+    const width = ($('.toolbar .addLink').innerWidth() / 2);
+    console.log(offset, $('.toolbar .addLink').innerWidth(), width);
+    $('#newLink').css({left: offset.left + width, top: 0});
   }
-
 
   // Reset form to make sure it is all clear
   $('#newLink').find('textarea').val('');
